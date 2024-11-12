@@ -7,4 +7,8 @@ public class Maincito {
     public void imprimir () {
 
     }
+
+    public void avanzar () {
+
+    }
 }
