@@ -1,0 +1,11 @@
+.gitkeep
+kirbydown.png
+kirbyrun.png
+kirbyslide.png
+kirbystay.png
+kirbywalking.png
+skin/default (1).png
+skin/default.fnt
+skin/uiskin.atlas
+skin/uiskin.json
+skin/uiskin.png
