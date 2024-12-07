@@ -1,4 +1,8 @@
 package KirbyGame_HVL.git.entities.player;
 
-public interface Box2d {
+import com.badlogic.gdx.physics.box2d.World;
+
+public interface Box2dPlayer {
+
+    void createBody (World world);
 }
