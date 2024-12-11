@@ -13,9 +13,11 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
+import java.io.Serializable;
+
 import static KirbyGame_HVL.git.entities.Constants.Constants.PIXEL_IN_METER;
 
-public class Kirby extends ActorWithBox2d implements Box2dPlayer {
+public class Kirby extends ActorWithBox2d implements Box2dPlayer, Serializable {
 
     /* Atributos:
      *  Texturas de los distintos movimientos del personaje de kirby,
@@ -26,6 +28,11 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
      *  en este momento y que movimiento, junto con una variable de velocidad constante y un
      *  booleano que nos va a indicar si debemos voltear la imagen o no.
      * */
+
+    private final String id;
+    //private static final long serialVersionUID = -1816334362202070857L;
+    private static final long serialVersionUID = 1L;
+
 
     private Texture kirbywalktexture;
     private Texture kirbyStaytexture;
@@ -65,13 +72,24 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
        todos los movimientos. Se extraen de las texturas frame por frame con el split para luego
        pasarlo a un array unidimensional mediante un bucle for, para luego inicializar las respectivas animaciones.
     * */
+    public Kirby() {
+        this.id = generateId() ;
+    }
+
     public Kirby (World world, Main main) {
+        this.id = generateId();
         this.world = world;
         this.main = main;
         createBody(world);
         texture_animation();
 
     }
+    private String generateId() {
+        return "KIRBY-" + System.currentTimeMillis();
+    }
+
+    public String getId() {return id;}
+
 
     /* Metodo que se utiliza para actualizar la posicion y animacion del Sprite
      * */

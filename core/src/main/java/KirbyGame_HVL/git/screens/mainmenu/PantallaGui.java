@@ -81,6 +81,14 @@ public class PantallaGui extends Pantalla {
             }
         });
 
+        multijugador.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                PantallaSetMultiplayer psMultiplayer = new PantallaSetMultiplayer(main);
+                main.setScreen(psMultiplayer);
+            }
+        });
+
         salir.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
