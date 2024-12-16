@@ -48,10 +48,10 @@ public class Cliente {
             salidaServidor.writeObject("Conexión iniciada");
             salidaServidor.flush();
 
-            // Recibir objeto Kirby
+            // Recibir objeto KirbyState
             Kirby kirbyRecibido = (Kirby) entradaServidor.readObject();
             //kirbyRecibido.initializeGraphics();
-            System.out.println("Kirby recibido con ID: " + kirbyRecibido.getId());
+            System.out.println("KirbyState recibido con ID: " + kirbyRecibido.getId());
 
             // Confirmación al servidor
             salidaServidor.writeObject("recibido");

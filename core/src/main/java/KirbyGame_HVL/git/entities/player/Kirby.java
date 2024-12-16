@@ -15,8 +15,6 @@ import com.badlogic.gdx.physics.box2d.*;
 
 import java.io.Serializable;
 
-import static KirbyGame_HVL.git.entities.Constants.Constants.PIXEL_IN_METER;
-
 public class Kirby extends ActorWithBox2d implements Box2dPlayer, Serializable {
 
     /* Atributos:
@@ -89,6 +87,21 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer, Serializable {
     }
 
     public String getId() {return id;}
+
+    public int getPositioX(){
+        return (int) body.getPosition().x;
+    }
+
+    public int getPositioY(){
+        return (int) body.getPosition().y;
+    }
+
+    public void setFlipX(boolean flipX) {this.flipX = flipX;}
+
+    public Body getBody(){
+        return  body;
+    }
+
 
 
     /* Metodo que se utiliza para actualizar la posicion y animacion del Sprite
@@ -300,4 +313,23 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer, Serializable {
 
         }
     }
+
+    public String getCurrentAnimationName() {
+        if (currentAnimation == kirbyanimationRun) return "RUN";
+        if (currentAnimation == kirbyanimationWalk) return "WALK";
+        if (currentAnimation == kirbyanimationDown) return "DOWN";
+        if (currentAnimation == kirbyanimationDash) return "DASH";
+        if (currentAnimation == kirbyanimationJump) return "JUMP";
+
+        return "STAY";
+    }
+
+    public String getCurrentColor() {
+        return kirbysprite.getColor().toString();
+    }
+
+    public boolean isFlipX() {
+        return flipX;
+    }
+
 }

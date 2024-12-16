@@ -28,16 +28,16 @@ public class AtencionCliente extends Thread {
             String mensaje = (String) entradaCliente.readObject();
             System.out.println("Mensaje cliente " + nCliente + ": " + mensaje);
 
-            // crear un nuevo Kirby y enviarlo al cliente
+            // crear un nuevo KirbyState y enviarlo al cliente
             Kirby nuevoKirby = new Kirby();
             salidaCliente.writeObject(nuevoKirby);
             salidaCliente.flush();
-            System.out.println("Kirby creado y enviado al cliente " + nCliente + " con ID: " + nuevoKirby.getId());
+            System.out.println("KirbyState creado y enviado al cliente " + nCliente + " con ID: " + nuevoKirby.getId());
 
             // leer respuesta del cliente
             mensaje = (String) entradaCliente.readObject();
             if ("recibido".equalsIgnoreCase(mensaje)) {
-                salidaCliente.writeUTF("El ID del Kirby es: " + nuevoKirby.getId());
+                salidaCliente.writeUTF("El ID del KirbyState es: " + nuevoKirby.getId());
                 salidaCliente.flush();
             }
 

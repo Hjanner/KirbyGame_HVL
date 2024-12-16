@@ -19,7 +19,9 @@ public class Main extends Game {
     public void create() {
         batch = new SpriteBatch();
         pantallaini = new PantallaGui(this);
-        gameScreen = new GameScreen(this);
+        gameScreen = new GameScreen(this, "localhost", 2468);
+
+        //gameScreen = new GameScreen(this);
         manager = new AssetManager();
         manager.load("assets/art/sprites/kirbystay.png", Texture.class);
         manager.load("assets/art/sprites/kirbywalking.png", Texture.class);
@@ -29,6 +31,7 @@ public class Main extends Game {
         manager.load("assets/art/sprites/kirbyjump.png", Texture.class);
         manager.finishLoading();
         setScreen(pantallaini);
+        //main.setScreen(gameScreen);
 
     }
 

@@ -1,9 +1,12 @@
 package KirbyGame_HVL.git.netv2.servidor;
 
+import KirbyGame_HVL.git.entities.player.Kirby;
 import KirbyGame_HVL.git.netv2.cliente.Cliente;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 //import com.badlogic.gdx.net.ServerSocket;
 //import com.badlogic.gdx.net.ServerSocket;
 
@@ -13,6 +16,9 @@ public class Servidor {
     private boolean continuar;
     private int nClientes;
    // private ServerSocket servidor;
+
+    //private List<KirbyState> players;
+    //private final ConcurrentHashMap<String, PlayerState> players;
 
     public Servidor(int puerto) throws Exception {
         this.puerto = puerto;
