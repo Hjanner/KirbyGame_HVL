@@ -31,7 +31,6 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer, Serializable {
     //private static final long serialVersionUID = -1816334362202070857L;
     private static final long serialVersionUID = 1L;
 
-
     private Texture kirbywalktexture;
     private Texture kirbyStaytexture;
     private Texture kirbydowntexture;
@@ -80,8 +79,8 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer, Serializable {
         this.main = main;
         createBody(world);
         texture_animation();
-
     }
+
     private String generateId() {
         return "KIRBY-" + System.currentTimeMillis();
     }
@@ -102,24 +101,34 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer, Serializable {
         return  body;
     }
 
-
-
     /* Metodo que se utiliza para actualizar la posicion y animacion del Sprite
      * */
     @Override
-    public void draw (Batch batch, float parentAlpha) {
-        kirbysprite.setPosition(body.getPosition().x - 18,body.getPosition().y - 8);
+    public void draw(Batch batch, float parentAlpha) {
+        // Asegurarse de que el sprite esté en la posición correcta
+        float x = body.getPosition().x - (kirbysprite.getWidth() / 2);
+        float y = body.getPosition().y - (kirbysprite.getHeight() / 2);
+        kirbysprite.setPosition(x, y);
+
+        // Aplicar el color actual con la transparencia correcta
+        Color color = kirbysprite.getColor();
+        batch.setColor(color.r, color.g, color.b, parentAlpha);
+
+        // Dibujar el sprite
         kirbysprite.draw(batch);
     }
 
-    public void createBody (World world) {
+    public void createBody(World world) {
         BodyDef kirbybodydef = new BodyDef();
-        kirbybodydef.position.set(180,1010);
+        kirbybodydef.position.set(180, 1010);
         kirbybodydef.type = BodyDef.BodyType.DynamicBody;
         body = this.world.createBody(kirbybodydef);
+
         CircleShape kirbyshape = new CircleShape();
         kirbyshape.setRadius(8);
-        fixture = body.createFixture(kirbyshape,0.01f);
+        fixture = body.createFixture(kirbyshape, 0.01f);
+        fixture.setUserData(this);  // Importante para identificar el cuerpo
+
         body.setFixedRotation(true);
         kirbyshape.dispose();
     }
@@ -185,30 +194,57 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer, Serializable {
         currentAnimation = kirbyanimationStay;
     }
 
-    /*Metodo para eliminar las texturas una vez acabe el programa y no quede basura en la
-      memoria.
-    * */
-    public void dispose () {
-        kirbywalktexture.dispose();
-        kirbyStaytexture.dispose();
-        kirbyslidetexture.dispose();
-        kirbydowntexture.dispose();
-        kirbyruntexture.dispose();
-        body.destroyFixture(fixture);
-        world.destroyBody(body);
+    public void update(float delta) {
+        verificarmovimiento(delta);
+        updateAnimation(delta);
+        kirbysprite.setPosition(body.getPosition().x - 18, body.getPosition().y - 8);
+    }
+
+    /**
+     * actualiza solo las animaciones del Kirby sin modificar la física
+     */
+    public void updateAnimation(float delta) {
+        duracion += delta;
+        TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duracion, true);                             // obtener el frame actual de la animación
+        kirbysprite.setRegion(frame);
+        kirbysprite.flip(flipX, false);
+        kirbysprite.setSize(38, 38);
+
+        updateSpriteColor();            //borrar despues
     }
 
     /*Metodo que permitira realizar todas las acciones del actor kirby en el escenario
      * */
-    @Override
-    public void act (float delta) {
-        super.act(delta);
-        verificarmovimiento(delta);
-        duracion += delta;
-        TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duracion, true);
-        kirbysprite.setRegion(frame);
-        kirbysprite.flip(flipX,false);
+//    @Override
+//    public void act (float delta) {
+//        super.act(delta);
+//        verificarmovimiento(delta);
+//        duracion += delta;
+//        TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duracion, true);
+//        kirbysprite.setRegion(frame);
+//        kirbysprite.flip(flipX,false);
+//
+//    }
 
+    //cambia el color del sprite basado en la animación actual
+    private void updateSpriteColor() {
+        if (currentAnimation == kirbyanimationRun) {
+            kirbysprite.setColor(Color.GOLD);
+        } else if (currentAnimation == kirbyanimationWalk) {
+            kirbysprite.setColor(Color.BLUE);
+        } else if (currentAnimation == kirbyanimationDown) {
+            kirbysprite.setColor(Color.GREEN);
+        } else if (currentAnimation == kirbyanimationDash) {
+            kirbysprite.setColor(Color.ORANGE);
+        } else {
+            kirbysprite.setColor(Color.WHITE);
+        }
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        update(delta);
     }
 
     private void verificarmovimiento(float delta) {
@@ -332,4 +368,13 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer, Serializable {
         return flipX;
     }
 
+    public void dispose () {
+        kirbywalktexture.dispose();
+        kirbyStaytexture.dispose();
+        kirbyslidetexture.dispose();
+        kirbydowntexture.dispose();
+        kirbyruntexture.dispose();
+        body.destroyFixture(fixture);
+        world.destroyBody(body);
+    }
 }

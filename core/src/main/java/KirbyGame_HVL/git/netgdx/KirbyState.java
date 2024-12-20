@@ -30,4 +30,8 @@ public class KirbyState implements Serializable {
             ", Current Animation: " + currentAnimation);
 
     }
+
+    public String getId() {
+        return id;
+    }
 }

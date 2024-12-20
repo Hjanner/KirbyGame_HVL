@@ -21,6 +21,8 @@ public class Server implements Disposable {
     private final int port;
 
     private List<ManejadorCliente> connectedClients = new CopyOnWriteArrayList<>();
+    //private final List<KirbyState> remoteKirbyStates;
+
 
     public Server(int port) {
         this.port = port;
@@ -46,7 +48,7 @@ public class Server implements Disposable {
         ServerSocketHints hints = new ServerSocketHints();
         hints.acceptTimeout = 0;
         server = Gdx.net.newServerSocket(Net.Protocol.TCP, "localhost", port, hints);
-        System.out.println("Servidor activo en el puerto: " + port);
+        System.out.println("Servidor activo en el puerto: " + port + " -- " +server.getProtocol());
 
         new Thread(() -> {                                                                                              //nuevo hilo para nuevo cliente
             while (!Thread.currentThread().isInterrupted()) {
@@ -87,7 +89,9 @@ public class Server implements Disposable {
         @Override
         public void run() {
             try {
-                System.out.println("Cliente conectado desde: " + client.getRemoteAddress());
+                System.out.println("Cliente conectado desde: " +
+                    client.getRemoteAddress() );
+                    //+ client.);
 
                 connectedClients.add(this);                                                                             //se anade el cliente a la lista de clientes conectados
 
@@ -121,6 +125,7 @@ public class Server implements Disposable {
             }
         }
 
+        //maneja mensaje especifiso de este cliente
         public void sendMessage(String message) throws IOException {
             if (outputStream != null) {
                 outputStream.write(message.getBytes());

@@ -10,6 +10,8 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Json;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,6 +21,18 @@ public class Client implements Disposable {
     private Socket client;
     private ExecutorService receiveExecutor;
     private ClientStateListener stateListener;
+
+    public int getPort() {
+        return port;
+    }
+
+    public Socket getClient() {
+        return client;
+    }
+
+    public ClientStateListener getStateListener() {
+        return stateListener;
+    }
 
     public interface ClientStateListener {
         void onKirbyStateReceived(KirbyState state);
@@ -38,12 +52,14 @@ public class Client implements Disposable {
         try {
             client = Gdx.net.newClientSocket(Net.Protocol.TCP, host, port, hints);
 
+            //escucha constantemente mensajes desde el servidor
             receiveExecutor.submit(() -> {
                 try {
                     byte[] readBuffer = new byte[1024];
                     int bytesRead;
                     StringBuilder messageBuilder = new StringBuilder();
 
+                    //para recibir mensajes
                     while (!Thread.currentThread().isInterrupted() &&
                         (bytesRead = client.getInputStream().read(readBuffer)) != -1) {
                         String chunk = new String(readBuffer, 0, bytesRead);
@@ -57,13 +73,13 @@ public class Client implements Disposable {
                         if (bracketStart != -1 && bracketEnd != -1 && bracketStart < bracketEnd) {
                             String jsonMessage = message.substring(bracketStart, bracketEnd + 1);
                             try {
-                                // state del kirby en formato JSON
                                 Json json = new Json();
-                                KirbyState state = json.fromJson(KirbyState.class, jsonMessage);
+                                KirbyState state = json.fromJson(KirbyState.class, jsonMessage);                        //convierte el mensaje JSON en un objeto KirbyState
 
+                                //para ejecutar en el hilo principal del juego
                                 Gdx.app.postRunnable(() -> {                                                                                                //notifica al cliente en el hilo proncipal
                                     if (stateListener != null) {
-                                        stateListener.onKirbyStateReceived(state);
+                                        stateListener.onKirbyStateReceived(state);                                      //notificar que se ha recibido un nuevo estado
                                     }
                                 });
 
@@ -83,6 +99,7 @@ public class Client implements Disposable {
         }
     }
 
+    //majeneja mensajes especificos de este cliente
     public void sendKirbyState(KirbyState state) {
         if (client != null) {
             try {
@@ -104,6 +121,31 @@ public class Client implements Disposable {
         }
         if (client != null) {
             client.dispose();
+        }
+    }
+
+
+    public class MultiplayerStateHandler implements Client.ClientStateListener {
+        private final List<KirbyState> remoteKirbyStates;
+
+        public MultiplayerStateHandler() {
+            this.remoteKirbyStates = new ArrayList<>();
+        }
+
+        @Override
+        public void onKirbyStateReceived(KirbyState state) {
+            // Verifica si el estado recibido pertenece a un Kirby remoto y actualiza la lista
+            synchronized (remoteKirbyStates) {
+                // Actualiza o agrega el estado remoto recibido
+                remoteKirbyStates.removeIf(k -> k.getId().equals(state.getId()));
+                remoteKirbyStates.add(state);
+            }
+        }
+
+        public List<KirbyState> getRemoteKirbyStates() {
+            synchronized (remoteKirbyStates) {
+                return new ArrayList<>(remoteKirbyStates);
+            }
         }
     }
 }

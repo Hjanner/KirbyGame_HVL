@@ -149,6 +149,8 @@ public class PantallaSetMultiplayer extends Pantalla {
             client.start();
 
             System.out.println("Cliente conectado a " + ip + ":" + puerto);
+            System.out.println("CLiente conectado aa :" + client.getClient().getRemoteAddress());
+            System.out.println("Cliente conectado aaa " + ip + ":" + client.getPort());
         } catch (Exception ex) {
             System.err.println("Error al unirse a la partida: " + ex.getMessage());
             ex.printStackTrace();
