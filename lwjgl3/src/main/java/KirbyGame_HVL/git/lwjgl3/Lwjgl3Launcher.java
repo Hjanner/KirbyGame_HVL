@@ -30,7 +30,7 @@ public class Lwjgl3Launcher {
         configuration.setWindowedMode(1280, 720);
         configuration.setForegroundFPS(60);
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
-        configuration.setWindowIcon("logito.png");
+        configuration.setWindowIcon("logito2.png");
         return configuration;
     }
 }

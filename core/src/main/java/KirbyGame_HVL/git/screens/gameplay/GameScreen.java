@@ -23,7 +23,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Json;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GameScreen extends Pantalla implements Client.ClientStateListener {
 
@@ -45,52 +47,79 @@ public class GameScreen extends Pantalla implements Client.ClientStateListener {
     private static final float STATE_SYNC_INTERVAL = 0.1f; // Send state 10 times per second
     private List<Kirby> players;
 
-    public GameScreen(Main main, String host, int port) {
+    private boolean isHost;
+    private Map<String, Kirby> kirbys;
+
+    public GameScreen(Main main, String host, int port, boolean isHost) {
         super(main);
         this.main = main;
-        //stage = new Stage();
+        this.isHost = isHost;
+        this.kirbys = new HashMap<>();
+
+
+
+        if (isHost) {
+            // El primer jugador crea el servidor
+            server = new Server(port);
+            server.start();
+        }
+
+        // Todos los jugadores crean un cliente
         client = new Client(host, port, this);
+        client.start();
     }
 
     @Override
     public void show() {
         world = new World(new Vector2(0, -9.8f), true);
-        players = new ArrayList<>();
-
         stage = new Stage();
 
-        //confi camara
-        cam = (OrthographicCamera) stage.getCamera();
-        cam.zoom = 0.65f;
-
-        stage.getViewport().setCamera(cam);
-
-        //creo el kirbylocal
+        // Crear Kirby local
         localKirby = new Kirby(world, main);
+        kirbys.put(localKirby.getId(), localKirby);
         stage.addActor(localKirby);
-        players.add(localKirby);
 
-        client.start();                                                                                                 //inicia la conexion con el client
+        // Configuración inicial
+        setupCamera();
+        setupMap();
 
-        Kirby remoteKirby1 = new Kirby(world, main);
-        Kirby remoteKirby2 = new Kirby(world, main);
-        players.add(remoteKirby1);
-        players.add(remoteKirby2);
-        stage.addActor(remoteKirby1);
-        stage.addActor(remoteKirby2);
+    }
 
+    @Override
+    public void onKirbyStateReceived(KirbyState state) {
+        Gdx.app.log("GameScreen", "Received state for Kirby: " + state.getId());
 
+        Gdx.app.postRunnable(() -> {
+            // Si es nuestro Kirby local, ignoramos la actualización
+            if (localKirby != null && state.getId().equals(localKirby.getId())) {
+                return;
+            }
 
+            // Buscar o crear Kirby remoto
+            Kirby remoteKirby = kirbys.get(state.getId());
+            if (remoteKirby == null) {
+                Gdx.app.log("GameScreen", "Creating new remote Kirby: " + state.getId());
+                remoteKirby = new Kirby(world, main);
+                kirbys.put(state.getId(), remoteKirby);
+                stage.addActor(remoteKirby);
+            }
 
+            // Actualizar estado
+            updateKirbyState(remoteKirby, state);
+        });
+    }
 
-        tiledMapHelper = new TiledMapHelper();
-        map = tiledMapHelper.setupmap();
-        bdr = new Box2DDebugRenderer();
+    private void updateKirbyState(Kirby kirby, KirbyState state) {
+        Gdx.app.log("GameScreen", "Updating Kirby state: " + state.getId() +
+            " pos: " + state.getX() + "," + state.getY());
 
-        for (int i = 2; i < 4; i++) {
-            floor = new Floor(world, map, i);
-        }
-        spikes = new Spikes(world, map, 4);
+        // Convertir coordenadas de píxeles a metros
+        float xInMeters = state.getX() / Constants.PPM;
+        float yInMeters = state.getY() / Constants.PPM;
+
+        kirby.getBody().setTransform(xInMeters, yInMeters, 0);
+        kirby.setAnimation(EnumStates.valueOf(state.getCurrentAnimation()));
+        kirby.setFlipX(state.isFlipX());
     }
 
     @Override
@@ -100,38 +129,71 @@ public class GameScreen extends Pantalla implements Client.ClientStateListener {
 
         world.step(1/60f, 6, 2);
 
-        //actualiza kyrbi y camara
-        updateAllKirbys(delta);
-        updateCamera();
+        updateAndSyncStates(delta);
+
+        renderWorld();
+
+
+//        //actualiza kyrbi y camara
+//        updateAllKirbys(delta);
+//        updateCamera();
 
         // Actualizar las entidades
         //float delta = Gdx.graphics.getDeltaTime();
-        for (Kirby kirby : players) {
-            kirby.act(Gdx.graphics.getDeltaTime());
+//        for (Kirby kirby : kirbys) {
+//            kirby.act(Gdx.graphics.getDeltaTime());
+//        }
+
+//        // Dibujar las entidades
+//        stage.getBatch().begin();
+//        //stabatch.begin();
+//        for (Kirby kirby : players) {
+//            kirby.draw( stage.getBatch()  , 1);
+//        }
+//        //batch.end();
+//        stage.getBatch().end();
+//
+//        stage.getBatch().setProjectionMatrix(cam.combined);
+//
+//        //render mapa
+//        map.setView(cam);
+//        map.render();
+//
+//        //rederiza actores
+//        stage.act(delta);
+//        stage.draw();
+//
+//        bdr.render(world, cam.combined);
+//
+//        // sincronizar estado
+//        stateSyncTimer += delta;
+//        if (stateSyncTimer >= STATE_SYNC_INTERVAL) {
+//            sendLocalKirbyState();
+//            stateSyncTimer = 0;
+//        }
+
+        stateSyncTimer += delta;
+        if (stateSyncTimer >= STATE_SYNC_INTERVAL) {
+            sendLocalKirbyState();
+            stateSyncTimer = 0;
         }
 
-        // Dibujar las entidades
-        stage.getBatch().begin();
-        //stabatch.begin();
-        for (Kirby kirby : players) {
-            kirby.draw( stage.getBatch()  , 1);
+    }
+
+    private void updateAndSyncStates(float delta) {
+        // Actualizar Kirby local
+        if (localKirby != null) {
+            localKirby.update(delta);
         }
-        //batch.end();
-        stage.getBatch().end();
 
-        stage.getBatch().setProjectionMatrix(cam.combined);
+        // Actualizar Kirbys remotos (solo animaciones)
+        for (Kirby kirby : kirbys.values()) {
+            if (kirby != localKirby) {
+                kirby.updateAnimation(delta);
+            }
+        }
 
-        //render mapa
-        map.setView(cam);
-        map.render();
-
-        //rederiza actores
-        stage.act(delta);
-        stage.draw();
-
-        bdr.render(world, cam.combined);
-
-        // sincronizar estado
+        // Enviar estado local
         stateSyncTimer += delta;
         if (stateSyncTimer >= STATE_SYNC_INTERVAL) {
             sendLocalKirbyState();
@@ -139,39 +201,44 @@ public class GameScreen extends Pantalla implements Client.ClientStateListener {
         }
     }
 
-    @Override
-    public void onKirbyStateReceived(KirbyState state) {
-        if (remoteKirby == null) {
-            remoteKirby = new Kirby(world, main);
-            stage.addActor(remoteKirby);
-            players.add(remoteKirby);
-            System.out.println("Remote Kirby created and added to stage");
-            pause();
+    private void renderWorld() {
+        // Limpiar pantalla
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Actualizar cámara siguiendo al Kirby local
+        updateCamera();
+
+        // Renderizar mapa
+        map.setView(cam);
+        map.render();
+
+        // Renderizar todos los Kirbys
+        stage.getBatch().begin();
+        for (Kirby kirby : kirbys.values()) {
+            kirby.draw(stage.getBatch(), 1);
         }
+        stage.getBatch().end();
 
-        // Convertir coordenadas
-        float xInMeters = state.x / Constants.PPM;
-        float yInMeters = state.y / Constants.PPM;
-
-        // Actualizar el Kirby remoto en el hilo principal
-        Gdx.app.postRunnable(() -> {
-            remoteKirby.getBody().setTransform(xInMeters, yInMeters, 0);
-            remoteKirby.setAnimation(EnumStates.valueOf(state.currentAnimation));
-            remoteKirby.setFlipX(state.flipX);
-
-            // Forzar actualización del sprite
-            remoteKirby.updateAnimation(Gdx.graphics.getDeltaTime());
-            System.out.println("Remote Kirby updated: " + xInMeters + ", " + yInMeters);
-        });
+        // Debug render si es necesario
+        bdr.render(world, cam.combined);
     }
-
     // envia estado del Kirby local al servidor
     private void sendLocalKirbyState() {
         if (client != null && localKirby != null) {
-            KirbyState state = new KirbyState(localKirby);
+            // Convertir coordenadas de metros a píxeles para enviar
+            Vector2 position = localKirby.getBody().getPosition();
+            KirbyState state = new KirbyState(
+                localKirby.getId(),
+                position.x * Constants.PPM,
+                position.y * Constants.PPM,
+                localKirby.getCurrentAnimationName(),
+                localKirby.isFlipX(),
+                "ffffffff" // color por defecto
+            );
             client.sendKirbyState(state);
         }
     }
+
 
     private void updateAllKirbys(float delta) {
         for (Kirby kirby : players) {
@@ -187,15 +254,60 @@ public class GameScreen extends Pantalla implements Client.ClientStateListener {
         }
     }
 
-    private void updateCamera() {
-        cam.position.set(localKirby.getFixture().getBody().getPosition(), 0);
+    private void setupCamera() {
+        // Configuración de la cámara ortográfica
+        cam = (OrthographicCamera) stage.getCamera();
+        cam.zoom = 0.65f; // Ajusta el zoom de la cámara
+
+        // Configurar viewport
+        stage.getViewport().setCamera(cam);
+
+        // Posición inicial de la cámara (puede ser la posición inicial del Kirby local)
+        if (localKirby != null) {
+            cam.position.set(localKirby.getBody().getPosition().x,
+                localKirby.getBody().getPosition().y,
+                0);
+        }
         cam.update();
-        map.setView(cam);
+    }
+
+    private void setupMap() {
+        // Inicializar el helper del mapa
+        tiledMapHelper = new TiledMapHelper();
+        map = tiledMapHelper.setupmap();
+
+        // Configurar el debug renderer para Box2D
+        bdr = new Box2DDebugRenderer();
+
+        // Crear los elementos del mapa
+        for (int i = 2; i < 4; i++) {
+            floor = new Floor(world, map, i);
+        }
+        spikes = new Spikes(world, map, 4);
+    }
+
+    // Función de actualización de cámara que sigue al Kirby local
+    private void updateCamera() {
+        if (localKirby != null) {
+            // Obtener la posición actual del Kirby local
+            Vector2 kirbyPosition = localKirby.getBody().getPosition();
+
+            // Suavizar el movimiento de la cámara (interpolación lineal)
+            float lerp = 0.1f;
+            cam.position.x += (kirbyPosition.x - cam.position.x) * lerp;
+            cam.position.y += (kirbyPosition.y - cam.position.y) * lerp;
+
+            // Actualizar la cámara
+            cam.update();
+        }
     }
 
 
     @Override
     public void dispose() {
+        for (Kirby kirby : kirbys.values()) {
+            kirby.dispose();
+        }
         if (stage != null) stage.dispose();
         if (world != null) world.dispose();
         if (localKirby != null) localKirby.dispose();

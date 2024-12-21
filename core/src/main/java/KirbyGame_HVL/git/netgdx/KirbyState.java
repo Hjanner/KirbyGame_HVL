@@ -14,7 +14,7 @@ public class KirbyState implements Serializable {
     public boolean flipY;
     public String color;
 
-    public KirbyState() {}
+    public KirbyState(String id, float v, float v1, String currentAnimationName, boolean flipX, String ffffffff) {}
 
     public KirbyState(Kirby kirby){
         this.id = kirby.getId();
@@ -24,14 +24,29 @@ public class KirbyState implements Serializable {
         this.flipX = kirby.isFlipX();
         this.color = kirby.getCurrentColor();
 
-        System.out.println("Estado Kirby - ID: " + id +
-            ", X: " + x +
-            ", Y: " + y +
-            ", Current Animation: " + currentAnimation);
-
+//        System.out.println("Estado Kirby - ID: " + id +
+//            ", X: " + x +
+//            ", Y: " + y +
+//            ", Current Animation: " + currentAnimation);
     }
 
     public String getId() {
         return id;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public String getCurrentAnimation() {
+        return currentAnimation;
+    }
+
+    public boolean isFlipX() {
+        return flipX;
     }
 }

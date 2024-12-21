@@ -3,9 +3,12 @@ package KirbyGame_HVL.git.screens.mainmenu;
 import KirbyGame_HVL.git.Main;
 //import KirbyGame_HVL.git.netv2.cliente.Cliente;
 //import KirbyGame_HVL.git.netv2.servidor.Servidor;
+import KirbyGame_HVL.git.entities.net.GameServer;
+import KirbyGame_HVL.git.entities.net.MultiplayerGameScreen;
 import KirbyGame_HVL.git.netgdx.server.Server;
 import KirbyGame_HVL.git.netgdx.client.Client;
 
+import KirbyGame_HVL.git.screens.gameplay.GameScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -79,7 +82,7 @@ public class PantallaSetMultiplayer extends Pantalla {
     }
 
     private void iniciarPartida( int puerto) {
-        try {
+//        try {
             //s-c cn java.net
 //            servidor = new Servidor(puerto);                                                                   //se crea e servidor en otro hilo
 //            servidor.startServer();
@@ -90,17 +93,26 @@ public class PantallaSetMultiplayer extends Pantalla {
 //            System.out.println("Cliente conectado como host.");
 
             //Con JDX
-            server = new Server(puerto);
-            server.start();
+//            server = new Server(puerto);
+//            server.start();
+//
+//            Client client = new Client("localhost", puerto, state -> System.out.println(state));
+//            client.start();
+//
+//            Gdx.app.postRunnable(() -> main.setScreen(main.gameScreen));                                                    //a la pantalla del juego
+//        } catch (Exception ex) {
+//            System.err.println("Error al iniciar la partida: " + ex.getMessage());
+//            ex.printStackTrace();
+//        }
+        //main.startGame(main, "localhost", puerto, true);
+        GameServer server = new GameServer(puerto);
+        new Thread(() -> server.start()).start();
 
-            Client client = new Client("localhost", puerto, state -> System.out.println(state));
-            client.start();
+        main.startMultiplayerGame("localhost", puerto);
 
-            Gdx.app.postRunnable(() -> main.setScreen(main.gameScreen));                                                    //a la pantalla del juego
-        } catch (Exception ex) {
-            System.err.println("Error al iniciar la partida: " + ex.getMessage());
-            ex.printStackTrace();
-        }
+//            Gdx.app.postRunnable(() -> main.setScreen(main.gameScreen));                                                    //a la pantalla del juego
+
+
     }
 
     private void mostrarDialogoUnirse( int control) {                                   //control 0 para crear 1 para unirse
@@ -144,18 +156,24 @@ public class PantallaSetMultiplayer extends Pantalla {
     }
 
     private void unirseAPartida(String ip, int puerto) {
-        try {
-            Client client = new Client("localhost", puerto, state -> System.out.println(state));
-            client.start();
+//        try {
+//            Client client = new Client("localhost", puerto, state -> System.out.println(state));
+//            client.start();
+//
+//            System.out.println("Cliente conectado a " + ip + ":" + puerto);
+//            System.out.println("CLiente conectado aa :" + client.getClient().getRemoteAddress());
+//            System.out.println("Cliente conectado aaa " + ip + ":" + client.getPort());
+//        } catch (Exception ex) {
+//            System.err.println("Error al unirse a la partida: " + ex.getMessage());
+//            ex.printStackTrace();
+//        }
+        //Gdx.app.postRunnable(() -> main.setScreen(main.gameScreen));                                                    //a la pantalla del juego
+//        new GameScreen(main, ip, puerto, true);
+//        main.startGame(main, "localhost", puerto, false);
+//        main.setScreen();
+        main.startMultiplayerGame("localhost", puerto);
 
-            System.out.println("Cliente conectado a " + ip + ":" + puerto);
-            System.out.println("CLiente conectado aa :" + client.getClient().getRemoteAddress());
-            System.out.println("Cliente conectado aaa " + ip + ":" + client.getPort());
-        } catch (Exception ex) {
-            System.err.println("Error al unirse a la partida: " + ex.getMessage());
-            ex.printStackTrace();
-        }
-        Gdx.app.postRunnable(() -> main.setScreen(main.gameScreen));                                                    //a la pantalla del juego
+
     }
 
     @Override

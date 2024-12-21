@@ -1,5 +1,6 @@
 package KirbyGame_HVL.git.netgdx.client;
 
+import KirbyGame_HVL.git.utils.helpers.NetworkUtils;
 import KirbyGame_HVL.git.netgdx.KirbyState;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
@@ -22,6 +23,9 @@ public class Client implements Disposable {
     private ExecutorService receiveExecutor;
     private ClientStateListener stateListener;
 
+    private NetworkUtils networkUtils;
+
+
     public int getPort() {
         return port;
     }
@@ -43,6 +47,7 @@ public class Client implements Disposable {
         this.port = port;
         this.stateListener = listener;
         this.receiveExecutor = Executors.newSingleThreadExecutor();
+        this.networkUtils = new NetworkUtils();
     }
 
     public void start() {
@@ -52,41 +57,22 @@ public class Client implements Disposable {
         try {
             client = Gdx.net.newClientSocket(Net.Protocol.TCP, host, port, hints);
 
-            //escucha constantemente mensajes desde el servidor
             receiveExecutor.submit(() -> {
                 try {
-                    byte[] readBuffer = new byte[1024];
-                    int bytesRead;
-                    StringBuilder messageBuilder = new StringBuilder();
-
-                    //para recibir mensajes
-                    while (!Thread.currentThread().isInterrupted() &&
-                        (bytesRead = client.getInputStream().read(readBuffer)) != -1) {
-                        String chunk = new String(readBuffer, 0, bytesRead);
-                        messageBuilder.append(chunk);
-
-                        //  JSON message checking
-                        String message = messageBuilder.toString().trim();
-                        int bracketStart = message.indexOf('{');
-                        int bracketEnd = message.lastIndexOf('}');
-
-                        if (bracketStart != -1 && bracketEnd != -1 && bracketStart < bracketEnd) {
-                            String jsonMessage = message.substring(bracketStart, bracketEnd + 1);
+                    while (!Thread.currentThread().isInterrupted()) {
+                        String line = networkUtils.readLine(client.getInputStream());
+                        if (line != null) {
                             try {
                                 Json json = new Json();
-                                KirbyState state = json.fromJson(KirbyState.class, jsonMessage);                        //convierte el mensaje JSON en un objeto KirbyState
+                                KirbyState state = json.fromJson(KirbyState.class, line);
 
-                                //para ejecutar en el hilo principal del juego
-                                Gdx.app.postRunnable(() -> {                                                                                                //notifica al cliente en el hilo proncipal
+                                Gdx.app.postRunnable(() -> {
                                     if (stateListener != null) {
-                                        stateListener.onKirbyStateReceived(state);                                      //notificar que se ha recibido un nuevo estado
+                                        stateListener.onKirbyStateReceived(state);
                                     }
                                 });
-
-                                messageBuilder.setLength(0);
                             } catch (Exception e) {
                                 System.err.println("Error parsing JSON: " + e.getMessage());
-                                messageBuilder.setLength(0);
                             }
                         }
                     }
@@ -104,8 +90,9 @@ public class Client implements Disposable {
         if (client != null) {
             try {
                 Json json = new Json();
+                json.setQuoteLongValues(true); // Asegura que los números largos sean quoted
                 String stateJson = json.toJson(state);
-
+                stateJson += "\n"; // Añadir delimitador
                 client.getOutputStream().write(stateJson.getBytes());
                 client.getOutputStream().flush();
             } catch (IOException e) {
