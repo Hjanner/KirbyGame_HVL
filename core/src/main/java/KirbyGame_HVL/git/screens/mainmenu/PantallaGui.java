@@ -1,6 +1,6 @@
 package KirbyGame_HVL.git.screens.mainmenu;
 import KirbyGame_HVL.git.Main;
-import KirbyGame_HVL.git.screens.gameplay.PantallaScene;
+import KirbyGame_HVL.git.screens.gameplay.GameScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -20,7 +20,7 @@ public class PantallaGui extends Pantalla {
        cambiar de pantalla. Tambien se encuentra la skin de los botones y su respectivo Stage para
        operar con el escenario y añadir los distintoa actores.
     * */
-    public PantallaScene escena;
+    public GameScreen gameScreen;
     private Stage stage;
     private Skin skin;
     private Table tabla, tabla2;
@@ -77,7 +77,15 @@ public class PantallaGui extends Pantalla {
         singleplayer.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
-                main.setScreen(main.escena);
+                main.setScreen(main.gameScreen);
+            }
+        });
+
+        multijugador.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                PantallaSetMultiplayer psMultiplayer = new PantallaSetMultiplayer(main);
+                main.setScreen(psMultiplayer);
             }
         });
 
