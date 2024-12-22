@@ -81,6 +81,20 @@ public class PantallaGui extends Pantalla {
             }
         });
 
+        acerca_De.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                main.setScreen(main.gameCulebrita);
+            }
+        });
+
+        ayuda.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                main.setScreen(main.gameViejita);
+            }
+        });
+
         salir.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
