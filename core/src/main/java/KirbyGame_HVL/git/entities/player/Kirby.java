@@ -60,6 +60,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private Animation kirbyanimationJump;
     private Animation currentAnimation;
 
+    private boolean isDashing = false;
 
     /* Constructor en donde se van a cargar todas las texturas y se incializan las regiones de
        todos los movimientos. Se extraen de las texturas frame por frame con el split para luego
@@ -70,7 +71,6 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         this.main = main;
         createBody(world);
         texture_animation();
-
     }
 
     /* Metodo que se utiliza para actualizar la posicion y animacion del Sprite
@@ -90,6 +90,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbyshape.setRadius(8);
         fixture = body.createFixture(kirbyshape,0.01f);
         body.setFixedRotation(true);
+        fixture.setUserData(this);                                         //para colisiones
         kirbyshape.dispose();
     }
 
@@ -177,7 +178,6 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duracion, true);
         kirbysprite.setRegion(frame);
         kirbysprite.flip(flipX,false);
-
     }
 
     private void verificarmovimiento(float delta) {
@@ -186,10 +186,13 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         boolean abajo = Gdx.input.isKeyPressed(Input.Keys.DOWN);
         boolean pushX = Gdx.input.isKeyPressed(Input.Keys.X);
         boolean up = Gdx.input.isKeyPressed(Input.Keys.UP);
+
+        //reseteando estados
+        isDashing = false;
+
         if (derecha && !izq && !abajo) {
             body.applyLinearImpulse(5,0, body.getPosition().x, body.getPosition().y, true);
             body.setLinearVelocity(80,0);
-            kirbysprite.setColor(Color.BLUE);
             currentAnimation = kirbyanimationWalk;
             flipX = false;
             if (pushX) {
@@ -203,7 +206,6 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         else if (izq && !derecha && !abajo) {
             body.applyLinearImpulse(-5,0, body.getPosition().x, body.getPosition().y, true);
             body.setLinearVelocity(-80,0);
-            kirbysprite.setColor((Color.BLUE));
             currentAnimation = kirbyanimationWalk;
             flipX = true;
             if (pushX) {
@@ -219,15 +221,15 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
             currentAnimation = kirbyanimationDown;
             if (derecha) {
                 body.applyLinearImpulse(30,0, body.getPosition().x, body.getPosition().y, true);
-                kirbysprite.setColor(Color.ORANGE);
                 currentAnimation = kirbyanimationDash;
+                isDashing = true;
             }
 
             if (izq) {
                 body.applyLinearImpulse(-30,0, body.getPosition().x, body.getPosition().y, true);
-                kirbysprite.setColor(Color.ORANGE);
                 currentAnimation = kirbyanimationDash;
                 flipX = true;
+                isDashing = true;
             }
         }
 
@@ -239,10 +241,8 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         else if (body.getLinearVelocity().y >= 0){
             Vector2 impulsoOpuesto = body.getLinearVelocity().cpy().scl(-0.8f);
             body.applyLinearImpulse(impulsoOpuesto.x, impulsoOpuesto.y, body.getPosition().x, body.getPosition().y, true);
-            kirbysprite.setColor(Color.WHITE);
             currentAnimation = kirbyanimationStay;
         }
-
 
         body.applyLinearImpulse(0, -15, body.getPosition().x, body.getPosition().y, true);
     }
@@ -250,7 +250,6 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     public void setAnimation (EnumStates typestate) {
 
         switch (typestate) {
-
             case RUN:
                 currentAnimation = kirbyanimationRun;
                 break;
@@ -281,5 +280,9 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
                 break;
 
         }
+    }
+
+    public boolean isDashing() {
+        return isDashing;
     }
 }

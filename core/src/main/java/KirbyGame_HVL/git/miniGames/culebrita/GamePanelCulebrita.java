@@ -12,12 +12,14 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class GamePanelCulebrita implements Screen {
+    private Skin skin;
     private final Game game;
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -198,7 +200,7 @@ public class GamePanelCulebrita implements Screen {
 
     private void loadAssets(){
         try {
-            backgroundTexture = new Texture(Gdx.files.internal("assets/art/minijuegos/background.png"));
+            backgroundTexture = new Texture(Gdx.files.internal("assets/art/backgrounds/background.png"));
             backgroundTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
             obstacleTexture = new Texture(Gdx.files.internal("assets/art/minijuegos/imagen.png"));
             foodTexture = getRandomFoodTexture(); // Inicializar con una imagen aleatoria
