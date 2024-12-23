@@ -42,10 +42,9 @@ public class GameScreen extends Pantalla {
 
         world = new World (new Vector2(0, 0), true);
         kirby = new Kirby(world, main);
-        kirby.setUserObject("kirby");
         stage.addActor(kirby);
         cam = (OrthographicCamera) stage.getCamera();
-        cam.zoom = 0.45f;
+        cam.zoom = 0.34f;
         tiledMapHelper = new TiledMapHelper();
         map = tiledMapHelper.setupmap();
         bdr = new Box2DDebugRenderer();

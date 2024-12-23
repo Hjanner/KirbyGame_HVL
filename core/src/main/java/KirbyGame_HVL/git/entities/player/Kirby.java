@@ -233,6 +233,10 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         return colisionSuelo;
     }
 
+    public State getcurrentState () {
+        return stateManager.getState();
+    }
+
     /*Metodo que permitira realizar todas las acciones del actor kirby en el escenario
      * */
     @Override
