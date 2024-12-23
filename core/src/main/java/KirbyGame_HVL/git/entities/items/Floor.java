@@ -20,10 +20,11 @@ public class Floor extends ActorWithBox2d implements Box2dSpace {
         for (MapObject object : map.getMap().getLayers().get(layerindex).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject)object).getRectangle();
             bodydef.type = BodyDef.BodyType.StaticBody;
-            bodydef.position.set((rectangle.x + rectangle.width / 2), (rectangle.y + rectangle.height /2));
+            bodydef.position.set((rectangle.x + (rectangle.width - 1) / 2), (rectangle.y + (rectangle.height - 1) /2));
             body = world.createBody(bodydef);
-            shape.setAsBox(rectangle.width / 2 ,rectangle.height / 2);
+            shape.setAsBox((rectangle.width-1) / 2 ,(rectangle.height-1)  / 2);
             fixture = body.createFixture(shape, 1);
+            fixture.setUserData("suelo");
         }
 
         shape.dispose();

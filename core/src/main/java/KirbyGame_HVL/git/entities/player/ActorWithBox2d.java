@@ -14,10 +14,6 @@ public class ActorWithBox2d extends Actor {
     protected Fixture fixture;
     protected Main main;
 
-    public Fixture getFixture () {
-        return fixture;
-    }
-
 
 
 }

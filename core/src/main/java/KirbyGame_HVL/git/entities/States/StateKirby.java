@@ -9,21 +9,5 @@ public abstract class StateKirby implements State {
     public StateKirby (Kirby kirby) {
         this.kirby = kirby;
     }
-
-
-    public void start () {
-
-    }
-
-    public void update (float delta) {
-
-    }
-
-    public void end () {
-
-    }
-
-
-
-
+    
 }
