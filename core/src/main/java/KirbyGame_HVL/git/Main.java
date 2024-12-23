@@ -1,5 +1,7 @@
 package KirbyGame_HVL.git;
 
+import KirbyGame_HVL.git.miniGames.culebrita.GamePanelCulebrita;
+import KirbyGame_HVL.git.miniGames.viejita.GamePanelViejita;
 import KirbyGame_HVL.git.screens.gameplay.GameScreen;
 import KirbyGame_HVL.git.screens.mainmenu.PantallaGui;
 import com.badlogic.gdx.Game;
@@ -14,12 +16,16 @@ public class Main extends Game {
     public SpriteBatch batch;
     public PantallaGui pantallaini;
     public GameScreen gameScreen;
+    public GamePanelCulebrita gameCulebrita;
+    public GamePanelViejita gameViejita;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         pantallaini = new PantallaGui(this);
         gameScreen = new GameScreen(this);
+        gameCulebrita = new GamePanelCulebrita(this);
+        gameViejita = new GamePanelViejita();
         manager = new AssetManager();
         manager.load("assets/art/sprites/kirbystay.png", Texture.class);
         manager.load("assets/art/sprites/kirbywalking.png", Texture.class);
