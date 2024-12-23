@@ -149,7 +149,7 @@ public class WaddleDee extends Actor {
         if (isDisposed || isDead) {
             return;
         }
-        waddleDeeSprite.setPosition(body.getPosition().x - 16, body.getPosition().y - 16);
+        waddleDeeSprite.setPosition(body.getPosition().x - 16, body.getPosition().y - 8);
         waddleDeeSprite.draw(batch);
     }
 

@@ -88,7 +88,7 @@ public class GameScreen extends Pantalla implements ContactListener {
         update();
         map.render();
         stage.draw();
-        //bdr.render(world, cam.combined);
+        bdr.render(world, cam.combined);
     }
 
     @Override
