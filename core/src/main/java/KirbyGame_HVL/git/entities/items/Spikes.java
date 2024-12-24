@@ -28,6 +28,7 @@ public class Spikes extends ActorWithBox2d implements Box2dSpace {
             body = world.createBody(bodydef);
             shape.setAsBox(rectangle.width / 2 ,rectangle.height / 2);
             fixture = body.createFixture(shape, 1);
+            fixture.setUserData("spikes");
         }
 
         shape.dispose();

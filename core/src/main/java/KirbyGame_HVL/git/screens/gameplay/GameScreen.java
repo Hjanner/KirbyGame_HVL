@@ -52,9 +52,10 @@ public class GameScreen extends Pantalla implements ContactListener {
         world = new World (new Vector2(0, 0), true);
         world.setContactListener(this);                                 // Añadir el listener de contactos
         kirby = new Kirby(world, main);
+        kirby.setUserObject("kirby");
         stage.addActor(kirby);
         cam = (OrthographicCamera) stage.getCamera();
-        cam.zoom = 0.65f;
+        cam.zoom = 0.45f;
 
         //enemies
         createWaddleDees();
@@ -67,6 +68,39 @@ public class GameScreen extends Pantalla implements ContactListener {
         }
 
         spikes = new Spikes(world, map, 4);
+
+        world.setContactListener(new ContactListener() {
+
+            private boolean setContact(Contact contact, Object userA, Object userB) {
+                return ((contact.getFixtureA().getUserData().equals(userA) && contact.getFixtureB().getUserData().equals(userB)) || (contact.getFixtureA().getUserData().equals(userB) && contact.getFixtureB().getUserData().equals(userA)));
+            }
+
+            @Override
+            public void beginContact(Contact contact) {
+                if ((setContact(contact, "kirby","suelo")) || (setContact(contact, "kirby","spikes"))) {
+                    kirby.setColisionSuelo(true);
+                }
+
+                else {
+                    kirby.setColisionSuelo(false);
+                }
+            }
+
+            @Override
+            public void endContact(Contact contact) {
+                kirby.setColisionSuelo(false);
+            }
+
+            @Override
+            public void preSolve(Contact contact, Manifold manifold) {
+
+            }
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse contactImpulse) {
+
+            }
+        });
     }
 
     @Override
@@ -103,7 +137,7 @@ public class GameScreen extends Pantalla implements ContactListener {
     }
 
     public void update () {
-        cam.position.set(kirby.getFixture().getBody().getPosition(),0);
+        cam.position.set(kirby.getBody().getPosition(),0);
         cam.update();
         map.setView(cam);
     }

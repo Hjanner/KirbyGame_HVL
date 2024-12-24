@@ -11,5 +11,6 @@ public enum EnumStates {
     FLY,
     FREEZE,
     JUMP,
+    FALL2;
 
 }

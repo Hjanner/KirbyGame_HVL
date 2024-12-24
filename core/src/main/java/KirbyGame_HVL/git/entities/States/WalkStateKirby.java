@@ -3,6 +3,7 @@ package KirbyGame_HVL.git.entities.States;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Vector2;
 
 public class WalkStateKirby extends StateKirby{
 
@@ -12,20 +13,47 @@ public class WalkStateKirby extends StateKirby{
 
     @Override
     public void start() {
-
-        kirby.getFixture().getBody().applyLinearImpulse(5,0, kirby.getFixture().getBody().getPosition().x, kirby.getFixture().getBody().getPosition().y, true);
-        kirby.getFixture().getBody().setLinearVelocity(80,0);
-        kirby.setAnimation(EnumStates.WALK);
-
+        System.out.println("Estado caminando");
     }
 
     @Override
     public void update(float delta) {
 
-        if (kirby.getFixture().getBody().getLinearVelocity().y < 0) {
-            kirby.setState(EnumStates.FALL);
-            kirby.setAnimation(EnumStates.FALL);
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && !Gdx.input.isKeyPressed(Input.Keys.LEFT) && !Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            kirby.getBody().setLinearVelocity(60,0);
+            kirby.setFlipx(false);
         }
+
+        else if (!Gdx.input.isKeyPressed(Input.Keys.RIGHT) && Gdx.input.isKeyPressed(Input.Keys.LEFT) && !Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            kirby.getBody().setLinearVelocity(-60,0);
+            kirby.setFlipx(true);
+        }
+
+        if (kirby.getBody().getLinearVelocity().x == 0) {
+            kirby.setState(EnumStates.STAY);
+            kirby.setAnimation(EnumStates.STAY);
+        }
+        if (kirby.getBody().getLinearVelocity().y < 0) {
+            kirby.setState(EnumStates.FALL);
+            kirby.setAnimation(EnumStates.FALL2);
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            kirby.setState(EnumStates.DOWN);
+            kirby.setAnimation(EnumStates.DOWN);
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            kirby.setState(EnumStates.JUMP);
+            kirby.setAnimation(EnumStates.JUMP);
+            kirby.setOpuesto(false);
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.X)) {
+            kirby.setState(EnumStates.RUN);
+            kirby.setAnimation(EnumStates.RUN);
+        }
+
 
     }
 
