@@ -35,6 +35,10 @@ public class Main extends Game {
         manager.load("assets/art/sprites/kirbyjump.png", Texture.class);
         manager.load("assets/art/sprites/kirbyfall.png", Texture.class);
         manager.load("assets/art/sprites/kirbyfall2.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyfly.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyflybegin.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyflyfall.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyflyfallend.png", Texture.class);
         manager.finishLoading();
         setScreen(pantallaini);
 

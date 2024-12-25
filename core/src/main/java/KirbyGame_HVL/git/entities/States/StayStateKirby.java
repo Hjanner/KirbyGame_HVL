@@ -6,6 +6,8 @@ import com.badlogic.gdx.Input;
 
 public class StayStateKirby extends StateKirby {
 
+    private float accumulatedtimer;
+
     public StayStateKirby(Kirby kirby) {
         super(kirby);
     }
@@ -13,32 +15,42 @@ public class StayStateKirby extends StateKirby {
     @Override
     public void start() {
 
-        kirby.setAnimation(EnumStates.STAY);
+        kirby.setOpuesto(false);
         System.out.println("Estado estatico");
+        accumulatedtimer = 0;
     }
 
     @Override
     public void update(float delta) {
 
+        accumulatedtimer += delta;
+        if (accumulatedtimer > 0.16f) {
+            kirby.setAnimation(EnumStates.STAY);
+        }
+
         if (kirby.getBody().getLinearVelocity().y < 0) {
-            kirby.setAnimation(EnumStates.FALL2);
             kirby.setState(EnumStates.FALL);
+            kirby.setDuracion(0);
+            kirby.setAnimation(EnumStates.FALL2);
         }
 
         else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && !Gdx.input.isKeyPressed(Input.Keys.LEFT) && !Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            kirby.setAnimation(EnumStates.WALK);
             kirby.setState(EnumStates.WALK);
+            kirby.setDuracion(0);
+            kirby.setAnimation(EnumStates.WALK);
             kirby.setOpuesto(true);
         }
 
         else if (!Gdx.input.isKeyPressed(Input.Keys.RIGHT) && Gdx.input.isKeyPressed(Input.Keys.LEFT) && !Gdx.input.isKeyPressed(Input.Keys.DOWN)){
-            kirby.setAnimation(EnumStates.WALK);
             kirby.setState(EnumStates.WALK);
+            kirby.setDuracion(0);
+            kirby.setAnimation(EnumStates.WALK);
             kirby.setOpuesto(true);
         }
 
         else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             kirby.setState(EnumStates.DOWN);
+            kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.DOWN);
         }
 
@@ -46,6 +58,7 @@ public class StayStateKirby extends StateKirby {
             kirby.setState(EnumStates.JUMP);
             kirby.setAnimation(EnumStates.JUMP);
             kirby.setOpuesto(false);
+            kirby.getBody().applyLinearImpulse(0,50, kirby.getBody().getPosition().x,kirby.getBody().getPosition().y, true);
         }
     }
 

@@ -8,9 +8,14 @@ public enum EnumStates {
     DOWN,
     DASH,
     FALL,
+    FALL2,
     FLY,
+    FLY2,
+    FLY3,
+    FLY4,
     FREEZE,
     JUMP,
-    FALL2;
+
+
 
 }
