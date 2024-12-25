@@ -90,6 +90,9 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private Animation currentAnimation;
     private CloudKirby cloudkirby;
 
+    private float initialX = 180;
+    private float initialY = 1010;
+
 
     /* Constructor en donde se van a cargar todas las texturas y se incializan las regiones de
        todos los movimientos. Se extraen de las texturas frame por frame con el split para luego
@@ -111,6 +114,12 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         createBody(world);
         texture_animation();
 
+    }
+
+
+    public void resetPosition() {
+        body.setTransform(new Vector2(initialX, initialY), 0);
+        body.setLinearVelocity(0, 0);
     }
 
     public World getWorld () {

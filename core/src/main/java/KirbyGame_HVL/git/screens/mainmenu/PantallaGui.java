@@ -91,7 +91,7 @@ public class PantallaGui extends Pantalla {
         ayuda.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
-                main.setScreen(main.gameViejita);
+                //main.setScreen(main.gameViejita);
             }
         });
 

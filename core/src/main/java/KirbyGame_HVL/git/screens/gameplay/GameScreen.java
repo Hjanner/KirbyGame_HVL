@@ -2,6 +2,7 @@ package KirbyGame_HVL.git.screens.gameplay;
 
 import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.entities.enemis.WaddleDee;
+import KirbyGame_HVL.git.entities.items.CloudKirby;
 import KirbyGame_HVL.git.entities.items.Floor;
 import KirbyGame_HVL.git.entities.items.Spikes;
 import KirbyGame_HVL.git.entities.player.Kirby;
@@ -39,12 +40,20 @@ public class GameScreen extends Pantalla implements ContactListener {
     private ArrayList<WaddleDee> waddleDees;
     private Array<WaddleDee> waddleDeesToRemove;
 
+    //ataques
+    private ArrayList<CloudKirby> clouds;
+    private Array<CloudKirby> cloudsToRemove;
+
+    private boolean puedoResetKirby = false;
+
     public GameScreen(Main main) {
         super(main);
         this.main = main;
         stage = new Stage ();
         waddleDees = new ArrayList<>();
         waddleDeesToRemove = new Array<>();
+        clouds = new ArrayList<>();
+        cloudsToRemove = new Array<>();
     }
 
     @Override
@@ -54,6 +63,7 @@ public class GameScreen extends Pantalla implements ContactListener {
         world.setContactListener(this);                                 // Añadir el listener de contactos
 
         kirby = new Kirby(world, main);
+
         stage.addActor(kirby);
         cam = (OrthographicCamera) stage.getCamera();
         cam.zoom = 0.34f;
@@ -77,6 +87,12 @@ public class GameScreen extends Pantalla implements ContactListener {
         Gdx.gl.glClearColor(0.53f, 0.81f, 0.92f, 1);
 
         world.step(1/60f,6,2);
+
+        if (puedoResetKirby) {
+            kirby.resetPosition();
+            puedoResetKirby = false;
+        }
+
         cloud();
 
         //muerte de enemies
@@ -87,6 +103,14 @@ public class GameScreen extends Pantalla implements ContactListener {
             waddleDees.remove(waddle);
         }
         waddleDeesToRemove.clear();
+
+        // eliminar nubes
+        for (CloudKirby cloud : cloudsToRemove) {
+            cloud.remove();                         // Elimina del stage
+            world.destroyBody(cloud.getBody());     // Destruye el cuerpo en Box2D
+            clouds.remove(cloud);
+        }
+        cloudsToRemove.clear();
 
         stage.act();
         update();
@@ -110,7 +134,6 @@ public class GameScreen extends Pantalla implements ContactListener {
         waddleDees.add(waddleDee2);
         waddleDees.add(waddleDee3);
     }
-
 
     @Override
     public void dispose() {
@@ -155,20 +178,36 @@ public class GameScreen extends Pantalla implements ContactListener {
             Kirby kirby = (Kirby) (userDataA instanceof Kirby ? userDataA : userDataB);
             WaddleDee waddle = (WaddleDee) (userDataA instanceof WaddleDee ? userDataA : userDataB);
 
+            //muerte por dashing
             if (kirby.isDashing()) {
                 System.out.println("Waddle Dee eliminado por dash");
                 if (!waddleDeesToRemove.contains(waddle, true)) {
                     waddleDeesToRemove.add(waddle);
-                    //waddle.die();
                 }
             } else {
                 // Kirby recibe daño o rebota
+                puedoResetKirby = true;
                 kirby.setColisionSuelo(true);
-                System.out.println("Kirby ha colisionado con WaddleDee sin dash");
+                //aqui debe ir una animacion de muerte
             }
         }
 
-        // Colisión con el suelo
+        // muerte por cloud
+        if ((userDataA instanceof CloudKirby && userDataB instanceof WaddleDee) ||
+            (userDataB instanceof CloudKirby && userDataA instanceof WaddleDee)) {
+
+            WaddleDee waddle = (WaddleDee) (userDataA instanceof WaddleDee ? userDataA : userDataB);
+            if (!waddleDeesToRemove.contains(waddle, true)) {
+                waddleDeesToRemove.add(waddle);
+            }
+
+            CloudKirby cloud = (CloudKirby) (userDataA instanceof CloudKirby ? userDataA : userDataB);
+            if (!cloudsToRemove.contains(cloud, true)) {
+                cloudsToRemove.add(cloud);
+            }
+        }
+
+        // colision con el suelo
         if ((setContact(contact, this.kirby, "suelo")) ||
             (setContact(contact, this.kirby, "spikes"))) {
             kirby.setColisionSuelo(true);

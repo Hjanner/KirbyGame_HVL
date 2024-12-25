@@ -52,7 +52,7 @@ public class CloudKirby extends ActorWithBox2d {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(3,3);
         fixture = body.createFixture(shape,0.01f);
-        fixture.setUserData("Cloud");
+        fixture.setUserData(this);
         shape.dispose();
     }
 
@@ -64,8 +64,32 @@ public class CloudKirby extends ActorWithBox2d {
     public void act(float delta) {
         super.act(delta);
         this.accumulatedtimer += delta;
-        if (accumulatedtimer > 0.6f) {
-            addAction(Actions.removeActor());
+
+        if (accumulatedtimer > 0.8f) {
+            // Agregar una accion para eliminar el actor
+            addAction(Actions.sequence(
+                Actions.removeActor(),
+                Actions.run(() -> {
+                    if (world != null && body != null) {
+                        world.destroyBody(body);
+                        body = null;
+                    }
+                })
+            ));
         }
     }
+
+    public void dispose(){
+        if (kirbyCloudTexture != null) {
+            kirbyCloudTexture.dispose();
+            kirbyCloudTexture = null;
+        }
+
+        if (world != null && body != null) {
+            world.destroyBody(body);
+            body = null;
+        }
+    }
+
+
 }
