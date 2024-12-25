@@ -145,7 +145,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         CircleShape kirbyshape = new CircleShape();
         kirbyshape.setRadius(5);
         fixture = body.createFixture(kirbyshape,0.008f);
-        fixture.setUserData("kirby");
+        fixture.setUserData(this);
         body.setFixedRotation(true);
         kirbyshape.dispose();
     }
@@ -411,6 +411,11 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
             default:
                 break;
         }
+    }
+
+    public boolean isDashing(){
+        System.out.println("esta dacheando");
+        return getcurrentState() instanceof DashStateKirby;
     }
 
     public void setState(EnumStates typestate) {

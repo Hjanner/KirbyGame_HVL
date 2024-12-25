@@ -132,23 +132,8 @@ public class WaddleDee extends Actor {
 
     public void die() {
         isDead = true;
-        // Opcional: añadir animación de muerte
-        body.setActive(false); // Desactivar físicas
+        body.setActive(false);          // Desactivar físicas
         System.out.println("muerto");
-    }
-
-    public boolean isDashing(Body otherBody) {
-        Fixture fixture = otherBody.getFixtureList().first();                   //obtener fixture
-        System.out.println("pase por aca");
-        if (fixture != null) {
-            Object userData = fixture.getUserData();                            //obtener referencia
-            if (userData instanceof Kirby) {
-                Kirby kirby = (Kirby) userData;
-                System.out.println("ha sido dacheado");
-                return kirby.isDashing();
-            }
-        }
-        return false;
     }
 
     @Override
@@ -156,7 +141,7 @@ public class WaddleDee extends Actor {
         if (isDisposed || isDead) {
             return;
         }
-        waddleDeeSprite.setPosition(body.getPosition().x - 16, body.getPosition().y - 16);
+        waddleDeeSprite.setPosition(body.getPosition().x - 16, body.getPosition().y - 8);
         waddleDeeSprite.draw(batch);
     }
 
