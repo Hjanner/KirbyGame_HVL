@@ -2,6 +2,7 @@ package KirbyGame_HVL.git.entities.player;
 
 import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.entities.States.*;
+import KirbyGame_HVL.git.entities.items.CloudKirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -30,6 +31,10 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private Texture kirbyjumptexture;
     private Texture kirbyfalltexture;
     private Texture kirbyfall2texture;
+    private Texture kirbyflytexture;
+    private Texture kirbyflybegintexture;
+    private Texture kirbyflyfalltexture;
+    private Texture kirbyflyfallendtexture;
     private TextureRegion kirbywalkregion;
     private TextureRegion kirbyStayregion;
     private TextureRegion kirbydownregion;
@@ -38,6 +43,10 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private TextureRegion kirbyjumpregion;
     private TextureRegion kirbyfallregion;
     private TextureRegion kirbyfall2region;
+    private TextureRegion kirbyflyregion;
+    private TextureRegion kirbyflybeginregion;
+    private TextureRegion kirbyflyfallregion;
+    private TextureRegion kirbyflyfallendregion;
     private TextureRegion [] kirbyframeswalk;
     private TextureRegion [] kirbyframesstay;
     private TextureRegion [] kirbyframesdown;
@@ -46,11 +55,17 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private TextureRegion [] kirbyframesjump;
     private TextureRegion [] kirbyframesfall;
     private TextureRegion [] kirbyframesfall2;
+    private TextureRegion [] kirbyframesfly;
+    private TextureRegion [] kirbyframesflybegin;
+    private TextureRegion [] kirbyframesflyfall;
+    private TextureRegion [] kirbyframesflyfallend;
     private Sprite kirbysprite;
-    float duracion = 0;
+    private float duracion = 0;
+    private int contador;
     private boolean flipX;
     private boolean opuesto;
     private boolean colisionSuelo;
+    private boolean realizar;
     private StateManager stateManager;
     private RunStateKirby stateRun;
     private WalkStateKirby stateWalk;
@@ -59,6 +74,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private DashStateKirby stateDash;
     private FallStateKirby stateFall;
     private DownStateKirby stateDown;
+    private FlyStateKirby stateFly;
     private Animation kirbyanimationStay;
     private Animation kirbyanimationWalk;
     private Animation kirbyanimationDown;
@@ -67,7 +83,12 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private Animation kirbyanimationJump;
     private Animation kirbyanimationfall;
     private Animation kirbyanimationfall2;
+    private Animation kirbyanimationfly;
+    private Animation kirbyanimationflybegin;
+    private Animation kirbyanimationflyfall;
+    private Animation kirbyanimationflyfallend;
     private Animation currentAnimation;
+    private CloudKirby cloudkirby;
 
 
     /* Constructor en donde se van a cargar todas las texturas y se incializan las regiones de
@@ -85,10 +106,27 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         this.stateDash = new DashStateKirby(this);
         this.stateFall = new FallStateKirby(this);
         this.stateDown = new DownStateKirby(this);
+        this.stateFly = new FlyStateKirby(this);
         this.stateManager.setState(stateStay);
         createBody(world);
         texture_animation();
 
+    }
+
+    public World getWorld () {
+        return this.world;
+    }
+
+    public void setCloud (CloudKirby cloudKirby) {
+        this.cloudkirby = cloudKirby;
+    }
+
+    public CloudKirby getCloud () {
+        return this.cloudkirby;
+    }
+
+    public boolean getFlipX () {
+        return this.flipX;
     }
 
     /* Metodo que se utiliza para actualizar la posicion y animacion del Sprite
@@ -131,6 +169,14 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbyfallregion = new TextureRegion(kirbyfalltexture, 1600,32);
         kirbyfall2texture = main.getManager().get("assets/art/sprites/kirbyfall2.png");
         kirbyfall2region = new TextureRegion(kirbyfall2texture, 1600,32);
+        kirbyflytexture = main.getManager().get("assets/art/sprites/kirbyfly.png");
+        kirbyflyregion = new TextureRegion(kirbyflytexture, 160,32);
+        kirbyflybegintexture = main.getManager().get("assets/art/sprites/kirbyflybegin.png");
+        kirbyflybeginregion = new TextureRegion(kirbyflybegintexture, 192,32);
+        kirbyflyfalltexture = main.getManager().get("assets/art/sprites/kirbyflyfall.png");
+        kirbyflyfallregion = new TextureRegion(kirbyflyfalltexture, 96,32);
+        kirbyflyfallendtexture = main.getManager().get("assets/art/sprites/kirbyflyfallend.png");
+        kirbyflyfallendregion = new TextureRegion(kirbyflyfallendtexture, 64,32);
 
         TextureRegion [][] tempkirbystay = kirbyStayregion.split(64/2,32);
         TextureRegion[][] tempkirbywalk = kirbywalkregion.split(320/10,32);
@@ -139,6 +185,10 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         TextureRegion [][] tempkirbyrun = kirbyrunregion.split(256/8, 32);
         TextureRegion [][] tempkirbyfall = kirbyfallregion.split(1600/50,32);
         TextureRegion [][] tempkirbyfall2 = kirbyfall2region.split(1600/50,32);
+        TextureRegion [][] tempkirbyfly = kirbyflyregion.split(160/5, 32);
+        TextureRegion [][] tempkirbyflybegin = kirbyflybeginregion.split(192/6, 32);
+        TextureRegion [][] tempkirbyflyfall = kirbyflyfallregion.split(96/3, 32);
+        TextureRegion [][] tempkirbyflyfallend = kirbyflyfallendregion.split(64/2, 32);
         kirbyframeswalk = new TextureRegion[tempkirbywalk.length * tempkirbywalk[0].length];
         kirbyframesstay = new TextureRegion [tempkirbystay.length * tempkirbystay[0].length];
         kirbyframesdown = new TextureRegion[tempkirbydown.length * tempkirbydown[0].length];
@@ -148,6 +198,11 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbyframesjump[0] = kirbyjumpregion;
         kirbyframesfall = new TextureRegion[tempkirbyfall.length * tempkirbyfall[0].length];
         kirbyframesfall2 = new TextureRegion[tempkirbyfall2.length * tempkirbyfall2[0].length];
+        kirbyframesfly = new TextureRegion[tempkirbyfly.length * tempkirbyfly[0].length];
+        kirbyframesflybegin = new TextureRegion[tempkirbyflybegin.length * tempkirbyflybegin[0].length];
+        kirbyframesflyfall = new TextureRegion[tempkirbyflyfall.length * tempkirbyflyfall[0].length];
+        kirbyframesflyfallend = new TextureRegion[tempkirbyflyfallend.length * tempkirbyflyfallend[0].length];
+
         int id = 0;
         for (int i = 0; i < tempkirbywalk.length; i++) {
             for (int j = 0; j < tempkirbywalk[i].length; j++){
@@ -155,11 +210,13 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
                 id++;
             }
         }
+
         id = 0;
         for (int i = 0; i < tempkirbystay.length; i++) {
             for (int j = 0; j < tempkirbystay[i].length; j++) {
                 kirbyframesstay[id] = tempkirbystay[i][j];
                 kirbyframesdown[id] = tempkirbydown[i][j];
+                kirbyframesflyfallend[id] = tempkirbyflyfallend[i][j];
                 id++;
             }
         }
@@ -174,9 +231,33 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         }
 
         id = 0;
+        for (int i = 0; i< tempkirbyfly.length; i++) {
+            for (int j = 0; j < tempkirbyfly[i].length; j++) {
+                kirbyframesfly[id] = tempkirbyfly[i][j];
+                id++;
+            }
+        }
+
+        id = 0;
+        for (int i = 0; i< tempkirbyflyfall.length; i++) {
+            for (int j = 0; j < tempkirbyflyfall[i].length; j++) {
+                kirbyframesflyfall[id] = tempkirbyflyfall[i][j];
+                id++;
+            }
+        }
+
+        id = 0;
         for (int i = 0; i < tempkirbyslide.length; i++) {
             for (int j = 0; j < tempkirbyslide[i].length; j++) {
                 kirbyframesslide[id] = tempkirbyslide[i][j];
+                id++;
+            }
+        }
+
+        id = 0;
+        for (int i = 0; i < tempkirbyflybegin.length; i++) {
+            for (int j = 0; j < tempkirbyflybegin[i].length; j++) {
+                kirbyframesflybegin[id] = tempkirbyflybegin[i][j];
                 id++;
             }
         }
@@ -197,6 +278,10 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbyanimationJump = new Animation (1f,kirbyframesjump);
         kirbyanimationfall = new Animation(0.06f, kirbyframesfall);
         kirbyanimationfall2 = new Animation(0.06f, kirbyframesfall2);
+        kirbyanimationflybegin = new Animation(0.05f, kirbyframesflybegin);
+        kirbyanimationfly = new Animation(0.08f, kirbyframesfly);
+        kirbyanimationflyfall = new Animation(0.08f, kirbyframesflyfall);
+        kirbyanimationflyfallend = new Animation(0.1f, kirbyframesflyfallend);
         currentAnimation = kirbyanimationStay;
     }
 
@@ -233,6 +318,14 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         return colisionSuelo;
     }
 
+    public boolean getRealizar() {
+        return realizar;
+    }
+
+    public void setRealizar (boolean realizar) {
+        this.realizar = realizar;
+    }
+
     public State getcurrentState () {
         return stateManager.getState();
     }
@@ -252,16 +345,31 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     }
 
     private void retroceso () {
-        body.applyLinearImpulse(0, -0.8f, body.getPosition().x, body.getPosition().y, true);
+        if (stateManager.getState() instanceof FlyStateKirby) {
+            body.applyForce(0, -13f, body.getPosition().x, body.getPosition().y, true);
+        }
+        else {
+            body.applyLinearImpulse(0, -0.8f, body.getPosition().x, body.getPosition().y, true);
+        }
         if (opuesto) {
             Vector2 impulsoOpuesto = body.getLinearVelocity().cpy().scl(-0.1f);
             body.applyLinearImpulse(impulsoOpuesto.x, impulsoOpuesto.y, body.getPosition().x, body.getPosition().y, true);
         }
+
+        else {
+            Vector2 impulsoOpuesto = body.getLinearVelocity().cpy().scl(-0.003f);
+            body.applyLinearImpulse(impulsoOpuesto.x, impulsoOpuesto.y, body.getPosition().x, body.getPosition().y, true);
+        }
+    }
+
+
+
+    public void setDuracion(float duracion) {
+        this.duracion = duracion;
     }
 
     public void setAnimation (EnumStates typestate) {
 
-        duracion = 0;
         switch (typestate) {
 
             case RUN:
@@ -287,6 +395,18 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
                 break;
             case FALL2:
                 currentAnimation = kirbyanimationfall2;
+                break;
+            case FLY:
+                currentAnimation = kirbyanimationflybegin;
+                break;
+            case FLY2:
+                currentAnimation = kirbyanimationfly;
+                break;
+            case FLY3:
+                currentAnimation = kirbyanimationflyfall;
+                break;
+            case FLY4:
+                currentAnimation = kirbyanimationflyfallend;
                 break;
             default:
                 break;
@@ -317,6 +437,11 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
                 break;
             case DOWN:
                 stateManager.setState(stateDown);
+                break;
+            case FLY:
+                stateManager.setState(stateFly);
+                break;
+            default:
                 break;
 
         }

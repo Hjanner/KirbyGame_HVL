@@ -19,6 +19,13 @@ public class WalkStateKirby extends StateKirby{
     @Override
     public void update(float delta) {
 
+        if (kirby.getBody().getLinearVelocity().y < 0) {
+            kirby.setState(EnumStates.FALL);
+            kirby.setDuracion(0);
+            kirby.setAnimation(EnumStates.FALL2);
+            kirby.setOpuesto(false);
+        }
+
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && !Gdx.input.isKeyPressed(Input.Keys.LEFT) && !Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             kirby.getBody().setLinearVelocity(60,0);
             kirby.setFlipx(false);
@@ -31,15 +38,13 @@ public class WalkStateKirby extends StateKirby{
 
         if (kirby.getBody().getLinearVelocity().x == 0) {
             kirby.setState(EnumStates.STAY);
+            kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.STAY);
-        }
-        if (kirby.getBody().getLinearVelocity().y < 0) {
-            kirby.setState(EnumStates.FALL);
-            kirby.setAnimation(EnumStates.FALL2);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             kirby.setState(EnumStates.DOWN);
+            kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.DOWN);
         }
 
@@ -47,6 +52,7 @@ public class WalkStateKirby extends StateKirby{
             kirby.setState(EnumStates.JUMP);
             kirby.setAnimation(EnumStates.JUMP);
             kirby.setOpuesto(false);
+            kirby.getBody().applyLinearImpulse(0,50,kirby.getBody().getPosition().x,kirby.getBody().getPosition().y, true);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.X)) {

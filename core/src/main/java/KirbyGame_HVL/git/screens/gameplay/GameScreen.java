@@ -14,6 +14,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 
 public class GameScreen extends Pantalla {
 
@@ -94,6 +95,7 @@ public class GameScreen extends Pantalla {
         Gdx.gl.glClearColor(0.53f, 0.81f, 0.92f, 1);
 
         world.step(1/60f,6,2);
+        cloud();
         stage.act();
         update();
         map.render();
@@ -113,6 +115,14 @@ public class GameScreen extends Pantalla {
         cam.position.set(kirby.getBody().getPosition(),0);
         cam.update();
         map.setView(cam);
+
     }
+
+    public void cloud () {
+        if (kirby.getCloud() != null) {
+            stage.addActor(kirby.getCloud());
+        }
+    }
+
 
 }

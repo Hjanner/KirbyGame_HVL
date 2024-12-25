@@ -19,11 +19,13 @@ public class DownStateKirby extends StateKirby {
     public void update(float delta) {
         if (!Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             kirby.setState(EnumStates.STAY);
+            kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.STAY);
         }
 
         else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             kirby.setState(EnumStates.DASH);
+            kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.DASH);
             kirby.getBody().applyLinearImpulse(60,0, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
             kirby.setFlipx(false);
@@ -31,6 +33,7 @@ public class DownStateKirby extends StateKirby {
 
         else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             kirby.setState(EnumStates.DASH);
+            kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.DASH);
             kirby.getBody().applyLinearImpulse(-120,0, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
             kirby.setFlipx(true);

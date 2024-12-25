@@ -12,7 +12,6 @@ public class JumpStateKirby extends StateKirby {
 
     @Override
     public void start() {
-        kirby.getBody().applyLinearImpulse(0,50,kirby.getBody().getPosition().x,kirby.getBody().getPosition().y, true);
         System.out.println("Estado Saltando");
     }
 
@@ -21,17 +20,24 @@ public class JumpStateKirby extends StateKirby {
 
         if (kirby.getBody().getLinearVelocity().y <= 0) {
             kirby.setState(EnumStates.FALL);
+            kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.FALL);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            kirby.getBody().applyLinearImpulse(2,0, kirby.getBody().getPosition().x,kirby.getBody().getPosition().y, true);
+            kirby.getBody().applyForce(50,0, kirby.getBody().getPosition().x,kirby.getBody().getPosition().y, true);
             kirby.setFlipx(false);
         }
 
         else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            kirby.getBody().applyLinearImpulse(-2,0, kirby.getBody().getPosition().x,kirby.getBody().getPosition().y, true);
+            kirby.getBody().applyForce(-50,0, kirby.getBody().getPosition().x,kirby.getBody().getPosition().y, true);
             kirby.setFlipx(true);
+        }
+
+        else if (Gdx.input.isKeyPressed(Input.Keys.C)) {
+            kirby.setState(EnumStates.FLY);
+            kirby.setDuracion(0);
+            kirby.setAnimation(EnumStates.FLY);
         }
 
 
