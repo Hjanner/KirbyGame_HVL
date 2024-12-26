@@ -40,9 +40,11 @@ public class GameScreen extends Pantalla implements ContactListener {
     private ArrayList<WaddleDee> waddleDees;
     private Array<WaddleDee> waddleDeesToRemove;
 
-    //ataques
+//ataques
+    //nubes
     private ArrayList<CloudKirby> clouds;
     private Array<CloudKirby> cloudsToRemove;
+    private float lastCloudCreationTime = 0;
 
     private boolean puedoResetKirby = false;
 
@@ -93,24 +95,13 @@ public class GameScreen extends Pantalla implements ContactListener {
             puedoResetKirby = false;
         }
 
-        cloud();
 
         //muerte de enemies
-        for (WaddleDee waddle : waddleDeesToRemove) {
-            waddle.dispose();
-            waddle.die();
-            world.destroyBody(waddle.getBody());
-            waddleDees.remove(waddle);
-        }
-        waddleDeesToRemove.clear();
+        deleteWaddleDees();
 
-        // eliminar nubes
-        for (CloudKirby cloud : cloudsToRemove) {
-            cloud.remove();                         // Elimina del stage
-            world.destroyBody(cloud.getBody());     // Destruye el cuerpo en Box2D
-            clouds.remove(cloud);
-        }
-        cloudsToRemove.clear();
+        cloud();
+        deleteClouds();
+
 
         stage.act();
         update();
@@ -135,15 +126,14 @@ public class GameScreen extends Pantalla implements ContactListener {
         waddleDees.add(waddleDee3);
     }
 
-    @Override
-    public void dispose() {
-        stage.dispose();
-        world.dispose();
-        kirby.dispose();
-
-        for(WaddleDee waddle : waddleDees) {
+    private void deleteWaddleDees(){
+        for (WaddleDee waddle : waddleDeesToRemove) {
             waddle.dispose();
+            waddle.die();
+            world.destroyBody(waddle.getBody());
+            waddleDees.remove(waddle);
         }
+        waddleDeesToRemove.clear();
     }
 
     public void update () {
@@ -153,12 +143,25 @@ public class GameScreen extends Pantalla implements ContactListener {
 
     }
 
+//nube
     public void cloud () {
-        if (kirby.getCloud() != null) {
+        lastCloudCreationTime += Gdx.graphics.getDeltaTime();
+
+        if (lastCloudCreationTime >= 1f && kirby.getCloud() != null) {
             stage.addActor(kirby.getCloud());
         }
     }
 
+    public void deleteClouds(){
+        for (CloudKirby cloud : cloudsToRemove) {
+            world.destroyBody(cloud.getBody());     // Destruye el cuerpo en Box2D
+            cloud.remove();                         // Elimina del stage
+            clouds.remove(cloud);
+        }
+        cloudsToRemove.clear();
+    }
+
+//listener
     private boolean setContact(Contact contact, Object userA, Object userB) {
         return ((contact.getFixtureA().getUserData().equals(userA) && contact.getFixtureB().getUserData().equals(userB)) || (contact.getFixtureA().getUserData().equals(userB) && contact.getFixtureB().getUserData().equals(userA)));
     }
@@ -196,11 +199,13 @@ public class GameScreen extends Pantalla implements ContactListener {
         if ((userDataA instanceof CloudKirby && userDataB instanceof WaddleDee) ||
             (userDataB instanceof CloudKirby && userDataA instanceof WaddleDee)) {
 
+            //elimino waddle
             WaddleDee waddle = (WaddleDee) (userDataA instanceof WaddleDee ? userDataA : userDataB);
             if (!waddleDeesToRemove.contains(waddle, true)) {
                 waddleDeesToRemove.add(waddle);
             }
 
+            //elimino nube
             CloudKirby cloud = (CloudKirby) (userDataA instanceof CloudKirby ? userDataA : userDataB);
             if (!cloudsToRemove.contains(cloud, true)) {
                 cloudsToRemove.add(cloud);
@@ -229,6 +234,17 @@ public class GameScreen extends Pantalla implements ContactListener {
     @Override
     public void postSolve(Contact contact, ContactImpulse contactImpulse) {
 
+    }
+
+    @Override
+    public void dispose() {
+        stage.dispose();
+        world.dispose();
+        kirby.dispose();
+
+        for(WaddleDee waddle : waddleDees) {
+            waddle.dispose();
+        }
     }
 
 }

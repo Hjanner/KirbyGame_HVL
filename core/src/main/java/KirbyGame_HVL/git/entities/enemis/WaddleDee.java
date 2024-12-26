@@ -28,7 +28,7 @@ public class WaddleDee extends Actor {
     private boolean flipX = false;
     private float movementSpeed = 30f;                  // Pixels per second
     private float movementTime = 0;
-    private float cambioDireccionIntervalo = 2f;
+    private float cambioDireccionIntervalo = 2f;            //rango de cambio de direccion
 
     private boolean isDead = false;
     private boolean isDisposed = false;
@@ -47,7 +47,7 @@ public class WaddleDee extends Actor {
         body = world.createBody(bodyDef);
 
         CircleShape shape = new CircleShape();
-        shape.setRadius(8);                                 // Similar al Kirby
+        shape.setRadius(5);                                 // Similar al Kirby
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -79,7 +79,7 @@ public class WaddleDee extends Actor {
         // crear animation y y sprite
         walkAnimation = new Animation(0.15f, waddleDeeFrames);
         waddleDeeSprite = new Sprite(waddleDeeFrames[0]);
-        waddleDeeSprite.setSize(32, 32);
+        waddleDeeSprite.setSize(20, 20);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class WaddleDee extends Actor {
         if (isDisposed || isDead) {
             return;
         }
-        waddleDeeSprite.setPosition(body.getPosition().x - 16, body.getPosition().y - 8);
+        waddleDeeSprite.setPosition(body.getPosition().x - 10, body.getPosition().y - 5);
         waddleDeeSprite.draw(batch);
     }
 
