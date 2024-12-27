@@ -26,7 +26,7 @@ public class WaddleDee extends Actor {
 
     private float duration = 0;
     private boolean flipX = false;
-    private float movementSpeed = 30f;                  // Pixels per second
+    private float movementSpeed = 30f;                      // Pixels per second
     private float movementTime = 0;
     private float cambioDireccionIntervalo = 2f;            //rango de cambio de direccion
 

@@ -371,8 +371,6 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         }
     }
 
-
-
     public void setDuracion(float duracion) {
         this.duracion = duracion;
     }

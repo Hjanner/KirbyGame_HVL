@@ -70,7 +70,7 @@ public class CloudKirby extends ActorWithBox2d {
 
         //este metodo esta al peloooo pelucha
         if (accumulatedtimer > CLOUD_LIFETIME) {
-            if (world != null && body != null) {
+        if (world != null && body != null) {
                 world.destroyBody(body);            //Eliminacion directa del cuerpo fisico ojito! se ejecuta antes de eliminar el actor para evitar referencias fisicas residuales
                 body = null;
             }
@@ -79,7 +79,7 @@ public class CloudKirby extends ActorWithBox2d {
         }
 }
 
-    private void dispose() {
+    public void dispose() {
         if (kirbyCloudTexture != null) {
             kirbyCloudTexture.dispose();
             kirbyCloudTexture = null;

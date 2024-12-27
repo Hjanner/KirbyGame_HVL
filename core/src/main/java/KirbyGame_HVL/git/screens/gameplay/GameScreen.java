@@ -4,14 +4,19 @@ import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.entities.enemis.WaddleDee;
 import KirbyGame_HVL.git.entities.items.CloudKirby;
 import KirbyGame_HVL.git.entities.items.Floor;
+import KirbyGame_HVL.git.entities.items.Key;
 import KirbyGame_HVL.git.entities.items.Spikes;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
 import KirbyGame_HVL.git.utils.helpers.TiledMapHelper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -20,8 +25,11 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.Texture;
 
-public class GameScreen extends Pantalla implements ContactListener {
+
+public class GameScreen extends Pantalla implements ContactListener, Screen {
 
     private Stage stage;
 
@@ -35,6 +43,17 @@ public class GameScreen extends Pantalla implements ContactListener {
     private Box2DDebugRenderer bdr;
     private Floor floor;
     private Spikes spikes;
+
+
+//items
+    //keys
+    private ArrayList<Key> keys;
+    private Array<Key> keysToRemove;
+    private Texture keyIconTexture;
+    private Sprite keyIconSprite;
+    private int keysCollected = 0;
+    private final int TOTAL_KEYS = 3;
+    private BitmapFont font;
 
     //enemies
     private ArrayList<WaddleDee> waddleDees;
@@ -56,6 +75,10 @@ public class GameScreen extends Pantalla implements ContactListener {
         waddleDeesToRemove = new Array<>();
         clouds = new ArrayList<>();
         cloudsToRemove = new Array<>();
+        keys = new ArrayList<>();
+        keysToRemove = new Array<>();
+        font = new BitmapFont();
+        font.setColor(Color.WHITE);
     }
 
     @Override
@@ -70,7 +93,9 @@ public class GameScreen extends Pantalla implements ContactListener {
         cam = (OrthographicCamera) stage.getCamera();
         cam.zoom = 0.34f;
 
-        //enemies
+        loadAssetsKey();
+        createKeys();
+
         createWaddleDees();
 
         tiledMapHelper = new TiledMapHelper();
@@ -95,6 +120,7 @@ public class GameScreen extends Pantalla implements ContactListener {
             puedoResetKirby = false;
         }
 
+        deleteKeys();
 
         //muerte de enemies
         deleteWaddleDees();
@@ -102,15 +128,80 @@ public class GameScreen extends Pantalla implements ContactListener {
         cloud();
         deleteClouds();
 
-
         stage.act();
         update();
         map.render();
         bdr.render(world, cam.combined);
         stage.draw();
+
+        renderKeyContador();
     }
 
-    //enemies
+    public void update () {
+        cam.position.set(kirby.getBody().getPosition(),0);
+        cam.update();
+        map.setView(cam);
+
+    }
+
+//ITEMS
+    private void loadAssetsKey(){
+        keyIconTexture = main.getManager().get("assets/art/sprites/kirbystay.png");
+        keyIconSprite = new Sprite(keyIconTexture);
+        keyIconSprite.setSize(16, 16);
+    }
+
+    private void createKeys(){
+        Key key1 = new Key(world, main, 300, 1010);
+        Key key2 = new Key(world, main, 500, 1010);
+        Key key3 = new Key(world, main, 700, 1010);
+
+        keys.add(key1);
+        keys.add(key2);
+        keys.add(key3);
+
+        // Añade las llaves al stage
+        for (Key key : keys) {
+            stage.addActor(key);
+        }
+    }
+
+    private void renderKeyContador() {
+        Batch batch = stage.getBatch();
+        batch.begin();
+
+        batch.setProjectionMatrix(stage.getCamera().combined);
+
+        // posicion
+        float baseX = cam.position.x - cam.viewportWidth/2 * cam.zoom + 10;
+        float baseY = cam.position.y + cam.viewportHeight/2 * cam.zoom - 20;
+
+        // Dibuja las llaves
+        for (int i = 0; i < TOTAL_KEYS; i++) {
+            keyIconSprite.setPosition(baseX + (i * 20), baseY);
+            keyIconSprite.setAlpha(i < keysCollected ? 1f : 0.5f); // Llaves no recolectadas semi-transparentes
+            keyIconSprite.draw(batch);
+        }
+
+        // Dibuja el contador
+        font.getData().setScale(.8f);
+        font.draw(batch, keysCollected + "/" + TOTAL_KEYS,
+                baseX + (TOTAL_KEYS * 20) + 5,
+                baseY + 9);
+
+        batch.end();
+    }
+
+    private void deleteKeys(){
+        for (Key key : keysToRemove) {
+            world.destroyBody(key.getBody());
+            key.remove();
+        }
+        keysToRemove.clear();
+    }
+
+//ENEMIES
+    //WADDLE DEE
     private void createWaddleDees() {
         WaddleDee waddleDee1 = new WaddleDee(world, main, 400, 1010); // Ajusta las coordenadas según necesites
         WaddleDee waddleDee2 = new WaddleDee(world, main, 500, 1010);
@@ -134,13 +225,6 @@ public class GameScreen extends Pantalla implements ContactListener {
             waddleDees.remove(waddle);
         }
         waddleDeesToRemove.clear();
-    }
-
-    public void update () {
-        cam.position.set(kirby.getBody().getPosition(),0);
-        cam.update();
-        map.setView(cam);
-
     }
 
 //nube
@@ -174,7 +258,27 @@ public class GameScreen extends Pantalla implements ContactListener {
         Object userDataA = fixtureA.getUserData();
         Object userDataB = fixtureB.getUserData();
 
-        // Colisión Kirby-WaddleDee
+//ITEMS
+        // colision con llave
+        if ((userDataA instanceof Kirby && userDataB instanceof Key) ||
+            (userDataB instanceof Kirby && userDataA instanceof Key)) {
+
+            Key keyInContact = (Key) (userDataA instanceof Key ? userDataA : userDataB);
+
+            if (!keyInContact.isCollected()) {
+                keyInContact.collect();
+                for (Key key : keys) {
+                    if (key.isCollected() && !keysToRemove.contains(key, true)) {
+                        keysToRemove.add(key);
+                    }
+                }
+                keysCollected++;
+                //un  mensaje en pantalla ir en pantalla
+            }
+        }
+
+//ENEMIES
+        // colision Kirby-WaddleDee
         if ((userDataA instanceof Kirby && userDataB instanceof WaddleDee) ||
             (userDataB instanceof Kirby && userDataA instanceof WaddleDee)) {
 
@@ -195,7 +299,7 @@ public class GameScreen extends Pantalla implements ContactListener {
             }
         }
 
-        // muerte por cloud
+        // muerte por cloud Kirby-WaddleDee
         if ((userDataA instanceof CloudKirby && userDataB instanceof WaddleDee) ||
             (userDataB instanceof CloudKirby && userDataA instanceof WaddleDee)) {
 
@@ -212,6 +316,7 @@ public class GameScreen extends Pantalla implements ContactListener {
             }
         }
 
+//WORLD
         // colision con el suelo
         if ((setContact(contact, this.kirby, "suelo")) ||
             (setContact(contact, this.kirby, "spikes"))) {
@@ -245,6 +350,12 @@ public class GameScreen extends Pantalla implements ContactListener {
         for(WaddleDee waddle : waddleDees) {
             waddle.dispose();
         }
+
+        for (Key key : keys) {
+            key.dispose();
+        }
+        font.dispose();
+        keyIconTexture.dispose();
     }
 
 }

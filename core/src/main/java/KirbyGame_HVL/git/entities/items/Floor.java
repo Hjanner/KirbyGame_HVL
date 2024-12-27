@@ -29,4 +29,13 @@ public class Floor extends ActorWithBox2d implements Box2dSpace {
 
         shape.dispose();
     }
+
+    @Override
+    public void dispose() {
+        if (body != null) {
+            body.getWorld().destroyBody(body);
+            body = null;
+        }
+
+    }
 }

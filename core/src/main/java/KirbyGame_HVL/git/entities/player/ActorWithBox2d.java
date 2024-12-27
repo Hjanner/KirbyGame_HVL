@@ -6,7 +6,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public class ActorWithBox2d extends Actor {
+public abstract class ActorWithBox2d extends Actor {
 
     // Atributos
     protected World world;
@@ -15,5 +15,5 @@ public class ActorWithBox2d extends Actor {
     protected Main main;
 
 
-
+    public abstract void dispose();
 }
