@@ -1,4 +1,4 @@
-package KirbyGame_HVL.git.entities.States;
+package KirbyGame_HVL.git.entities.States.StatesKirby;
 
 public enum EnumStates {
 
@@ -13,8 +13,9 @@ public enum EnumStates {
     FLY2,
     FLY3,
     FLY4,
-    FREEZE,
+    DAMAGE,
     JUMP,
+    ABSORB,
 
 
 

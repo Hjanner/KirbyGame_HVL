@@ -1,10 +1,9 @@
-package KirbyGame_HVL.git.entities.States;
+package KirbyGame_HVL.git.entities.States.StatesKirby;
 
 import KirbyGame_HVL.git.entities.items.CloudKirby;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.physics.box2d.World;
 
 public class FlyStateKirby extends StateKirby {
 
@@ -35,10 +34,34 @@ public class FlyStateKirby extends StateKirby {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.Z) && kirby.getColisionSuelo() && !Gdx.input.isKeyPressed(Input.Keys.C)) {
+            kirby.setDuracion(0);
+            kirby.setAnimation(EnumStates.FLY4);
+            if (kirby.getFlipX()) {
+                CloudKirby cloudkirby = new CloudKirby(kirby.getWorld(), kirby, false);
+                cloudkirby.getBody().applyLinearImpulse(-35, 0, cloudkirby.getBody().getPosition().x, cloudkirby.getBody().getPosition().y, true);
+                kirby.setCloud(cloudkirby);
+            }
+            else {
+                CloudKirby cloudkirby = new CloudKirby(kirby.getWorld(), kirby, true);
+                cloudkirby.getBody().applyLinearImpulse(35, 0, cloudkirby.getBody().getPosition().x, cloudkirby.getBody().getPosition().y, true);
+                kirby.setCloud(cloudkirby);
+            }
             kirby.setState(EnumStates.STAY);
         }
 
         else if (Gdx.input.isKeyPressed(Input.Keys.Z) && !kirby.getColisionSuelo() && !Gdx.input.isKeyPressed(Input.Keys.C)) {
+            kirby.setDuracion(0);
+            kirby.setAnimation(EnumStates.FLY4);
+            if (kirby.getFlipX()) {
+                CloudKirby cloudkirby = new CloudKirby(kirby.getWorld(), kirby, false);
+                cloudkirby.getBody().applyLinearImpulse(-35, 0, cloudkirby.getBody().getPosition().x, cloudkirby.getBody().getPosition().y, true);
+                kirby.setCloud(cloudkirby);
+            }
+            else {
+                CloudKirby cloudkirby = new CloudKirby(kirby.getWorld(), kirby, true);
+                cloudkirby.getBody().applyLinearImpulse(35, 0, cloudkirby.getBody().getPosition().x, cloudkirby.getBody().getPosition().y, true);
+                kirby.setCloud(cloudkirby);
+            }
             kirby.setState(EnumStates.FALL);
             kirby.setRealizar(true);
             accumulatedtimer = 0;
@@ -58,18 +81,7 @@ public class FlyStateKirby extends StateKirby {
 
     @Override
     public void end() {
-        kirby.setDuracion(0);
-        kirby.setAnimation(EnumStates.FLY4);
-        if (kirby.getFlipX()) {
-            CloudKirby cloudkirby = new CloudKirby(kirby.getWorld(), kirby, false);
-            cloudkirby.getBody().applyLinearImpulse(-35, 0, cloudkirby.getBody().getPosition().x, cloudkirby.getBody().getPosition().y, true);
-            kirby.setCloud(cloudkirby);
-        }
-        else {
-            CloudKirby cloudkirby = new CloudKirby(kirby.getWorld(), kirby, true);
-            cloudkirby.getBody().applyLinearImpulse(35, 0, cloudkirby.getBody().getPosition().x, cloudkirby.getBody().getPosition().y, true);
-            kirby.setCloud(cloudkirby);
-        }
+
 
     }
 }

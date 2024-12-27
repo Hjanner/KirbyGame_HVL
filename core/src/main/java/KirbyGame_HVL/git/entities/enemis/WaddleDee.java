@@ -1,6 +1,12 @@
 package KirbyGame_HVL.git.entities.enemis;
 
 import KirbyGame_HVL.git.Main;
+import KirbyGame_HVL.git.entities.States.State;
+import KirbyGame_HVL.git.entities.States.StateManager;
+import KirbyGame_HVL.git.entities.States.StatesWaddleDee.DieStateWaddleDee;
+import KirbyGame_HVL.git.entities.States.StatesWaddleDee.EnumStatesWaddleDee;
+import KirbyGame_HVL.git.entities.States.StatesWaddleDee.WalkStateWaddleDee;
+import KirbyGame_HVL.git.entities.player.ActorWithBox2d;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -10,48 +16,53 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public class WaddleDee extends Actor {
-    private World world;
-    private Main main;
-    private Body body;
-    private Fixture fixture;
+public class WaddleDee extends Enemy {
 
-    private Texture waddleDeeTexture;
-    private TextureRegion waddleDeeRegion;
-    private TextureRegion[] waddleDeeFrames;
+
+    private Texture waddleDeeWalkTexture;
+    private TextureRegion waddleDeeWalkRegion;
+    private TextureRegion[] waddleDeeWalkFrames;
+    private Texture waddleDeeDieTexture;
+    private TextureRegion waddleDeeDieRegion;
+    private TextureRegion[] waddleDeeDieFrames;
     private Animation walkAnimation;
+    private Animation dieAnimation;
+    private Animation currentAnimation;
     private Sprite waddleDeeSprite;
 
     private float duration = 0;
-    private boolean flipX = false;
-    private float movementSpeed = 30f;                  // Pixels per second
-    private float movementTime = 0;
-    private float cambioDireccionIntervalo = 2f;            //rango de cambio de direccion
+    private boolean flipX;
 
-    private boolean isDead = false;
+    private StateManager stateManager;
+    private WalkStateWaddleDee walkWaddleDee;
+    private DieStateWaddleDee dieWaddleDee;
     private boolean isDisposed = false;
 
     public WaddleDee(World world, Main main, float x, float y) {
         this.world = world;
         this.main = main;
+        this.stateManager = new StateManager();
+        this.walkWaddleDee = new WalkStateWaddleDee(this);
+        this.dieWaddleDee = new DieStateWaddleDee(this);
+        this.stateManager.setState(walkWaddleDee);
         createBody(world, x, y);
         loadTextures();
     }
 
-    private void createBody(World world, float x, float y) {
+    @Override
+    public void createBody(World world, float x, float y) {
         BodyDef bodyDef = new BodyDef();                        //def del cuerpo
         bodyDef.position.set(x, y);
         bodyDef.type = BodyDef.BodyType.DynamicBody;            //cuerpo dinamico
         body = world.createBody(bodyDef);
 
         CircleShape shape = new CircleShape();
-        shape.setRadius(5);                                 // Similar al Kirby
+        shape.setRadius(4.5f);                                 // Similar al Kirby
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
+        fixtureDef.density = 0.5f;
         fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.1f;
 
@@ -63,23 +74,30 @@ public class WaddleDee extends Actor {
     }
 
     private void loadTextures() {
-        waddleDeeTexture = main.getManager().get("assets/art/sprites/kirbywalking.png");
-        waddleDeeRegion = new TextureRegion(waddleDeeTexture, 128, 32); // probar con 320 de width
+        waddleDeeWalkTexture = main.getManager().get("assets/art/spritesWaddleDee/WaddleDeeWalk.png");
+        waddleDeeWalkRegion = new TextureRegion(waddleDeeWalkTexture, 256, 32); // probar con 320 de width
+        waddleDeeDieTexture = main.getManager().get("assets/art/spritesWaddleDee/WaddleDeeDie.png");
+        waddleDeeDieRegion = new TextureRegion(waddleDeeDieTexture, 32, 32);
 
-        TextureRegion[][] tempFrames = waddleDeeRegion.split(32, 32);
-        waddleDeeFrames = new TextureRegion[4];                                 // 4 walking frames
+
+        TextureRegion[][] tempFrames = waddleDeeWalkRegion.split(256/8, 32);
+        waddleDeeWalkFrames = new TextureRegion[tempFrames.length * tempFrames[0].length];                                 // 4 walking frames
+        waddleDeeDieFrames = new TextureRegion[1];
+        waddleDeeDieFrames[0] = waddleDeeDieRegion;
 
         int index = 0;
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 4; j++) {
-                waddleDeeFrames[index++] = tempFrames[i][j];
+        for (int i = 0; i < tempFrames.length; i++) {
+            for (int j = 0; j < tempFrames[i].length; j++) {
+                waddleDeeWalkFrames[index++] = tempFrames[i][j];
             }
         }
 
         // crear animation y y sprite
-        walkAnimation = new Animation(0.15f, waddleDeeFrames);
-        waddleDeeSprite = new Sprite(waddleDeeFrames[0]);
-        waddleDeeSprite.setSize(20, 20);
+        walkAnimation = new Animation(0.1f, waddleDeeWalkFrames);
+        dieAnimation = new Animation(1, waddleDeeDieFrames);
+        waddleDeeSprite = new Sprite(waddleDeeWalkFrames[0]);
+        waddleDeeSprite.setSize(15, 15);
+        currentAnimation = walkAnimation;
     }
 
     @Override
@@ -88,60 +106,65 @@ public class WaddleDee extends Actor {
             return;
         }
         super.act(delta);
-        updateMovement(delta);
+        this.stateManager.update(delta);
         updateAnimation(delta);
     }
 
-    private void updateMovement(float delta) {
-        movementTime += delta;
+    public void setState(EnumStatesWaddleDee typeState) {
 
-        // cambiar deireccion
-        if (movementTime > cambioDireccionIntervalo) {
-            movementTime = 0;
-            flipX = !flipX;
-            movementSpeed = -movementSpeed;
+        switch (typeState) {
+
+            case WALK:
+                stateManager.setState(walkWaddleDee);
+                break;
+            case DIE:
+                stateManager.setState(dieWaddleDee);
+                break;
+            default:
+                break;
         }
 
-        body.setLinearVelocity(movementSpeed, body.getLinearVelocity().y);                                              // aplica movimiento
+    }
 
-        body.applyLinearImpulse(0, -9.8f, body.getPosition().x, body.getPosition().y, true);       // gravedad
+    public void setAnimation (EnumStatesWaddleDee typeState) {
 
-        //los puedo mandar a volar para arriba
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            body.applyLinearImpulse(100, 0, body.getPosition().x, body.getPosition().y, true);
-        }
+        switch (typeState) {
 
-        //los puedo mandar a volar en una direccion
-        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
-            body.applyLinearImpulse(100, 100, body.getPosition().x, body.getPosition().y, true);
-        } else if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
-            body.applyLinearImpulse(-100, -100, body.getPosition().x, body.getPosition().y, true);
+            case WALK:
+                currentAnimation = walkAnimation;
+                break;
+            case DIE:
+                currentAnimation = dieAnimation;
+                break;
+            default:
+                break;
+
         }
     }
 
-    private void updateAnimation(float delta) {
+    @Override
+    public void updateAnimation(float delta) {
         duration += delta;
-        TextureRegion frame = (TextureRegion) walkAnimation.getKeyFrame(duration, true);
+        TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duration, true);
         waddleDeeSprite.setRegion(frame);
         waddleDeeSprite.setFlip(flipX, false);
     }
 
-    public void handleCollision(Kirby kirby) {
-        System.out.println("kirby muerto");
+    public void setflipX(boolean flipX) {
+        this.flipX = flipX;
     }
 
-    public void die() {
-        isDead = true;
-        body.setActive(false);          // Desactivar físicas
-        System.out.println("muerto");
+    public boolean getflipX() {
+        return flipX;
+    }
+
+    public State getcurrentState () {
+        return this.stateManager.getState();
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        if (isDisposed || isDead) {
-            return;
-        }
-        waddleDeeSprite.setPosition(body.getPosition().x - 10, body.getPosition().y - 5);
+        waddleDeeSprite.setPosition(body.getPosition().x - 8, body.getPosition().y - 5);
         waddleDeeSprite.draw(batch);
     }
 
@@ -155,5 +178,9 @@ public class WaddleDee extends Actor {
     // Getters for collision detection
     public Body getBody() {
         return body;
+    }
+
+    public World getWorld () {
+        return this.world;
     }
 }

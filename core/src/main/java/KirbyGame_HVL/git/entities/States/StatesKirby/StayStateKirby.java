@@ -1,4 +1,4 @@
-package KirbyGame_HVL.git.entities.States;
+package KirbyGame_HVL.git.entities.States.StatesKirby;
 
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
@@ -28,7 +28,7 @@ public class StayStateKirby extends StateKirby {
             kirby.setAnimation(EnumStates.STAY);
         }
 
-        if (kirby.getBody().getLinearVelocity().y < 0) {
+        if (kirby.getBody().getLinearVelocity().y < -0.5f && !kirby.getColisionSuelo()) {
             kirby.setState(EnumStates.FALL);
             kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.FALL2);

@@ -1,22 +1,27 @@
 package KirbyGame_HVL.git.screens.gameplay;
 
 import KirbyGame_HVL.git.Main;
+import KirbyGame_HVL.git.entities.States.StatesKirby.DashStateKirby;
+import KirbyGame_HVL.git.entities.States.StatesKirby.EnumStates;
+import KirbyGame_HVL.git.entities.States.StatesWaddleDee.DieStateWaddleDee;
+import KirbyGame_HVL.git.entities.States.StatesWaddleDee.EnumStatesWaddleDee;
+import KirbyGame_HVL.git.entities.enemis.EnemyFactory;
 import KirbyGame_HVL.git.entities.enemis.WaddleDee;
+import KirbyGame_HVL.git.entities.enemis.WaddleDeeFactory;
 import KirbyGame_HVL.git.entities.items.CloudKirby;
 import KirbyGame_HVL.git.entities.items.Floor;
+import KirbyGame_HVL.git.entities.items.Hole;
 import KirbyGame_HVL.git.entities.items.Spikes;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
 import KirbyGame_HVL.git.utils.helpers.TiledMapHelper;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
@@ -35,10 +40,12 @@ public class GameScreen extends Pantalla implements ContactListener {
     private Box2DDebugRenderer bdr;
     private Floor floor;
     private Spikes spikes;
+    private Hole hole;
 
     //enemies
     private ArrayList<WaddleDee> waddleDees;
     private Array<WaddleDee> waddleDeesToRemove;
+    private EnemyFactory factory;
 
 //ataques
     //nubes
@@ -48,6 +55,7 @@ public class GameScreen extends Pantalla implements ContactListener {
 
     private boolean puedoResetKirby = false;
 
+
     public GameScreen(Main main) {
         super(main);
         this.main = main;
@@ -56,6 +64,7 @@ public class GameScreen extends Pantalla implements ContactListener {
         waddleDeesToRemove = new Array<>();
         clouds = new ArrayList<>();
         cloudsToRemove = new Array<>();
+        factory = new WaddleDeeFactory();
     }
 
     @Override
@@ -78,9 +87,12 @@ public class GameScreen extends Pantalla implements ContactListener {
         bdr = new Box2DDebugRenderer();
         for (int i = 2; i < 4; i++) {
             floor = new Floor(world, map, i);
+
         }
 
         spikes = new Spikes(world, map, 4);
+        hole = new Hole(world, map, 5);
+
     }
 
     @Override
@@ -97,7 +109,7 @@ public class GameScreen extends Pantalla implements ContactListener {
 
 
         //muerte de enemies
-        deleteWaddleDees();
+        deleteWaddleDees(delta);
 
         cloud();
         deleteClouds();
@@ -112,9 +124,9 @@ public class GameScreen extends Pantalla implements ContactListener {
 
     //enemies
     private void createWaddleDees() {
-        WaddleDee waddleDee1 = new WaddleDee(world, main, 400, 1010); // Ajusta las coordenadas según necesites
-        WaddleDee waddleDee2 = new WaddleDee(world, main, 500, 1010);
-        WaddleDee waddleDee3 = new WaddleDee(world, main, 600, 1010);
+        WaddleDee waddleDee1 = (WaddleDee) factory.createEnemy(world, main, 400, 1010); // Ajusta las coordenadas según necesites
+        WaddleDee waddleDee2 = (WaddleDee) factory.createEnemy(world, main, 500, 1010);
+        WaddleDee waddleDee3 = (WaddleDee) factory.createEnemy(world, main, 600, 1010);
 
         // Añadir los WaddleDees al stage y a la lista
         stage.addActor(waddleDee1);
@@ -126,13 +138,13 @@ public class GameScreen extends Pantalla implements ContactListener {
         waddleDees.add(waddleDee3);
     }
 
-    private void deleteWaddleDees(){
+    private void deleteWaddleDees(float delta){
+
+
         for (WaddleDee waddle : waddleDeesToRemove) {
-            waddle.dispose();
-            waddle.die();
-            world.destroyBody(waddle.getBody());
             waddleDees.remove(waddle);
         }
+
         waddleDeesToRemove.clear();
     }
 
@@ -182,15 +194,18 @@ public class GameScreen extends Pantalla implements ContactListener {
             WaddleDee waddle = (WaddleDee) (userDataA instanceof WaddleDee ? userDataA : userDataB);
 
             //muerte por dashing
-            if (kirby.isDashing()) {
+            if (kirby.getcurrentState() instanceof DashStateKirby) {
                 System.out.println("Waddle Dee eliminado por dash");
                 if (!waddleDeesToRemove.contains(waddle, true)) {
+                    waddle.setflipX(kirby.getFlipX());
+                    waddle.setState(EnumStatesWaddleDee.DIE);
                     waddleDeesToRemove.add(waddle);
+                    kirby.setState(EnumStates.STAY);
                 }
-            } else {
+            } else if (!(waddle.getcurrentState() instanceof DieStateWaddleDee)){
                 // Kirby recibe daño o rebota
-                puedoResetKirby = true;
-                kirby.setColisionSuelo(true);
+                kirby.setState(EnumStates.DAMAGE);
+                kirby.setAnimation(EnumStates.DAMAGE);
                 //aqui debe ir una animacion de muerte
             }
         }
@@ -202,6 +217,8 @@ public class GameScreen extends Pantalla implements ContactListener {
             //elimino waddle
             WaddleDee waddle = (WaddleDee) (userDataA instanceof WaddleDee ? userDataA : userDataB);
             if (!waddleDeesToRemove.contains(waddle, true)) {
+                waddle.setflipX(kirby.getFlipX());
+                waddle.setState(EnumStatesWaddleDee.DIE);
                 waddleDeesToRemove.add(waddle);
             }
 
@@ -213,11 +230,23 @@ public class GameScreen extends Pantalla implements ContactListener {
         }
 
         // colision con el suelo
-        if ((setContact(contact, this.kirby, "suelo")) ||
-            (setContact(contact, this.kirby, "spikes"))) {
+        if ((setContact(contact, this.kirby, "suelo"))) {
             kirby.setColisionSuelo(true);
         }else {
             kirby.setColisionSuelo(false);
+        }
+
+        if (setContact(contact, this.kirby, "spikes")) {
+            kirby.setState(EnumStates.DAMAGE);
+            kirby.setAnimation(EnumStates.DAMAGE);
+        }
+
+        if ((setContact(contact, this.kirby, "Hole"))) {
+            puedoResetKirby = true;
+            kirby.setState(EnumStates.STAY);
+            kirby.setAnimation(EnumStates.STAY);
+        } else {
+            puedoResetKirby = false;
         }
     }
 

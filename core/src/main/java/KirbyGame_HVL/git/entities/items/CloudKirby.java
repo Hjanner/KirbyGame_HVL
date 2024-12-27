@@ -45,10 +45,10 @@ public class CloudKirby extends ActorWithBox2d {
     public void createBody (World world, Kirby kirby, boolean sentido) {
         BodyDef bodyDef = new BodyDef();
         if (sentido) {
-            bodyDef.position.set(kirby.getBody().getPosition().x + 5, kirby.getBody().getPosition().y + 2);
+            bodyDef.position.set(kirby.getBody().getPosition().x + 5.5f, kirby.getBody().getPosition().y + 2);
         }
         else {
-            bodyDef.position.set(kirby.getBody().getPosition().x - 5, kirby.getBody().getPosition().y + 2);
+            bodyDef.position.set(kirby.getBody().getPosition().x - 5.5f, kirby.getBody().getPosition().y + 2);
         }
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
