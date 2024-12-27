@@ -27,6 +27,8 @@ public class Main extends Game {
         gameCulebrita = new GamePanelCulebrita(this);
         gameViejita = new GamePanelViejita();
         manager = new AssetManager();
+
+        // Texturas del Kirby
         manager.load("assets/art/sprites/kirbystay.png", Texture.class);
         manager.load("assets/art/sprites/kirbywalking.png", Texture.class);
         manager.load("assets/art/sprites/kirbydown.png", Texture.class);
@@ -39,6 +41,12 @@ public class Main extends Game {
         manager.load("assets/art/sprites/kirbyflybegin.png", Texture.class);
         manager.load("assets/art/sprites/kirbyflyfall.png", Texture.class);
         manager.load("assets/art/sprites/kirbyflyfallend.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyDamage.png", Texture.class);
+
+        // Texturas del WaddleDee
+        manager.load("assets/art/spritesWaddleDee/WaddleDeeWalk.png", Texture.class);
+        manager.load("assets/art/spritesWaddleDee/WaddleDeeDie.png", Texture.class);
+
         manager.finishLoading();
         setScreen(pantallaini);
 

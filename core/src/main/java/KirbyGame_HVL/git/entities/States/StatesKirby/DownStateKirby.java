@@ -1,4 +1,4 @@
-package KirbyGame_HVL.git.entities.States;
+package KirbyGame_HVL.git.entities.States.StatesKirby;
 
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
@@ -13,6 +13,7 @@ public class DownStateKirby extends StateKirby {
     @Override
     public void start() {
         System.out.println("Estado abajo");
+        kirby.setOpuesto(true);
     }
 
     @Override
@@ -27,7 +28,7 @@ public class DownStateKirby extends StateKirby {
             kirby.setState(EnumStates.DASH);
             kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.DASH);
-            kirby.getBody().applyLinearImpulse(60,0, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
+            kirby.getBody().applyLinearImpulse(35,0, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
             kirby.setFlipx(false);
         }
 
@@ -35,7 +36,7 @@ public class DownStateKirby extends StateKirby {
             kirby.setState(EnumStates.DASH);
             kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.DASH);
-            kirby.getBody().applyLinearImpulse(-120,0, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
+            kirby.getBody().applyLinearImpulse(-35,0, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
             kirby.setFlipx(true);
         }
 

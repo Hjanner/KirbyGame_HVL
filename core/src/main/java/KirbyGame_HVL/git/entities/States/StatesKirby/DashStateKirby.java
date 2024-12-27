@@ -1,4 +1,4 @@
-package KirbyGame_HVL.git.entities.States;
+package KirbyGame_HVL.git.entities.States.StatesKirby;
 
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
@@ -6,7 +6,7 @@ import com.badlogic.gdx.Input;
 
 public class DashStateKirby extends StateKirby {
 
-
+    private float acummulatedtimer;
     public DashStateKirby(Kirby kirby) {
 
         super(kirby);
@@ -15,13 +15,18 @@ public class DashStateKirby extends StateKirby {
     @Override
     public void start() {
         System.out.println("Estado Dash");
+        kirby.setOpuesto(false);
+        acummulatedtimer = 0;
     }
 
     @Override
     public void update(float delta) {
 
-
-        if (!Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        acummulatedtimer += delta;
+        if (acummulatedtimer > 0.5f) {
+            kirby.setOpuesto(true);
+        }
+        if (!Gdx.input.isKeyPressed(Input.Keys.DOWN) && kirby.getBody().getLinearVelocity().x == 0) {
             kirby.setState(EnumStates.STAY);
             kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.STAY);
@@ -33,11 +38,7 @@ public class DashStateKirby extends StateKirby {
             kirby.setAnimation(EnumStates.DOWN);
         }
 
-        else if (kirby.getBody().getLinearVelocity().y < 0) {
-            kirby.setState(EnumStates.FALL);
-            kirby.setDuracion(0);
-            kirby.setAnimation(EnumStates.FALL2);
-        }
+
 
     }
 

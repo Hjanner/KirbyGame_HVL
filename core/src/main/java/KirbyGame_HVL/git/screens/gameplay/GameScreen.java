@@ -1,16 +1,25 @@
 package KirbyGame_HVL.git.screens.gameplay;
 
 import KirbyGame_HVL.git.Main;
-import KirbyGame_HVL.git.entities.enemis.WaddleDee;
+import KirbyGame_HVL.git.entities.States.StatesKirby.DashStateKirby;
+import KirbyGame_HVL.git.entities.States.StatesKirby.EnumStates;
+import KirbyGame_HVL.git.entities.States.StatesWaddleDee.DieStateWaddleDee;
+import KirbyGame_HVL.git.entities.States.StatesWaddleDee.EnumStatesWaddleDee;
+import KirbyGame_HVL.git.entities.States.statesBrontoBurt.EnumStatesBrontoBurt;
+import KirbyGame_HVL.git.entities.enemis.EnemyFactory;
+import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurdFactory;
+import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurt;
+import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDee;
+import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDeeFactory;
 import KirbyGame_HVL.git.entities.items.CloudKirby;
 import KirbyGame_HVL.git.entities.items.Floor;
 import KirbyGame_HVL.git.entities.items.Key;
+import KirbyGame_HVL.git.entities.items.Hole;
 import KirbyGame_HVL.git.entities.items.Spikes;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
 import KirbyGame_HVL.git.utils.helpers.TiledMapHelper;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -21,7 +30,6 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
@@ -43,6 +51,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private Box2DDebugRenderer bdr;
     private Floor floor;
     private Spikes spikes;
+    private Hole hole;
 
 
 //items
@@ -56,8 +65,11 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private BitmapFont font;
 
     //enemies
+    private EnemyFactory factory;
     private ArrayList<WaddleDee> waddleDees;
     private Array<WaddleDee> waddleDeesToRemove;
+    private ArrayList<BrontoBurt> brontoBurts;
+    private Array<BrontoBurt> brontoBurtsToRemove;
 
 //ataques
     //nubes
@@ -65,54 +77,63 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private Array<CloudKirby> cloudsToRemove;
     private float lastCloudCreationTime = 0;
 
+    //helpers
     private boolean puedoResetKirby = false;
 
     public GameScreen(Main main) {
         super(main);
         this.main = main;
         stage = new Stage ();
+
         waddleDees = new ArrayList<>();
         waddleDeesToRemove = new Array<>();
+        brontoBurts = new ArrayList<>();
+        brontoBurtsToRemove = new Array<>();
+
         clouds = new ArrayList<>();
         cloudsToRemove = new Array<>();
+
         keys = new ArrayList<>();
         keysToRemove = new Array<>();
+
         font = new BitmapFont();
         font.setColor(Color.WHITE);
     }
 
     @Override
     public void show() {
-
         world = new World (new Vector2(0, 0), true);
-        world.setContactListener(this);                                 // Añadir el listener de contactos
+        world.setContactListener(this);                                 // listener de contactos
 
         kirby = new Kirby(world, main);
-
         stage.addActor(kirby);
         cam = (OrthographicCamera) stage.getCamera();
         cam.zoom = 0.34f;
 
+        //UI
         loadAssetsKey();
+
+        //items
         createKeys();
 
+        //enemies
         createWaddleDees();
+        createBrontoBurts();
 
         tiledMapHelper = new TiledMapHelper();
         map = tiledMapHelper.setupmap();
         bdr = new Box2DDebugRenderer();
-        for (int i = 2; i < 4; i++) {
-            floor = new Floor(world, map, i);
-        }
 
+        //map elements
+        createFloor();
         spikes = new Spikes(world, map, 4);
+        hole = new Hole(world, map, 5);
     }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glClearColor(0.53f, 0.81f, 0.92f, 1);
-
         world.step(1/60f,6,2);
 
         if (puedoResetKirby) {
@@ -123,7 +144,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         deleteKeys();
 
         //muerte de enemies
-        deleteWaddleDees();
+        deleteWaddleDees(delta);
 
         cloud();
         deleteClouds();
@@ -141,10 +162,16 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         cam.position.set(kirby.getBody().getPosition(),0);
         cam.update();
         map.setView(cam);
+    }
 
+    public void createFloor(){
+        for (int i = 2; i < 4; i++) {
+            floor = new Floor(world, map, i);
+        }
     }
 
 //ITEMS
+    //keys
     private void loadAssetsKey(){
         keyIconTexture = main.getManager().get("assets/art/sprites/kirbystay.png");
         keyIconSprite = new Sprite(keyIconTexture);
@@ -172,8 +199,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
         batch.setProjectionMatrix(stage.getCamera().combined);
 
-        // posicion
-        float baseX = cam.position.x - cam.viewportWidth/2 * cam.zoom + 10;
+        float baseX = cam.position.x - cam.viewportWidth/2 * cam.zoom + 10;                             //posicion en pantalla
         float baseY = cam.position.y + cam.viewportHeight/2 * cam.zoom - 20;
 
         // Dibuja las llaves
@@ -201,11 +227,38 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     }
 
 //ENEMIES
+    //BRONTO BURT
+    private void createBrontoBurts(){
+        factory = new BrontoBurdFactory();
+
+        BrontoBurt brontoBurt1 = (BrontoBurt) factory.createEnemy(world, main, 500, 1100);
+        BrontoBurt brontoBurt2 = (BrontoBurt) factory.createEnemy(world, main, 600, 1150);
+        BrontoBurt brontoBurt3 = (BrontoBurt) factory.createEnemy(world, main, 750, 1050);
+
+        stage.addActor(brontoBurt1);
+        stage.addActor(brontoBurt2);
+        stage.addActor(brontoBurt3);
+
+        brontoBurts.add(brontoBurt1);
+        brontoBurts.add(brontoBurt2);
+        brontoBurts.add(brontoBurt3);
+    }
+
+    private void deleteBrontoBurts(float delta){
+        for (BrontoBurt bronto : brontoBurtsToRemove) {
+            brontoBurts.remove(bronto);
+        }
+        brontoBurtsToRemove.clear();
+    }
+
+
     //WADDLE DEE
     private void createWaddleDees() {
-        WaddleDee waddleDee1 = new WaddleDee(world, main, 400, 1010); // Ajusta las coordenadas según necesites
-        WaddleDee waddleDee2 = new WaddleDee(world, main, 500, 1010);
-        WaddleDee waddleDee3 = new WaddleDee(world, main, 600, 1010);
+        factory = new WaddleDeeFactory();
+
+        WaddleDee waddleDee1 = (WaddleDee) factory.createEnemy(world, main, 400, 1010);                             // Ajusta las coordenadas segun necesites
+        WaddleDee waddleDee2 = (WaddleDee) factory.createEnemy(world, main, 500, 1010);
+        WaddleDee waddleDee3 = (WaddleDee) factory.createEnemy(world, main, 600, 1010);
 
         // Añadir los WaddleDees al stage y a la lista
         stage.addActor(waddleDee1);
@@ -217,11 +270,8 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         waddleDees.add(waddleDee3);
     }
 
-    private void deleteWaddleDees(){
+    private void deleteWaddleDees(float delta){
         for (WaddleDee waddle : waddleDeesToRemove) {
-            waddle.dispose();
-            waddle.die();
-            world.destroyBody(waddle.getBody());
             waddleDees.remove(waddle);
         }
         waddleDeesToRemove.clear();
@@ -230,7 +280,6 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 //nube
     public void cloud () {
         lastCloudCreationTime += Gdx.graphics.getDeltaTime();
-
         if (lastCloudCreationTime >= 1f && kirby.getCloud() != null) {
             stage.addActor(kirby.getCloud());
         }
@@ -286,16 +335,18 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             WaddleDee waddle = (WaddleDee) (userDataA instanceof WaddleDee ? userDataA : userDataB);
 
             //muerte por dashing
-            if (kirby.isDashing()) {
-                System.out.println("Waddle Dee eliminado por dash");
+            if (kirby.getcurrentState() instanceof DashStateKirby) {
+                //waddle eliminado por dash
                 if (!waddleDeesToRemove.contains(waddle, true)) {
+                    waddle.setflipX(kirby.getFlipX());
+                    waddle.setState(EnumStatesWaddleDee.DIE);
                     waddleDeesToRemove.add(waddle);
+                    kirby.setState(EnumStates.STAY);
                 }
-            } else {
+            } else if (!(waddle.getcurrentState() instanceof DieStateWaddleDee)){
                 // Kirby recibe daño o rebota
-                puedoResetKirby = true;
-                kirby.setColisionSuelo(true);
-                //aqui debe ir una animacion de muerte
+                kirby.setState(EnumStates.DAMAGE);
+                kirby.setAnimation(EnumStates.DAMAGE);
             }
         }
 
@@ -306,7 +357,43 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             //elimino waddle
             WaddleDee waddle = (WaddleDee) (userDataA instanceof WaddleDee ? userDataA : userDataB);
             if (!waddleDeesToRemove.contains(waddle, true)) {
+                waddle.setflipX(kirby.getFlipX());
+                waddle.setState(EnumStatesWaddleDee.DIE);
                 waddleDeesToRemove.add(waddle);
+            }
+
+            //elimino nube
+            CloudKirby cloud = (CloudKirby) (userDataA instanceof CloudKirby ? userDataA : userDataB);
+            if (!cloudsToRemove.contains(cloud, true)) {
+                cloudsToRemove.add(cloud);
+            }
+        }
+
+        //colision kirby-bronto
+        if ((userDataA instanceof Kirby && userDataB instanceof BrontoBurt) ||
+            (userDataB instanceof Kirby && userDataA instanceof BrontoBurt)) {
+
+            Kirby kirby = (Kirby) (userDataA instanceof Kirby ? userDataA : userDataB);
+            BrontoBurt bronto = (BrontoBurt) (userDataA instanceof BrontoBurt ? userDataA : userDataB);
+
+            //kirby recibe dano
+            if (!(bronto.getcurrentState() instanceof DieStateWaddleDee)){
+                // Kirby recibe daño o rebota
+                kirby.setState(EnumStates.DAMAGE);
+                kirby.setAnimation(EnumStates.DAMAGE);
+            }
+        }
+
+        //colision nube-bronto
+        if ((userDataA instanceof CloudKirby && userDataB instanceof BrontoBurt) ||
+            (userDataB instanceof CloudKirby && userDataA instanceof BrontoBurt)) {
+
+            //elimino bronto
+            BrontoBurt bronto = (BrontoBurt) (userDataA instanceof BrontoBurt ? userDataA : userDataB);
+            if (!brontoBurtsToRemove.contains(bronto, true)) {
+                bronto.setflipX(kirby.getFlipX());
+                bronto.setState(EnumStatesBrontoBurt.DIE);
+                brontoBurtsToRemove.add(bronto);
             }
 
             //elimino nube
@@ -318,11 +405,23 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
 //WORLD
         // colision con el suelo
-        if ((setContact(contact, this.kirby, "suelo")) ||
-            (setContact(contact, this.kirby, "spikes"))) {
+        if ((setContact(contact, this.kirby, "suelo"))) {
             kirby.setColisionSuelo(true);
         }else {
             kirby.setColisionSuelo(false);
+        }
+
+        if (setContact(contact, this.kirby, "spikes")) {
+            kirby.setState(EnumStates.DAMAGE);
+            kirby.setAnimation(EnumStates.DAMAGE);
+        }
+
+        if ((setContact(contact, this.kirby, "Hole"))) {
+            puedoResetKirby = true;
+            kirby.setState(EnumStates.STAY);
+            kirby.setAnimation(EnumStates.STAY);
+        } else {
+            puedoResetKirby = false;
         }
     }
 

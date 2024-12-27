@@ -1,9 +1,8 @@
-package KirbyGame_HVL.git.entities.States;
+package KirbyGame_HVL.git.entities.States.StatesKirby;
 
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.physics.box2d.World;
 
 public class RunStateKirby extends StateKirby {
 
