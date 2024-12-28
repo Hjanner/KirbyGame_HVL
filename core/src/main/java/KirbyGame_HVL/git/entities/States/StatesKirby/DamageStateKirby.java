@@ -40,7 +40,7 @@ public class DamageStateKirby extends StateKirby {
             acummulatedtimer2 += delta;
             kirby.setOpuesto(true);
 
-            if (acummulatedtimer2 > 1.5f) {
+            if (acummulatedtimer2 > 2.5f) {
                 if (!kirby.getColisionSuelo()) {
                     kirby.setState(EnumStates.FALL);
                     kirby.setDuracion(0);

@@ -47,6 +47,13 @@ public class Main extends Game {
         manager.load("assets/art/spritesWaddleDee/WaddleDeeWalk.png", Texture.class);
         manager.load("assets/art/spritesWaddleDee/WaddleDeeDie.png", Texture.class);
 
+        // Texturas del BrontoBurt
+        manager.load("assets/art/spritesBrontoBurt/BrontoBurtFly.png", Texture.class);
+        manager.load("assets/art/spritesBrontoBurt/BrontoBurtDie.png", Texture.class);
+
+        // Texturas de la plataforma movil
+        manager.load("assets/art/tilesets/Platform.png", Texture.class);
+
         manager.finishLoading();
         setScreen(pantallaini);
 

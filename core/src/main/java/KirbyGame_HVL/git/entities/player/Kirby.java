@@ -385,7 +385,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         if (opuesto) {
             if (stateManager.getState() instanceof DamageStateKirby) {
                 Vector2 impulsoOpuesto = body.getLinearVelocity().cpy().scl(-1);
-                body.applyLinearImpulse(impulsoOpuesto.x, impulsoOpuesto.y, body.getPosition().x, body.getPosition().y, true);
+                body.applyLinearImpulse(impulsoOpuesto.x, -0.8f, body.getPosition().x, body.getPosition().y, true);
             }
             else {
                 Vector2 impulsoOpuesto = body.getLinearVelocity().cpy().scl(-0.1f);

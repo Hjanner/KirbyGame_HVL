@@ -75,12 +75,12 @@ public class BrontoBurt extends Enemy {
     }
 
     private void loadTextures() {
-        brontoBurtFlyTexture = main.getManager().get("assets/art/spritesWaddleDee/WaddleDeeWalk.png");
-        brontoBurtFlyRegion = new TextureRegion(brontoBurtFlyTexture, 256, 32);
-        brontoBurtDieTexture = main.getManager().get("assets/art/spritesWaddleDee/WaddleDeeDie.png");
+        brontoBurtFlyTexture = main.getManager().get("assets/art/spritesBrontoBurt/BrontoBurtFly.png");
+        brontoBurtFlyRegion = new TextureRegion(brontoBurtFlyTexture, 96, 32);
+        brontoBurtDieTexture = main.getManager().get("assets/art/spritesBrontoBurt/BrontoBurtDie.png");
         brontoBurtDieRegion = new TextureRegion(brontoBurtDieTexture, 32, 32);
 
-        TextureRegion[][] tempFrames = brontoBurtFlyRegion.split(256/8, 32);
+        TextureRegion[][] tempFrames = brontoBurtFlyRegion.split(96/3, 32);
         brontoBurtFlyFrames = new TextureRegion[tempFrames.length * tempFrames[0].length];
         brontoBurtDieFrames = new TextureRegion[1];
         brontoBurtDieFrames[0] = brontoBurtDieRegion;
@@ -95,7 +95,7 @@ public class BrontoBurt extends Enemy {
         flyAnimation = new Animation(0.1f, brontoBurtFlyFrames);
         dieAnimation = new Animation(1, brontoBurtDieFrames);
         brontoBurtSprite = new Sprite(brontoBurtFlyFrames[0]);
-        brontoBurtSprite.setSize(15, 15);
+        brontoBurtSprite.setSize(18, 18);
         currentAnimation = flyAnimation;
     }
 
@@ -168,7 +168,7 @@ public class BrontoBurt extends Enemy {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        brontoBurtSprite.setPosition(body.getPosition().x - 8, body.getPosition().y - 5);
+        brontoBurtSprite.setPosition(body.getPosition().x - 9, body.getPosition().y - 5);
         brontoBurtSprite.draw(batch);
     }
 

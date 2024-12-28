@@ -24,9 +24,6 @@ public class FallStateKirby extends StateKirby {
 
         kirby.getBody().applyLinearImpulse(0,-1f, kirby.getBody().getPosition().x,kirby.getBody().getPosition().y, true);
         accumulatedtimer += delta;
-        if (accumulatedtimer > 0.16f && kirby.getRealizar()) {
-            kirby.setAnimation(EnumStates.FALL2);
-        }
         if (kirby.getColisionSuelo()) {
             kirby.setState(EnumStates.STAY);
             kirby.setDuracion(0);
@@ -34,6 +31,11 @@ public class FallStateKirby extends StateKirby {
             kirby.setRealizar(false);
             kirby.setOpuesto(true);
         }
+
+        if (accumulatedtimer > 0.16f && kirby.getRealizar()) {
+            kirby.setAnimation(EnumStates.FALL2);
+        }
+
 
         if (Gdx.input.isKeyPressed(Input.Keys.C) && !Gdx.input.isKeyPressed(Input.Keys.Z)) {
             kirby.setState(EnumStates.FLY);

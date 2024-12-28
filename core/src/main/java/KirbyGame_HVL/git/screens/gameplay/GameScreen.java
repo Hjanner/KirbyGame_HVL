@@ -11,11 +11,7 @@ import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurdFactory;
 import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurt;
 import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDee;
 import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDeeFactory;
-import KirbyGame_HVL.git.entities.items.CloudKirby;
-import KirbyGame_HVL.git.entities.items.Floor;
-import KirbyGame_HVL.git.entities.items.Key;
-import KirbyGame_HVL.git.entities.items.Hole;
-import KirbyGame_HVL.git.entities.items.Spikes;
+import KirbyGame_HVL.git.entities.items.*;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
 import KirbyGame_HVL.git.utils.helpers.TiledMapHelper;
@@ -52,6 +48,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private Floor floor;
     private Spikes spikes;
     private Hole hole;
+    private Platform platform;
 
 
 //items
@@ -125,9 +122,12 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         bdr = new Box2DDebugRenderer();
 
         //map elements
+        createPlatformMoved();
         createFloor();
         spikes = new Spikes(world, map, 4);
         hole = new Hole(world, map, 5);
+        platform = new Platform(world, map, 6);
+
     }
 
     @Override
@@ -168,6 +168,13 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         for (int i = 2; i < 4; i++) {
             floor = new Floor(world, map, i);
         }
+    }
+
+    private void createPlatformMoved() {
+
+        PlatformMoved platformMoved1 = new PlatformMoved(world, main, 1000,1100);
+        stage.addActor(platformMoved1);
+
     }
 
 //ITEMS
@@ -405,10 +412,9 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
 //WORLD
         // colision con el suelo
-        if ((setContact(contact, this.kirby, "suelo"))) {
+        if ((setContact(contact, this.kirby, "suelo")) ||
+            (setContact(contact, this.kirby, "Plataforma"))) {
             kirby.setColisionSuelo(true);
-        }else {
-            kirby.setColisionSuelo(false);
         }
 
         if (setContact(contact, this.kirby, "spikes")) {
