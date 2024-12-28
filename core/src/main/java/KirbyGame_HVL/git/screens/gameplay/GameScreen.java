@@ -30,6 +30,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.Texture;
 
@@ -62,23 +65,18 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private BitmapFont font;
 
     //enemies
-    private Enemy enemy;
-
-    private EnemyFactory factory;
     private ArrayList<ArrayList<Enemy>> enemiesList;
-
-    private ArrayList<ArrayList<WaddleDee>> waddleDeesList;
-    private Array<WaddleDee> waddleDeesToRemove;
-    private ArrayList<BrontoBurt> brontoBurts;
-    private Array<BrontoBurt> brontoBurtsToRemove;
-    private int[][][] zonasCoordenadas = {
-        {{500, 1010}, {550, 1010}, {600, 1010}},        // Zona 1
-        {{700, 1020}, {850, 1020}, {900, 1020}},        // Zona 2
-        {{1000, 1030}, {1050, 1030}, {1100, 1030}},     // Zona 3
-        {{1200, 1040}, {1250, 1040}, {1300, 1040}}
+    private Array<Enemy> enemiesToRemove;
+    private Map<Integer, EnemyFactory> zonaFactories;           // Define que factory usar en cada zona
+    private int[][][] enemyZonaCoordenadas = {
+        {{500, 1010}, {550, 1010}, {600, 1010}, {100, 1010}},                // zona 1 - WaddleDees
+        {{700, 1020}, {850, 1020}, {900, 1020}},                // z 2 - BrontoBurts
+        {{500, 1100}, {600, 1150}, {750, 1050}},                // z 3 - BrontoBurts
+        {{1200, 1040}, {1250, 1040}, {1300, 1040}}              // z 4 - WaddleDees
     };
 
-//ataques
+    //ataques
+
     //nubes
     private ArrayList<CloudKirby> clouds;
     private Array<CloudKirby> cloudsToRemove;
@@ -92,10 +90,16 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         this.main = main;
         stage = new Stage ();
 
-        waddleDeesList = new ArrayList<>();
-        waddleDeesToRemove = new Array<>();
-        brontoBurts = new ArrayList<>();
-        brontoBurtsToRemove = new Array<>();
+        enemiesList = new ArrayList<>();
+        enemiesToRemove = new Array<>();
+        zonaFactories = new HashMap<>();
+        zonaFactories.put(0, new WaddleDeeFactory());                   //se define el factory a usar por grupo
+        zonaFactories.put(1, new BrontoBurdFactory());
+        zonaFactories.put(2, new BrontoBurdFactory());
+        zonaFactories.put(3, new WaddleDeeFactory());
+        for (int i = 0; i < enemyZonaCoordenadas.length; i++) {         //se crean ls grupos
+            enemiesList.add(new ArrayList<>());
+        }
 
         clouds = new ArrayList<>();
         cloudsToRemove = new Array<>();
@@ -122,7 +126,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
         //items
         createKeys();
-        createWaddleDees();
+        createEnemies();
 
         tiledMapHelper = new TiledMapHelper();
         map = tiledMapHelper.setupmap();
@@ -149,13 +153,10 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
 
         loadEnemies();
-
-        deleteKeys();
-
-        //muerte de enemies
-        deleteWaddleDees(delta);
-
         cloud();
+
+        deleteEnemies();
+        deleteKeys();
         deleteClouds();
 
         stage.act();
@@ -173,18 +174,80 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         map.setView(cam);
     }
 
-    public void loadEnemies(){
+//ENEMIES
+    private void createEnemies() {
+        // crea enemies por cada zonas
+        for (int zona = 0; zona < enemyZonaCoordenadas.length; zona++) {
+            ArrayList<Enemy> zoneEnemies = enemiesList.get(zona);
+            if (zoneEnemies.isEmpty()) {
+                createEnemiesZona(zona);
+            }
+        }
+    }
 
-        if (brontoBurts.isEmpty()){
-            createBrontoBurts();
+    private void createEnemiesZona(int zona) {
+        int[][] coordenadas = enemyZonaCoordenadas[zona];                   //obtiene coordenadas del grupo de enemies
+        ArrayList<Enemy> zonaEnemies = enemiesList.get(zona);               //inicializo zona
+        EnemyFactory factory = zonaFactories.get(zona);                     //obtengo factory segun la relacion hasmap
+
+        //creo enemies
+        for (int[] coordenada : coordenadas) {
+            Enemy enemy = factory.createEnemy(world, main, coordenada[0], coordenada[1]);
+            stage.addActor(enemy);
+            zonaEnemies.add(enemy);
+        }
+    }
+
+    private void loadEnemies() {
+        if (enemiesList.isEmpty()) {
+            createEnemies();
+            return;
         }
 
-        for (int i = 0; i < zonasCoordenadas.length; i++) {
-            ArrayList<WaddleDee> waddleDeeZonas = waddleDeesList.get(i);
-            if (waddleDeeZonas.isEmpty()) {
-                System.out.println("entre a la zona" + (i + 1));
-                waddleDeesList.set(i, createWaddleDeeZonas(zonasCoordenadas[i]));
+        // si se eliminan todos los enemies de una zona o grupo se realiza un respawn
+        for (int zona = 0; zona < enemyZonaCoordenadas.length; zona++) {
+            ArrayList<Enemy> zoneEnemies = enemiesList.get(zona);
+            if (zoneEnemies.isEmpty()) {
+                createEnemiesZona(zona);
             }
+        }
+    }
+
+    private void deleteEnemies() {
+        for (ArrayList<Enemy> zoneEnemies : enemiesList) {
+            for (Enemy enemy : new ArrayList<>(zoneEnemies)) {                          //  una copia para evitar errores
+                if (enemiesToRemove.contains(enemy, true)) {
+                    if (enemy.getBody() != null) {
+                        world.destroyBody(enemy.getBody());
+                    }
+                    enemy.remove();
+                    zoneEnemies.remove(enemy);                          // Eliminar de la lista de la zona
+                }
+            }
+        }
+        enemiesToRemove.clear();
+    }
+
+    private void manejadorEnemyColition(Kirby kirby, Enemy enemy) {
+        if (kirby.getcurrentState() instanceof DashStateKirby) {
+            //eliminacion de enemy por dash
+            if (!enemiesToRemove.contains(enemy, true)) {
+                enemy.setflipX(kirby.getFlipX());
+
+                if (enemy instanceof WaddleDee) {
+                    enemy.setState(EnumStatesWaddleDee.DIE);
+                } else if (enemy instanceof BrontoBurt) {
+                    enemy.setState(EnumStatesBrontoBurt.DIE);
+                }
+
+                enemiesToRemove.add(enemy);
+                kirby.setState(EnumStates.STAY);
+                enemy.remove();
+            }
+        } else {
+            //kirby recibe daño
+            kirby.setState(EnumStates.DAMAGE);
+            kirby.setAnimation(EnumStates.DAMAGE);
         }
     }
 
@@ -257,71 +320,6 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         keysToRemove.clear();
     }
 
-//ENEMIES
-    //BRONTO BURT
-    private void createBrontoBurts(){
-        factory = new BrontoBurdFactory();
-
-        BrontoBurt brontoBurt1 = (BrontoBurt) factory.createEnemy(world, main, 500, 1100);
-        BrontoBurt brontoBurt2 = (BrontoBurt) factory.createEnemy(world, main, 600, 1150);
-        BrontoBurt brontoBurt3 = (BrontoBurt) factory.createEnemy(world, main, 750, 1050);
-
-        stage.addActor(brontoBurt1);
-        stage.addActor(brontoBurt2);
-        stage.addActor(brontoBurt3);
-
-        brontoBurts.add(brontoBurt1);
-        brontoBurts.add(brontoBurt2);
-        brontoBurts.add(brontoBurt3);
-    }
-
-    private void deleteBrontoBurts(float delta){
-        for (BrontoBurt bronto : brontoBurtsToRemove) {
-            brontoBurts.remove(bronto);
-        }
-        brontoBurtsToRemove.clear();
-    }
-
-
-    //WADDLE DEE
-    private void createWaddleDees() {
-        factory = new WaddleDeeFactory();
-
-        //creamos lista por zonas
-        while (waddleDeesList.size() < zonasCoordenadas.length) {
-            waddleDeesList.add(new ArrayList<>());
-        }
-
-        for (int i = 0; i < zonasCoordenadas.length; i++) {
-            ArrayList<WaddleDee> waddleDeeZonas = waddleDeesList.get(i);
-            if (waddleDeeZonas.isEmpty()) {
-                waddleDeesList.set(i, createWaddleDeeZonas(zonasCoordenadas[i]));
-                System.out.println("creado grupo de zona " + (i + 1));
-            }
-        }
-    }
-
-    private ArrayList<WaddleDee> createWaddleDeeZonas(int[][] coordenadas) {
-        factory = new WaddleDeeFactory();
-        ArrayList<WaddleDee> waddleDeeGroup = new ArrayList<>();
-
-        for (int[] coordenada : coordenadas) {
-            int x = coordenada[0];
-            int y = coordenada[1];
-            WaddleDee waddleDee = (WaddleDee) factory.createEnemy(world, main, x, y);
-            stage.addActor(waddleDee);
-            waddleDeeGroup.add(waddleDee);
-        }
-
-        return waddleDeeGroup;
-    }
-    private void deleteWaddleDees(float delta){
-        for (int i = 0; i < waddleDeesList.size(); i++) {
-            ArrayList<WaddleDee> waddleDeeZonas = waddleDeesList.get(i);
-            waddleDeeZonas.removeIf(waddle -> waddleDeesToRemove.contains(waddle, true));
-        }
-        waddleDeesToRemove.clear();
-    }
 
 //nube
     public void cloud () {
@@ -340,7 +338,27 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         cloudsToRemove.clear();
     }
 
-//listener
+    private void manejadorCloudEnemyCollision(CloudKirby cloud, Enemy enemy) {
+        if (!enemiesToRemove.contains(enemy, true)) {
+            enemy.setflipX(kirby.getFlipX());
+
+            if (enemy instanceof WaddleDee) {
+                enemy.setState(EnumStatesWaddleDee.DIE);
+            } else if (enemy instanceof BrontoBurt) {
+                enemy.setState(EnumStatesBrontoBurt.DIE);
+            }
+
+            enemiesToRemove.add(enemy);
+            enemy.remove();
+        }
+
+        if (!cloudsToRemove.contains(cloud, true)) {
+            cloudsToRemove.add(cloud);
+        }
+    }
+
+
+    //listener
     private boolean setContact(Contact contact, Object userA, Object userB) {
         return ((contact.getFixtureA().getUserData().equals(userA) && contact.getFixtureB().getUserData().equals(userB)) || (contact.getFixtureA().getUserData().equals(userB) && contact.getFixtureB().getUserData().equals(userA)));
     }
@@ -373,81 +391,32 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
 
 //ENEMIES
-        // colision Kirby-WaddleDee
-        if ((userDataA instanceof Kirby && userDataB instanceof WaddleDee) ||
-            (userDataB instanceof Kirby && userDataA instanceof WaddleDee)) {
+        //colision kirby-enemies y dash
+        if ((userDataA instanceof Kirby && userDataB instanceof Enemy) ||
+            (userDataB instanceof Kirby && userDataA instanceof Enemy)) {
 
             Kirby kirby = (Kirby) (userDataA instanceof Kirby ? userDataA : userDataB);
-            WaddleDee waddle = (WaddleDee) (userDataA instanceof WaddleDee ? userDataA : userDataB);
+            Enemy enemy = (Enemy) (userDataA instanceof Enemy ? userDataA : userDataB);
 
-            //muerte por dashing
             if (kirby.getcurrentState() instanceof DashStateKirby) {
-                //waddle eliminado por dash
-                if (!waddleDeesToRemove.contains(waddle, true)) {
-                    waddle.setflipX(kirby.getFlipX());
-                    waddle.setState(EnumStatesWaddleDee.DIE);
-                    waddleDeesToRemove.add(waddle);
-                    kirby.setState(EnumStates.STAY);
-                }
-            } else if (!(waddle.getcurrentState() instanceof DieStateWaddleDee)){
-                // Kirby recibe daño o rebota
+                manejadorEnemyColition(kirby, enemy);
+            } else {
+                // debe llamar tambien a manejadorEnemyColition aqui para la logica de los puntos perdidos
                 kirby.setState(EnumStates.DAMAGE);
                 kirby.setAnimation(EnumStates.DAMAGE);
             }
         }
 
-        // muerte por cloud Kirby-WaddleDee
-        if ((userDataA instanceof CloudKirby && userDataB instanceof WaddleDee) ||
-            (userDataB instanceof CloudKirby && userDataA instanceof WaddleDee)) {
+        // colision cloud-enemies
+        if ((userDataA instanceof CloudKirby && userDataB instanceof Enemy) ||
+            (userDataB instanceof CloudKirby && userDataA instanceof Enemy)) {
 
-            //elimino waddle
-            WaddleDee waddle = (WaddleDee) (userDataA instanceof WaddleDee ? userDataA : userDataB);
-            if (!waddleDeesToRemove.contains(waddle, true)) {
-                waddle.setflipX(kirby.getFlipX());
-                waddle.setState(EnumStatesWaddleDee.DIE);
-                waddleDeesToRemove.add(waddle);
-            }
-
-            //elimino nube
             CloudKirby cloud = (CloudKirby) (userDataA instanceof CloudKirby ? userDataA : userDataB);
-            if (!cloudsToRemove.contains(cloud, true)) {
-                cloudsToRemove.add(cloud);
-            }
+            Enemy enemy = (Enemy) (userDataA instanceof Enemy ? userDataA : userDataB);
+
+            manejadorCloudEnemyCollision(cloud, enemy);
         }
 
-        //colision kirby-bronto
-        if ((userDataA instanceof Kirby && userDataB instanceof BrontoBurt) ||
-            (userDataB instanceof Kirby && userDataA instanceof BrontoBurt)) {
-
-            Kirby kirby = (Kirby) (userDataA instanceof Kirby ? userDataA : userDataB);
-            BrontoBurt bronto = (BrontoBurt) (userDataA instanceof BrontoBurt ? userDataA : userDataB);
-
-            //kirby recibe dano
-            if (!(bronto.getcurrentState() instanceof DieStateWaddleDee)){
-                // Kirby recibe daño o rebota
-                kirby.setState(EnumStates.DAMAGE);
-                kirby.setAnimation(EnumStates.DAMAGE);
-            }
-        }
-
-        //colision nube-bronto
-        if ((userDataA instanceof CloudKirby && userDataB instanceof BrontoBurt) ||
-            (userDataB instanceof CloudKirby && userDataA instanceof BrontoBurt)) {
-
-            //elimino bronto
-            BrontoBurt bronto = (BrontoBurt) (userDataA instanceof BrontoBurt ? userDataA : userDataB);
-            if (!brontoBurtsToRemove.contains(bronto, true)) {
-                bronto.setflipX(kirby.getFlipX());
-                bronto.setState(EnumStatesBrontoBurt.DIE);
-                brontoBurtsToRemove.add(bronto);
-            }
-
-            //elimino nube
-            CloudKirby cloud = (CloudKirby) (userDataA instanceof CloudKirby ? userDataA : userDataB);
-            if (!cloudsToRemove.contains(cloud, true)) {
-                cloudsToRemove.add(cloud);
-            }
-        }
 
 //WORLD
         // colision con el suelo
@@ -491,9 +460,9 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         world.dispose();
         kirby.dispose();
 
-        for (ArrayList<WaddleDee> waddleDeeArray : waddleDeesList) {
-            for (WaddleDee waddle : waddleDeeArray) {
-                waddle.dispose();
+        for (ArrayList<Enemy> zoneEnemies : enemiesList) {
+            for (Enemy enemy : zoneEnemies) {
+                enemy.dispose();
             }
         }
 

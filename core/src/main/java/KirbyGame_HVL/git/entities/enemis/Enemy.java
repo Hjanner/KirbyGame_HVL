@@ -12,7 +12,38 @@ public abstract class Enemy extends Actor {
     protected Body body;
     protected Fixture fixture;
     protected Main main;
+    protected boolean flipX;
+    protected Object currentState;
+
+    public Enemy() {
+        this.flipX = false;
+    }
 
     public abstract void createBody(World world, float x, float y);
-    public abstract void updateAnimation (float delta);
+    public abstract void updateAnimation(float delta);
+
+    public abstract void setState(Object state);
+    public abstract Object getCurrentState();
+
+    public Body getBody() {
+        return body;
+    }
+
+    public void setBody(Body body) {
+        this.body = body;
+    }
+
+    public boolean getFlipX() {
+        return flipX;
+    }
+
+    public void setflipX(boolean flipX) {
+        this.flipX = flipX;
+    }
+
+    public void dispose() {
+        if (body != null) {
+            world.destroyBody(body);
+        }
+    }
 }

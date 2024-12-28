@@ -140,6 +140,16 @@ public class WaddleDee extends Enemy {
         waddleDeeSprite.setFlip(flipX, false);
     }
 
+    @Override
+    public void setState(Object state) {
+
+    }
+
+    @Override
+    public Object getCurrentState() {
+        return null;
+    }
+
     public void setflipX(boolean flipX) {
         this.flipX = flipX;
     }
@@ -161,11 +171,10 @@ public class WaddleDee extends Enemy {
     public void dispose() {
         if (!isDisposed) {
             isDisposed = true;
-            this.remove();                          // Remover el actor del stage
+            this.remove();
         }
     }
 
-    // Getters for collision detection
     public Body getBody() {
         return body;
     }

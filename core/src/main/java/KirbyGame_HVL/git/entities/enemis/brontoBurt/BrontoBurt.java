@@ -154,6 +154,16 @@ public class BrontoBurt extends Enemy {
         brontoBurtSprite.setFlip(flipX, false);
     }
 
+    @Override
+    public void setState(Object state) {
+
+    }
+
+    @Override
+    public Object getCurrentState() {
+        return null;
+    }
+
     public void setflipX(boolean flipX) {
         this.flipX = flipX;
     }
