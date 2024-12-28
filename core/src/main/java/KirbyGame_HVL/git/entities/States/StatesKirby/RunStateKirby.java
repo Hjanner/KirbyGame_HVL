@@ -13,7 +13,6 @@ public class RunStateKirby extends StateKirby {
 
     @Override
     public void start() {
-        System.out.println("Estado Corriendo");
     }
 
     @Override

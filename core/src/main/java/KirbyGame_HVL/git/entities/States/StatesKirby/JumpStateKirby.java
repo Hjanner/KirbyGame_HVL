@@ -12,7 +12,6 @@ public class JumpStateKirby extends StateKirby {
 
     @Override
     public void start() {
-        System.out.println("Estado Saltando");
     }
 
     @Override

@@ -16,7 +16,6 @@ public class StayStateKirby extends StateKirby {
     public void start() {
 
         kirby.setOpuesto(false);
-        System.out.println("Estado estatico");
         accumulatedtimer = 0;
     }
 

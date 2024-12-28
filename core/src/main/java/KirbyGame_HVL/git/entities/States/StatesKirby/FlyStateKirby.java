@@ -14,7 +14,6 @@ public class FlyStateKirby extends StateKirby {
 
     @Override
     public void start() {
-        System.out.println("Estado volando");
         kirby.setOpuesto(false);
         accumulatedtimer = 0;
     }

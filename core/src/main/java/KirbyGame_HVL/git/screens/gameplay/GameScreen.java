@@ -6,6 +6,7 @@ import KirbyGame_HVL.git.entities.States.StatesKirby.EnumStates;
 import KirbyGame_HVL.git.entities.States.StatesWaddleDee.DieStateWaddleDee;
 import KirbyGame_HVL.git.entities.States.StatesWaddleDee.EnumStatesWaddleDee;
 import KirbyGame_HVL.git.entities.States.statesBrontoBurt.EnumStatesBrontoBurt;
+import KirbyGame_HVL.git.entities.enemis.Enemy;
 import KirbyGame_HVL.git.entities.enemis.EnemyFactory;
 import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurdFactory;
 import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurt;
@@ -53,7 +54,6 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private Spikes spikes;
     private Hole hole;
 
-
 //items
     //keys
     private ArrayList<Key> keys;
@@ -65,11 +65,21 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private BitmapFont font;
 
     //enemies
+    private Enemy enemy;
+
     private EnemyFactory factory;
-    private ArrayList<WaddleDee> waddleDees;
+    private ArrayList<ArrayList<Enemy>> enemiesList;
+
+    private ArrayList<ArrayList<WaddleDee>> waddleDeesList;
     private Array<WaddleDee> waddleDeesToRemove;
     private ArrayList<BrontoBurt> brontoBurts;
     private Array<BrontoBurt> brontoBurtsToRemove;
+    private int[][][] zonasCoordenadas = {
+        {{500, 1010}, {550, 1010}, {600, 1010}},        // Zona 1
+        {{700, 1020}, {850, 1020}, {900, 1020}},        // Zona 2
+        {{1000, 1030}, {1050, 1030}, {1100, 1030}},     // Zona 3
+        {{1200, 1040}, {1250, 1040}, {1300, 1040}}
+    };
 
 //ataques
     //nubes
@@ -85,7 +95,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         this.main = main;
         stage = new Stage ();
 
-        waddleDees = new ArrayList<>();
+        waddleDeesList = new ArrayList<>();
         waddleDeesToRemove = new Array<>();
         brontoBurts = new ArrayList<>();
         brontoBurtsToRemove = new Array<>();
@@ -115,10 +125,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
         //items
         createKeys();
-
-        //enemies
         createWaddleDees();
-        createBrontoBurts();
 
         tiledMapHelper = new TiledMapHelper();
         map = tiledMapHelper.setupmap();
@@ -141,6 +148,8 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             puedoResetKirby = false;
         }
 
+        loadEnemies();
+
         deleteKeys();
 
         //muerte de enemies
@@ -162,6 +171,21 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         cam.position.set(kirby.getBody().getPosition(),0);
         cam.update();
         map.setView(cam);
+    }
+
+    public void loadEnemies(){
+
+        if (brontoBurts.isEmpty()){
+            createBrontoBurts();
+        }
+
+        for (int i = 0; i < zonasCoordenadas.length; i++) {
+            ArrayList<WaddleDee> waddleDeeZonas = waddleDeesList.get(i);
+            if (waddleDeeZonas.isEmpty()) {
+                System.out.println("entre a la zona" + (i + 1));
+                waddleDeesList.set(i, createWaddleDeeZonas(zonasCoordenadas[i]));
+            }
+        }
     }
 
     public void createFloor(){
@@ -256,23 +280,38 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private void createWaddleDees() {
         factory = new WaddleDeeFactory();
 
-        WaddleDee waddleDee1 = (WaddleDee) factory.createEnemy(world, main, 400, 1010);                             // Ajusta las coordenadas segun necesites
-        WaddleDee waddleDee2 = (WaddleDee) factory.createEnemy(world, main, 500, 1010);
-        WaddleDee waddleDee3 = (WaddleDee) factory.createEnemy(world, main, 600, 1010);
+        //creamos lista por zonas
+        while (waddleDeesList.size() < zonasCoordenadas.length) {
+            waddleDeesList.add(new ArrayList<>());
+        }
 
-        // Añadir los WaddleDees al stage y a la lista
-        stage.addActor(waddleDee1);
-        stage.addActor(waddleDee2);
-        stage.addActor(waddleDee3);
-
-        waddleDees.add(waddleDee1);
-        waddleDees.add(waddleDee2);
-        waddleDees.add(waddleDee3);
+        for (int i = 0; i < zonasCoordenadas.length; i++) {
+            ArrayList<WaddleDee> waddleDeeZonas = waddleDeesList.get(i);
+            if (waddleDeeZonas.isEmpty()) {
+                waddleDeesList.set(i, createWaddleDeeZonas(zonasCoordenadas[i]));
+                System.out.println("creado grupo de zona " + (i + 1));
+            }
+        }
     }
 
+    private ArrayList<WaddleDee> createWaddleDeeZonas(int[][] coordenadas) {
+        factory = new WaddleDeeFactory();
+        ArrayList<WaddleDee> waddleDeeGroup = new ArrayList<>();
+
+        for (int[] coordenada : coordenadas) {
+            int x = coordenada[0];
+            int y = coordenada[1];
+            WaddleDee waddleDee = (WaddleDee) factory.createEnemy(world, main, x, y);
+            stage.addActor(waddleDee);
+            waddleDeeGroup.add(waddleDee);
+        }
+
+        return waddleDeeGroup;
+    }
     private void deleteWaddleDees(float delta){
-        for (WaddleDee waddle : waddleDeesToRemove) {
-            waddleDees.remove(waddle);
+        for (int i = 0; i < waddleDeesList.size(); i++) {
+            ArrayList<WaddleDee> waddleDeeZonas = waddleDeesList.get(i);
+            waddleDeeZonas.removeIf(waddle -> waddleDeesToRemove.contains(waddle, true));
         }
         waddleDeesToRemove.clear();
     }
@@ -446,8 +485,10 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         world.dispose();
         kirby.dispose();
 
-        for(WaddleDee waddle : waddleDees) {
-            waddle.dispose();
+        for (ArrayList<WaddleDee> waddleDeeArray : waddleDeesList) {
+            for (WaddleDee waddle : waddleDeeArray) {
+                waddle.dispose();
+            }
         }
 
         for (Key key : keys) {

@@ -14,8 +14,6 @@ public class FallStateKirby extends StateKirby {
 
     @Override
     public void start() {
-
-        System.out.println("Estado cayendo");
         accumulatedtimer = 0;
     }
 

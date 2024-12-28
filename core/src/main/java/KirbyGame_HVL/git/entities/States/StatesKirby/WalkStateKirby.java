@@ -12,7 +12,6 @@ public class WalkStateKirby extends StateKirby {
 
     @Override
     public void start() {
-        System.out.println("Estado caminando");
     }
 
     @Override
