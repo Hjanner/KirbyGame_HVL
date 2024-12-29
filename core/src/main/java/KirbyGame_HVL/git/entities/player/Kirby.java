@@ -116,9 +116,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         this.stateManager.setState(stateStay);
         createBody(world);
         texture_animation();
-
     }
-
 
     public void resetPosition() {
         body.setTransform(new Vector2(initialX, initialY), 0);
@@ -366,6 +364,8 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duracion, true);
         kirbysprite.setRegion(frame);
         kirbysprite.flip(flipX,false);
+
+        System.out.println(body.getPosition().x + " " + body.getPosition().y);
 
     }
 

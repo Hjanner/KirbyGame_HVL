@@ -6,7 +6,7 @@ public class FlyStateBrontoBurt extends StateBrontoBurt {
     private float movementSpeed = 40f;
     private float movementTime = 0;
     private float cambioDireccionIntervalo = 3f;
-    private float amplitude = 40f;
+    private final float amplitude = 30f;
     private float frequency = 2f;
     private float time = 0;
 

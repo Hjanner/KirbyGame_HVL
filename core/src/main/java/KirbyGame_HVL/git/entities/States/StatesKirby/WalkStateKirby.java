@@ -25,12 +25,12 @@ public class WalkStateKirby extends StateKirby {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && !Gdx.input.isKeyPressed(Input.Keys.LEFT) && !Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            kirby.getBody().setLinearVelocity(60,0);
+            kirby.getBody().setLinearVelocity(200,0);
             kirby.setFlipx(false);
         }
 
         else if (!Gdx.input.isKeyPressed(Input.Keys.RIGHT) && Gdx.input.isKeyPressed(Input.Keys.LEFT) && !Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            kirby.getBody().setLinearVelocity(-60,0);
+            kirby.getBody().setLinearVelocity(-200,0);
             kirby.setFlipx(true);
         }
 

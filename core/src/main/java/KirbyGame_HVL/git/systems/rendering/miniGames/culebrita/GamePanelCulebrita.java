@@ -1,4 +1,4 @@
-package KirbyGame_HVL.git.miniGames.culebrita;
+package KirbyGame_HVL.git.systems.rendering.miniGames.culebrita;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;

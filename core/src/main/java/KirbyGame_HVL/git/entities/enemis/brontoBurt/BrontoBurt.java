@@ -30,7 +30,7 @@ public class BrontoBurt extends Enemy {
     private float duration = 0;
     private boolean flipX;
     private float startY;
-    private float amplitude = 40f;                          // amplitud del movimiento ondulado
+    private float amplitude = 30f;                          // amplitud del movimiento ondulado
     private float frequency = 2f;                           // frecuencia cambio de  movimiento
     private float time = 0;                                 // tiempo para el movimiento ondulado
 
@@ -59,7 +59,7 @@ public class BrontoBurt extends Enemy {
         body = world.createBody(bodyDef);
 
         CircleShape shape = new CircleShape();
-        shape.setRadius(4f);
+        shape.setRadius(6f);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -95,8 +95,14 @@ public class BrontoBurt extends Enemy {
         flyAnimation = new Animation(0.1f, brontoBurtFlyFrames);
         dieAnimation = new Animation(1, brontoBurtDieFrames);
         brontoBurtSprite = new Sprite(brontoBurtFlyFrames[0]);
-        brontoBurtSprite.setSize(18, 18);
+        brontoBurtSprite.setSize(24, 24);                               //ajusta el tamano de sprite
         currentAnimation = flyAnimation;
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        brontoBurtSprite.setPosition(body.getPosition().x - 12, body.getPosition().y - 6);
+        brontoBurtSprite.draw(batch);
     }
 
     @Override
@@ -112,10 +118,10 @@ public class BrontoBurt extends Enemy {
 
     private void updateMovement(float delta) {
         time += delta;
-        float xVel = (flipX ? -50f : 50f);                                  // Velocidad horizontal
+        float xVel = (flipX ? -70f : 70f);                                  // Velocidad horizontal
         float yOffset = amplitude * MathUtils.sin(time * frequency);
 
-        // Actualiza la posición del cuerpo
+        // Actualiza la posicion del cuerpo
         body.setLinearVelocity(xVel, 0);
         body.setTransform(body.getPosition().x, startY + yOffset, 0);
     }
@@ -174,12 +180,6 @@ public class BrontoBurt extends Enemy {
 
     public State getcurrentState() {
         return this.stateManager.getState();
-    }
-
-    @Override
-    public void draw(Batch batch, float parentAlpha) {
-        brontoBurtSprite.setPosition(body.getPosition().x - 9, body.getPosition().y - 5);
-        brontoBurtSprite.draw(batch);
     }
 
     public void dispose() {

@@ -23,7 +23,7 @@ public class FlyStateKirby extends StateKirby {
 
         accumulatedtimer += delta;
         if (Gdx.input.isKeyPressed(Input.Keys.C) && accumulatedtimer > 0.16f) {
-            kirby.getBody().applyForce(0,50f, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
+            kirby.getBody().applyForce(0,200f, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
             kirby.setAnimation(EnumStates.FLY2);
 
         }

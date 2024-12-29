@@ -31,9 +31,7 @@ public class WalkStateWaddleDee extends StateWaddleDee {
 
         if (movementSpeed > 0) {
             waddleDee.setflipX(false);
-
         }
-
 
         waddleDee.getBody().setLinearVelocity(movementSpeed, waddleDee.getBody().getLinearVelocity().y);                                              // aplica movimiento
 

@@ -1,7 +1,7 @@
 package KirbyGame_HVL.git;
 
-import KirbyGame_HVL.git.miniGames.culebrita.GamePanelCulebrita;
-import KirbyGame_HVL.git.miniGames.viejita.GamePanelViejita;
+import KirbyGame_HVL.git.systems.rendering.miniGames.culebrita.GamePanelCulebrita;
+import KirbyGame_HVL.git.systems.rendering.miniGames.viejita.GamePanelViejita;
 import KirbyGame_HVL.git.screens.gameplay.GameScreen;
 import KirbyGame_HVL.git.screens.mainmenu.PantallaGui;
 import com.badlogic.gdx.Game;

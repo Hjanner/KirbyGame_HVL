@@ -11,6 +11,7 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -20,12 +21,21 @@ public class PlatformMoved extends ActorWithBox2d {
     private Texture platformTexture;
     private TextureRegion platformTextureRegion;
     private Sprite platformSprite;
-    private boolean sentido;
 
-    public PlatformMoved (World world, Main main, float x, float y) {
+    private static final float MOVEMENT_SPEED = 30f;
+    private static final float CAMBIO_DIRECCION = 5f;
 
+    private boolean isVerticalM;  // true para vertical, false para horizontal
+    private float duracion = 0;
+    private boolean movimeintoPositivo;
+
+
+    public PlatformMoved(World world, Main main, float x, float y, boolean isVerticalMovement) {
         this.world = world;
         this.main = main;
+        this.isVerticalM = isVerticalMovement;
+        this.movimeintoPositivo = true;
+
         createBody(world,x, y);
         loadTextures();
     }
@@ -50,18 +60,41 @@ public class PlatformMoved extends ActorWithBox2d {
         platformSprite = new Sprite(platformTextureRegion);
         platformSprite.setSize(122.5f,12.5f);
     }
+
     @Override
     public void act(float delta) {
         super.act(delta);
+        updateMovement(delta);
+    }
 
-        // Verificar en que sentido va la plataforma, si se mueve horizontal o verticalmente
-        if (sentido) {
+    public void updateMovement(float delta) {
+        duracion += delta;
 
+        if (isVerticalM) {
+
+            // Cambiar direccion
+            if (duracion >= CAMBIO_DIRECCION) {
+                duracion = 0;
+                movimeintoPositivo = !movimeintoPositivo;
+            }
+
+            // Aplicar velocidad
+            float velocityY = movimeintoPositivo ? MOVEMENT_SPEED : -MOVEMENT_SPEED;
+            body.setLinearVelocity(0, velocityY);
+        } else {
+            if (duracion >= CAMBIO_DIRECCION) {
+                duracion = 0;
+                movimeintoPositivo = !movimeintoPositivo;
+            }
+
+            // Aplicar velocidad
+            float velocityX = movimeintoPositivo ? MOVEMENT_SPEED : -MOVEMENT_SPEED;
+            body.setLinearVelocity(velocityX, 0);
         }
+    }
 
-        else {
-            // Logica de movimiento de las plataformas
-        }
+    public boolean isMovimientoVertical() {
+        return isVerticalM;
     }
 
     @Override
@@ -69,6 +102,10 @@ public class PlatformMoved extends ActorWithBox2d {
 
         platformSprite.setPosition(body.getPosition().x - 62, body.getPosition().y - 4f);
         platformSprite.draw(batch);
+    }
+
+    public Body getBody(){
+        return this.body;
     }
 
     @Override

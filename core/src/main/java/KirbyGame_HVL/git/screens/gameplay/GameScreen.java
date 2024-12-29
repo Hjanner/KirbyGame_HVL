@@ -40,7 +40,6 @@ import com.badlogic.gdx.graphics.Texture;
 public class GameScreen extends Pantalla implements ContactListener, Screen {
 
     private Stage stage;
-
     private World world;
 
     private Kirby kirby;
@@ -49,10 +48,6 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private TiledMapHelper tiledMapHelper;
     private OrthogonalTiledMapRenderer map;
     private Box2DDebugRenderer bdr;
-    private Floor floor;
-    private Spikes spikes;
-    private Hole hole;
-    private Platform platform;
 
 //items
     //keys
@@ -63,24 +58,32 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private int keysCollected = 0;
     private final int TOTAL_KEYS = 3;
     private BitmapFont font;
+    private Door door;
+    private boolean levelCompleted = false;
 
     //enemies
     private ArrayList<ArrayList<Enemy>> enemiesList;
     private Array<Enemy> enemiesToRemove;
     private Map<Integer, EnemyFactory> zonaFactories;           // Define que factory usar en cada zona
     private int[][][] enemyZonaCoordenadas = {
-        {{500, 1010}, {550, 1010}, {600, 1010}, {100, 1010}},                // zona 1 - WaddleDees
-        {{700, 1020}, {850, 1020}, {900, 1020}},                // z 2 - BrontoBurts
-        {{500, 1100}, {600, 1150}, {750, 1050}},                // z 3 - BrontoBurts
-        {{1200, 1040}, {1250, 1040}, {1300, 1040}}              // z 4 - WaddleDees
+        {{500, 1010}, {550, 1010}, {600, 1010}, {100, 1010}},           // zona 1 - WaddleDees
+        {{700, 1020}, {850, 1020}, {900, 1020}},                        // z 2 - BrontoBurts
+        {{500, 1100}, {600, 1150}, {750, 1050}},                        // z 3 - BrontoBurts
+        {{1200, 1040}, {1250, 1040}, {1300, 1040}}                      // z 4 - WaddleDees
     };
 
-    //ataques
+//ataques
 
-    //nubes
+//nubes
     private ArrayList<CloudKirby> clouds;
     private Array<CloudKirby> cloudsToRemove;
     private float lastCloudCreationTime = 0;
+
+//objetos del mapa
+    private Floor floor;
+    private Spikes spikes;
+    private Hole hole;
+    private ArrayList<PlatformMoved> platforms;
 
     //helpers
     private boolean puedoResetKirby = false;
@@ -122,11 +125,13 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         cam.zoom = 0.34f;
 
         //UI
-        loadAssetsKey();
+        //loadAssetsKey();
+
+        createEnemies();
 
         //items
         createKeys();
-        createEnemies();
+        createDoor();
 
         tiledMapHelper = new TiledMapHelper();
         map = tiledMapHelper.setupmap();
@@ -137,8 +142,6 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         createFloor();
         spikes = new Spikes(world, map, 4);
         hole = new Hole(world, map, 5);
-        platform = new Platform(world, map, 6);
-
     }
 
     @Override
@@ -147,18 +150,21 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         Gdx.gl.glClearColor(0.53f, 0.81f, 0.92f, 1);
         world.step(1/60f,6,2);
 
+        loadAssetsKey();
+
         if (puedoResetKirby) {
             kirby.resetPosition();
             puedoResetKirby = false;
         }
 
-        loadEnemies();
         cloud();
 
         deleteEnemies();
         deleteKeys();
         deleteClouds();
+        loadEnemies();
 
+        updateMovementPlataforms(delta);
         stage.act();
         update();
         map.render();
@@ -251,6 +257,12 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
     }
 
+//objetos mapa
+    private void createDoor() {
+        door = new Door(world, main, 100, 1050);
+        stage.addActor(door);
+    }
+
     public void createFloor(){
         for (int i = 2; i < 4; i++) {
             floor = new Floor(world, map, i);
@@ -258,12 +270,26 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     }
 
     private void createPlatformMoved() {
+        platforms = new ArrayList<>();
+        PlatformMoved verticalPlatform = new PlatformMoved(world, main, 400, 1010, true);
+        platforms.add(verticalPlatform);
+        stage.addActor(verticalPlatform);
 
-        PlatformMoved platformMoved1 = new PlatformMoved(world, main, 1000,1100);
-        stage.addActor(platformMoved1);
+        PlatformMoved horizontalPlatform = new PlatformMoved(world, main, 800, 1010, false);
+        platforms.add(horizontalPlatform);
+        stage.addActor(horizontalPlatform);
+
+        PlatformMoved horizontalPlatform1 = new PlatformMoved(world, main, 1000, 1010, false);
+        platforms.add(horizontalPlatform1);
+        stage.addActor(horizontalPlatform1);
 
     }
 
+    private void updateMovementPlataforms(float delta){
+        for (PlatformMoved platform : platforms) {
+            platform.act(delta);
+        }
+    }
 //ITEMS
     //keys
     private void loadAssetsKey(){
@@ -273,9 +299,9 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     }
 
     private void createKeys(){
-        Key key1 = new Key(world, main, 300, 1010);
-        Key key2 = new Key(world, main, 500, 1010);
-        Key key3 = new Key(world, main, 700, 1010);
+        Key key1 = new Key(world, main, 80, 1010);
+        Key key2 = new Key(world, main, 110, 1010);
+        Key key3 = new Key(world, main, 200, 1010);
 
         keys.add(key1);
         keys.add(key2);
@@ -320,6 +346,15 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         keysToRemove.clear();
     }
 
+    private void manejadorKeyColition(){
+        for (Key key : keys) {
+            if (key.isCollected() && !keysToRemove.contains(key, true)) {
+                keysToRemove.add(key);
+            }
+        }
+        keysCollected++;
+        //un  mensaje en pantalla ir en pantalla
+    }
 
 //nube
     public void cloud () {
@@ -357,8 +392,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
     }
 
-
-    //listener
+//listener
     private boolean setContact(Contact contact, Object userA, Object userB) {
         return ((contact.getFixtureA().getUserData().equals(userA) && contact.getFixtureB().getUserData().equals(userB)) || (contact.getFixtureA().getUserData().equals(userB) && contact.getFixtureB().getUserData().equals(userA)));
     }
@@ -380,15 +414,20 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
             if (!keyInContact.isCollected()) {
                 keyInContact.collect();
-                for (Key key : keys) {
-                    if (key.isCollected() && !keysToRemove.contains(key, true)) {
-                        keysToRemove.add(key);
-                    }
-                }
-                keysCollected++;
-                //un  mensaje en pantalla ir en pantalla
+                manejadorKeyColition();
             }
         }
+
+        if ((userDataA instanceof Kirby && userDataB instanceof Door) ||
+            (userDataB instanceof Kirby && userDataA instanceof Door)) {
+
+            Door door = (Door) (userDataA instanceof Door ? userDataA : userDataB);
+            if (keysCollected >= TOTAL_KEYS && !levelCompleted) {
+                levelCompleted = true;
+                miniGame();
+            }
+        }
+
 
 //ENEMIES
         //colision kirby-enemies y dash
@@ -454,6 +493,12 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
     }
 
+    public void miniGame(){
+        //dispose();
+        //aqui puede ir un mensaje
+        main.setScreen(main.gameCulebrita);
+    }
+
     @Override
     public void dispose() {
         stage.dispose();
@@ -472,5 +517,9 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         font.dispose();
         keyIconTexture.dispose();
     }
+
+//    if (door != null) {
+//        door.dispose();
+//    }
 
 }
