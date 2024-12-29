@@ -1,6 +1,7 @@
 package KirbyGame_HVL.git.screens.gameplay;
 
 import KirbyGame_HVL.git.Main;
+import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
 import KirbyGame_HVL.git.entities.States.StatesKirby.DashStateKirby;
 import KirbyGame_HVL.git.entities.States.StatesKirby.EnumStates;
 import KirbyGame_HVL.git.entities.States.StatesWaddleDee.DieStateWaddleDee;
@@ -223,10 +224,6 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         for (ArrayList<Enemy> zoneEnemies : enemiesList) {
             for (Enemy enemy : new ArrayList<>(zoneEnemies)) {                          //  una copia para evitar errores
                 if (enemiesToRemove.contains(enemy, true)) {
-                    if (enemy.getBody() != null) {
-                        world.destroyBody(enemy.getBody());
-                    }
-                    enemy.remove();
                     zoneEnemies.remove(enemy);                          // Eliminar de la lista de la zona
                 }
             }
@@ -239,16 +236,9 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             //eliminacion de enemy por dash
             if (!enemiesToRemove.contains(enemy, true)) {
                 enemy.setflipX(kirby.getFlipX());
-
-                if (enemy instanceof WaddleDee) {
-                    enemy.setState(EnumStatesWaddleDee.DIE);
-                } else if (enemy instanceof BrontoBurt) {
-                    enemy.setState(EnumStatesBrontoBurt.DIE);
-                }
-
+                enemy.setState(EnumStateEnemy.DIE);
                 enemiesToRemove.add(enemy);
                 kirby.setState(EnumStates.STAY);
-                enemy.remove();
             }
         } else {
             //kirby recibe daño
@@ -376,15 +366,9 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private void manejadorCloudEnemyCollision(CloudKirby cloud, Enemy enemy) {
         if (!enemiesToRemove.contains(enemy, true)) {
             enemy.setflipX(kirby.getFlipX());
-
-            if (enemy instanceof WaddleDee) {
-                enemy.setState(EnumStatesWaddleDee.DIE);
-            } else if (enemy instanceof BrontoBurt) {
-                enemy.setState(EnumStatesBrontoBurt.DIE);
-            }
-
+            enemy.setState(EnumStateEnemy.DIE);
             enemiesToRemove.add(enemy);
-            enemy.remove();
+            //enemy.remove();
         }
 
         if (!cloudsToRemove.contains(cloud, true)) {

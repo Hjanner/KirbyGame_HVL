@@ -1,6 +1,9 @@
 package KirbyGame_HVL.git.entities.enemis;
 
 import KirbyGame_HVL.git.Main;
+import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
+import KirbyGame_HVL.git.entities.States.State;
+import KirbyGame_HVL.git.entities.States.StatesWaddleDee.EnumStatesWaddleDee;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
@@ -22,8 +25,8 @@ public abstract class Enemy extends Actor {
     public abstract void createBody(World world, float x, float y);
     public abstract void updateAnimation(float delta);
 
-    public abstract void setState(Object state);
-    public abstract Object getCurrentState();
+    public abstract void setState(EnumStateEnemy typeState);
+    public abstract State getcurrentState();
 
     public Body getBody() {
         return body;

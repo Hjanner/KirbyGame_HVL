@@ -1,8 +1,10 @@
 package KirbyGame_HVL.git.entities.enemis.brontoBurt;
 
 import KirbyGame_HVL.git.Main;
+import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
 import KirbyGame_HVL.git.entities.States.State;
 import KirbyGame_HVL.git.entities.States.StateManager;
+import KirbyGame_HVL.git.entities.States.StatesWaddleDee.EnumStatesWaddleDee;
 import KirbyGame_HVL.git.entities.States.statesBrontoBurt.DieStateBrontoBurt;
 import KirbyGame_HVL.git.entities.States.statesBrontoBurt.EnumStatesBrontoBurt;
 import KirbyGame_HVL.git.entities.States.statesBrontoBurt.FlyStateBrontoBurt;
@@ -14,6 +16,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.math.MathUtils;
+
+import static KirbyGame_HVL.git.entities.States.statesBrontoBurt.EnumStatesBrontoBurt.FLY;
 
 public class BrontoBurt extends Enemy {
     private Texture brontoBurtFlyTexture;
@@ -126,19 +130,6 @@ public class BrontoBurt extends Enemy {
         body.setTransform(body.getPosition().x, startY + yOffset, 0);
     }
 
-    public void setState(EnumStatesBrontoBurt typeState) {
-        switch (typeState) {
-            case FLY:
-                stateManager.setState(flyBrontoBurt);
-                break;
-            case DIE:
-                stateManager.setState(dieBrontoBurt);
-                break;
-            default:
-                break;
-        }
-    }
-
     public void setAnimation(EnumStatesBrontoBurt typeState) {
         switch (typeState) {
             case FLY:
@@ -161,13 +152,21 @@ public class BrontoBurt extends Enemy {
     }
 
     @Override
-    public void setState(Object state) {
-
+    public void setState(EnumStateEnemy typeState) {
+        switch (typeState) {
+            case FLY:
+                stateManager.setState(flyBrontoBurt);
+                break;
+            case DIE:
+                stateManager.setState(dieBrontoBurt);
+                break;
+            default:
+                break;
+        }
     }
 
-    @Override
-    public Object getCurrentState() {
-        return null;
+    public void setState(EnumStatesWaddleDee typeState) {
+
     }
 
     public void setflipX(boolean flipX) {
@@ -178,6 +177,7 @@ public class BrontoBurt extends Enemy {
         return flipX;
     }
 
+    @Override
     public State getcurrentState() {
         return this.stateManager.getState();
     }

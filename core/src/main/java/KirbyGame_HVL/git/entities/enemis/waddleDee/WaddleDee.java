@@ -1,6 +1,7 @@
 package KirbyGame_HVL.git.entities.enemis.waddleDee;
 
 import KirbyGame_HVL.git.Main;
+import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
 import KirbyGame_HVL.git.entities.States.State;
 import KirbyGame_HVL.git.entities.States.StateManager;
 import KirbyGame_HVL.git.entities.States.StatesWaddleDee.DieStateWaddleDee;
@@ -106,19 +107,6 @@ public class WaddleDee extends Enemy {
         updateAnimation(delta);
     }
 
-    public void setState(EnumStatesWaddleDee typeState) {
-        switch (typeState) {
-            case WALK:
-                stateManager.setState(walkWaddleDee);
-                break;
-            case DIE:
-                stateManager.setState(dieWaddleDee);
-                break;
-            default:
-                break;
-        }
-    }
-
     public void setAnimation (EnumStatesWaddleDee typeState) {
         switch (typeState) {
             case WALK:
@@ -141,13 +129,17 @@ public class WaddleDee extends Enemy {
     }
 
     @Override
-    public void setState(Object state) {
-
-    }
-
-    @Override
-    public Object getCurrentState() {
-        return null;
+    public void setState(EnumStateEnemy typeState) {
+        switch (typeState) {
+            case WALK:
+                stateManager.setState(walkWaddleDee);
+                break;
+            case DIE:
+                stateManager.setState(dieWaddleDee);
+                break;
+            default:
+                break;
+        }
     }
 
     public void setflipX(boolean flipX) {
@@ -158,6 +150,7 @@ public class WaddleDee extends Enemy {
         return flipX;
     }
 
+    @Override
     public State getcurrentState () {
         return this.stateManager.getState();
     }

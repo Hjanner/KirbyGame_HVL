@@ -365,7 +365,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbysprite.setRegion(frame);
         kirbysprite.flip(flipX,false);
 
-        System.out.println(body.getPosition().x + " " + body.getPosition().y);
+        //System.out.println(body.getPosition().x + " " + body.getPosition().y);
 
     }
 
