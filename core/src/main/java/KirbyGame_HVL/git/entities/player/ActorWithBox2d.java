@@ -14,6 +14,9 @@ public abstract class ActorWithBox2d extends Actor {
     protected Fixture fixture;
     protected Main main;
 
+    public Body getBody() {
+        return body;
+    }
 
     public abstract void dispose();
 }

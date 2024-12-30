@@ -3,7 +3,10 @@ package KirbyGame_HVL.git.entities.player;
 import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.entities.States.*;
 import KirbyGame_HVL.git.entities.States.StatesKirby.*;
-import KirbyGame_HVL.git.entities.items.CloudKirby;
+import KirbyGame_HVL.git.entities.attacks.CloudKirby;
+import KirbyGame_HVL.git.entities.attacks.Fire;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
@@ -92,6 +95,9 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private Animation currentAnimation;
     private CloudKirby cloudkirby;
 
+    private boolean fireKeyPressed = false; // Bandera para controlar el disparo
+
+
     private float initialX = 180;
     private float initialY = 1010;
 
@@ -134,6 +140,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     public CloudKirby getCloud () {
         return this.cloudkirby;
     }
+
 
     public boolean getFlipX () {
         return this.flipX;
@@ -365,8 +372,21 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbysprite.setRegion(frame);
         kirbysprite.flip(flipX,false);
 
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            if (!fireKeyPressed) {
+                shootFire();
+                fireKeyPressed = true;
+            }
+        } else {
+            fireKeyPressed = false;
+        }
         //System.out.println(body.getPosition().x + " " + body.getPosition().y);
 
+    }
+
+    private void shootFire() {
+        Fire fire = new Fire(world, this, !flipX);
+        getStage().addActor(fire);
     }
 
     private void retroceso () {

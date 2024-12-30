@@ -1,5 +1,6 @@
 package KirbyGame_HVL.git;
 
+import KirbyGame_HVL.git.entities.player.Kirby;
 import KirbyGame_HVL.git.systems.rendering.miniGames.culebrita.GamePanelCulebrita;
 import KirbyGame_HVL.git.systems.rendering.miniGames.viejita.GamePanelViejita;
 import KirbyGame_HVL.git.screens.gameplay.GameScreen;
@@ -66,5 +67,9 @@ public class Main extends Game {
     public AssetManager getManager () {
         return manager;
     }
+
+//    public Kirby getKirby() {
+//        return kirby;
+//    }
 }
 

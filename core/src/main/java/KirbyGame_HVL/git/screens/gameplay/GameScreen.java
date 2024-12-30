@@ -4,14 +4,14 @@ import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
 import KirbyGame_HVL.git.entities.States.StatesKirby.DashStateKirby;
 import KirbyGame_HVL.git.entities.States.StatesKirby.EnumStates;
-import KirbyGame_HVL.git.entities.States.StatesWaddleDee.DieStateWaddleDee;
-import KirbyGame_HVL.git.entities.States.StatesWaddleDee.EnumStatesWaddleDee;
-import KirbyGame_HVL.git.entities.States.statesBrontoBurt.EnumStatesBrontoBurt;
+import KirbyGame_HVL.git.entities.attacks.Attack;
+import KirbyGame_HVL.git.entities.attacks.CloudKirby;
+import KirbyGame_HVL.git.entities.attacks.Fire;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
 import KirbyGame_HVL.git.entities.enemis.EnemyFactory;
 import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurdFactory;
-import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurt;
-import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDee;
+import KirbyGame_HVL.git.entities.enemis.hotHead.HotHead;
+import KirbyGame_HVL.git.entities.enemis.hotHead.HotHeadFactory;
 import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDeeFactory;
 import KirbyGame_HVL.git.entities.items.*;
 import KirbyGame_HVL.git.entities.player.Kirby;
@@ -36,7 +36,6 @@ import java.util.Map;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.Texture;
-
 
 public class GameScreen extends Pantalla implements ContactListener, Screen {
 
@@ -67,17 +66,19 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private Array<Enemy> enemiesToRemove;
     private Map<Integer, EnemyFactory> zonaFactories;           // Define que factory usar en cada zona
     private int[][][] enemyZonaCoordenadas = {
-        {{500, 1010}, {550, 1010}, {600, 1010}, {100, 1010}},           // zona 1 - WaddleDees
+        {{700, 1010}, {850, 1010}, {600, 1010}},           // zona 1 - WaddleDees
         {{700, 1020}, {850, 1020}, {900, 1020}},                        // z 2 - BrontoBurts
         {{500, 1100}, {600, 1150}, {750, 1050}},                        // z 3 - BrontoBurts
-        {{1200, 1040}, {1250, 1040}, {1300, 1040}}                      // z 4 - WaddleDees
+        {{1200, 1040}, {1250, 1040}, {1300, 1040}},                      // z 4 - WaddleDees
+        {{100, 1010}, {1400, 1010}, {1500, 1010}}                       //g 5 - HotHeads
     };
 
 //ataques
+    private Array<Fire> firesToRemove;
 
 //nubes
-    private ArrayList<CloudKirby> clouds;
-    private Array<CloudKirby> cloudsToRemove;
+    private ArrayList<Attack> attacks;
+    private Array<Attack> attacksToRemove;
     private float lastCloudCreationTime = 0;
 
 //objetos del mapa
@@ -101,12 +102,15 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         zonaFactories.put(1, new BrontoBurdFactory());
         zonaFactories.put(2, new BrontoBurdFactory());
         zonaFactories.put(3, new WaddleDeeFactory());
+        zonaFactories.put(4, new HotHeadFactory());
         for (int i = 0; i < enemyZonaCoordenadas.length; i++) {         //se crean ls grupos
             enemiesList.add(new ArrayList<>());
         }
 
-        clouds = new ArrayList<>();
-        cloudsToRemove = new Array<>();
+        firesToRemove = new Array<>();
+
+        attacks = new ArrayList<>();
+        attacksToRemove = new Array<>();
 
         keys = new ArrayList<>();
         keysToRemove = new Array<>();
@@ -117,7 +121,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
     @Override
     public void show() {
-        world = new World (new Vector2(0, 0), true);
+        world = new World (new Vector2(0, 0f), true);
         world.setContactListener(this);                                 // listener de contactos
 
         kirby = new Kirby(world, main);
@@ -162,7 +166,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
         deleteEnemies();
         deleteKeys();
-        deleteClouds();
+        deleteAttacks();
         loadEnemies();
 
         updateMovementPlataforms(delta);
@@ -200,6 +204,11 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         //creo enemies
         for (int[] coordenada : coordenadas) {
             Enemy enemy = factory.createEnemy(world, main, coordenada[0], coordenada[1]);
+
+            if (enemy instanceof HotHead){
+                ((HotHead) enemy).setKirbyBody(kirby.getBody());
+            }
+
             stage.addActor(enemy);
             zonaEnemies.add(enemy);
         }
@@ -224,6 +233,9 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         for (ArrayList<Enemy> zoneEnemies : enemiesList) {
             for (Enemy enemy : new ArrayList<>(zoneEnemies)) {                          //  una copia para evitar errores
                 if (enemiesToRemove.contains(enemy, true)) {
+                    if (enemy instanceof HotHead){
+                        ((HotHead) enemy).die();
+                    }
                     zoneEnemies.remove(enemy);                          // Eliminar de la lista de la zona
                 }
             }
@@ -354,25 +366,41 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
     }
 
-    public void deleteClouds(){
-        for (CloudKirby cloud : cloudsToRemove) {
-            world.destroyBody(cloud.getBody());     // Destruye el cuerpo en Box2D
-            cloud.remove();                         // Elimina del stage
-            clouds.remove(cloud);
+    public void deleteAttacks(){
+        for (Attack attack : attacksToRemove) {
+            if (attack.getBody() != null) {
+                world.destroyBody(attack.getBody());     // Destruye el cuerpo en Box2D
+                attack.remove();                         // Elimina del stage
+                attacks.remove(attack);
+            }
         }
-        cloudsToRemove.clear();
+        attacksToRemove.clear();
     }
 
-    private void manejadorCloudEnemyCollision(CloudKirby cloud, Enemy enemy) {
+    private void manejadorAttackEnemyCollision(Attack attack, Enemy enemy) {
+        if (!attacksToRemove.contains(attack, true)) {                                       // en lo que haga contacto desaparece
+            attacksToRemove.add(attack);
+        }
+
         if (!enemiesToRemove.contains(enemy, true)) {
             enemy.setflipX(kirby.getFlipX());
             enemy.setState(EnumStateEnemy.DIE);
             enemiesToRemove.add(enemy);
-            //enemy.remove();
+        }
+    }
+
+    private void manejadorAttackKirbyCollision(Attack attack){
+
+        if (attack.getAttackOfKirby()){                                                          //si el ataque es el kirby no pasa nada
+            return;
         }
 
-        if (!cloudsToRemove.contains(cloud, true)) {
-            cloudsToRemove.add(cloud);
+        //animaciones de muerte del kirby y debe ir logica de puntos
+        kirby.setState(EnumStates.DAMAGE);
+        kirby.setAnimation(EnumStates.DAMAGE);
+
+        if (!attacksToRemove.contains(attack, true)) {                                  // en lo que haga contacto desaparece
+            attacksToRemove.add(attack);
         }
     }
 
@@ -402,6 +430,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             }
         }
 
+        //colision con puerta
         if ((userDataA instanceof Kirby && userDataB instanceof Door) ||
             (userDataB instanceof Kirby && userDataA instanceof Door)) {
 
@@ -430,16 +459,25 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             }
         }
 
-        // colision cloud-enemies
-        if ((userDataA instanceof CloudKirby && userDataB instanceof Enemy) ||
-            (userDataB instanceof CloudKirby && userDataA instanceof Enemy)) {
+        // colision attack-enemies
+        if ((userDataA instanceof Attack && userDataB instanceof Enemy) ||
+            (userDataB instanceof Attack && userDataA instanceof Enemy)) {
 
-            CloudKirby cloud = (CloudKirby) (userDataA instanceof CloudKirby ? userDataA : userDataB);
+            Attack attack = (Attack) (userDataA instanceof Attack ? userDataA : userDataB);
+            if (!attack.getAttackOfKirby()) return;
+
             Enemy enemy = (Enemy) (userDataA instanceof Enemy ? userDataA : userDataB);
 
-            manejadorCloudEnemyCollision(cloud, enemy);
+            manejadorAttackEnemyCollision(attack, enemy);
         }
 
+        // colision ataque-kirby
+        if ((userDataA instanceof Attack && userDataB instanceof Kirby) ||
+            (userDataB instanceof Attack && userDataA instanceof Kirby)) {
+
+            Attack attack = (Attack) (userDataA instanceof Attack ? userDataA : userDataB);
+            manejadorAttackKirbyCollision(attack);
+        }
 
 //WORLD
         // colision con el suelo
@@ -483,6 +521,10 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         main.setScreen(main.gameCulebrita);
     }
 
+    public Kirby getKirby() {
+        return kirby;
+    }
+
     @Override
     public void dispose() {
         stage.dispose();
@@ -498,12 +540,9 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         for (Key key : keys) {
             key.dispose();
         }
+
         font.dispose();
         keyIconTexture.dispose();
     }
-
-//    if (door != null) {
-//        door.dispose();
-//    }
 
 }

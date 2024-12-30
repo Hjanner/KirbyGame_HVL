@@ -1,4 +1,4 @@
-package KirbyGame_HVL.git.entities.items;
+package KirbyGame_HVL.git.entities.attacks;
 
 import KirbyGame_HVL.git.entities.player.ActorWithBox2d;
 import KirbyGame_HVL.git.entities.player.Kirby;
@@ -10,29 +10,26 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
-import static sun.tools.jconsole.inspector.XDataViewer.dispose;
-
-public class CloudKirby extends ActorWithBox2d {
+public class CloudKirby extends Attack {
 
     private Texture kirbyCloudTexture;
     private TextureRegion kirbyCloudRegion;
     private Sprite kirbycloudsprite;
-    private Kirby kirby;
+    private ActorWithBox2d actor;
     private float accumulatedtimer;
     private static final float CLOUD_LIFETIME = 0.8f;
 
-    public CloudKirby (World world, Kirby kirby, boolean sentido) {
+    public CloudKirby (World world, ActorWithBox2d actor, boolean sentido) {
         this.world = world;
-        this.kirby = kirby;
+        this.actor = actor;
         this.kirbyCloudTexture = new Texture("assets/art/sprites/kirbycloud.png");
         this.kirbyCloudRegion = new TextureRegion(kirbyCloudTexture, 32,32);
         this.kirbycloudsprite = new Sprite(kirbyCloudRegion);
         this.kirbycloudsprite.setSize(25,25);
         this.accumulatedtimer = 0;
-        createBody(this.world, this.kirby, sentido);
+        if (actor instanceof Kirby) {this.attackOfkirby = true;}
+        createBody(this.world, this.actor, sentido);
 
     }
 
@@ -42,18 +39,20 @@ public class CloudKirby extends ActorWithBox2d {
         this.kirbycloudsprite.draw(batch);
     }
 
-    public void createBody (World world, Kirby kirby, boolean sentido) {
+    @Override
+    public void createBody (World world, ActorWithBox2d actor, boolean sentido) {
         BodyDef bodyDef = new BodyDef();
         if (sentido) {
-            bodyDef.position.set(kirby.getBody().getPosition().x + 5.5f, kirby.getBody().getPosition().y + 2);
+            bodyDef.position.set(actor.getBody().getPosition().x + 5.5f, actor.getBody().getPosition().y + 2);
         }
         else {
-            bodyDef.position.set(kirby.getBody().getPosition().x - 5.5f, kirby.getBody().getPosition().y + 2);
+            bodyDef.position.set(actor.getBody().getPosition().x - 5.5f, actor.getBody().getPosition().y + 2);
         }
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(3,3);
+
         fixture = body.createFixture(shape,0.01f);
         fixture.setUserData(this);
         shape.dispose();
@@ -77,7 +76,12 @@ public class CloudKirby extends ActorWithBox2d {
             remove();                                //se elimina al actor del stage
             dispose();                              //elimina cualquier textura o recurso asociado con la nube
         }
-}
+    }
+
+    public ActorWithBox2d getActor() {
+        return actor;
+    }
+
 
     public void dispose() {
         if (kirbyCloudTexture != null) {

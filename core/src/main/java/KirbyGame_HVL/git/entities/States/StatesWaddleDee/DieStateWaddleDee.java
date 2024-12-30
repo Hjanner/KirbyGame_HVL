@@ -13,7 +13,6 @@ public class DieStateWaddleDee extends StateWaddleDee {
     @Override
     public void start() {
 
-        System.out.println("He muerto waddleDIE");
         acummulatedtimer = 0;
         if (waddleDee.getflipX()){
             waddleDee.getBody().applyLinearImpulse(-50,50,waddleDee.getBody().getPosition().x, waddleDee.getBody().getPosition().y, true);

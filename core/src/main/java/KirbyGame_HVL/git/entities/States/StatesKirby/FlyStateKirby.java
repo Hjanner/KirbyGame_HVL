@@ -1,6 +1,6 @@
 package KirbyGame_HVL.git.entities.States.StatesKirby;
 
-import KirbyGame_HVL.git.entities.items.CloudKirby;
+import KirbyGame_HVL.git.entities.attacks.CloudKirby;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
