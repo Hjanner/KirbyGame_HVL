@@ -1,5 +1,6 @@
 package KirbyGame_HVL.git.entities.States.StatesWaddleDee;
 
+import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
 import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDee;
 
 public class WalkStateWaddleDee extends StateWaddleDee {
@@ -14,7 +15,7 @@ public class WalkStateWaddleDee extends StateWaddleDee {
 
     @Override
     public void start() {
-        waddleDee.setAnimation(EnumStatesWaddleDee.WALK);
+        waddleDee.setAnimation(EnumStateEnemy.WALK);
     }
 
     @Override
@@ -35,7 +36,7 @@ public class WalkStateWaddleDee extends StateWaddleDee {
 
         waddleDee.getBody().setLinearVelocity(movementSpeed, waddleDee.getBody().getLinearVelocity().y);                                              // aplica movimiento
 
-        waddleDee.getBody().applyLinearImpulse(0, -9.8f, waddleDee.getBody().getPosition().x, waddleDee.getBody().getPosition().y, true);       // gravedad
+        //waddleDee.getBody().applyLinearImpulse(0, -9.8f, waddleDee.getBody().getPosition().x, waddleDee.getBody().getPosition().y, true);       // gravedad
 
     }
 

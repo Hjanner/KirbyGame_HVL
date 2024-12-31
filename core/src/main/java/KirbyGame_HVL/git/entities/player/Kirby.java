@@ -4,13 +4,15 @@ import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.entities.States.*;
 import KirbyGame_HVL.git.entities.States.StatesKirby.*;
 import KirbyGame_HVL.git.entities.attacks.CloudKirby;
+import KirbyGame_HVL.git.entities.attacks.Star;
+import KirbyGame_HVL.git.entities.enemis.Enemy;
+import KirbyGame_HVL.git.entities.items.SensorKirby;
 import KirbyGame_HVL.git.entities.attacks.Fire;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import org.w3c.dom.Text;
 
 public class Kirby extends ActorWithBox2d implements Box2dPlayer {
 
@@ -37,6 +39,15 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private Texture kirbyflyfalltexture;
     private Texture kirbyflyfallendtexture;
     private Texture kirbyDamagetexture;
+    private Texture kirbyAbsorbtexture;
+    private Texture kirbyAbsorbStaytexture;
+    private Texture kirbyAbsorbWalktexture;
+    private Texture kirbyAbsorbJumptexture;
+    private Texture kirbyAbsorbFalltexture;
+    private Texture kirbyAbsorbFall2texture;
+    private Texture kirbyAbsorbDowntexture;
+    private Texture kirbyAbsorbDamagetexture;
+    private Texture kirbyAbsorbSpittexture;
     private TextureRegion kirbywalkregion;
     private TextureRegion kirbyStayregion;
     private TextureRegion kirbydownregion;
@@ -50,6 +61,15 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private TextureRegion kirbyflyfallregion;
     private TextureRegion kirbyflyfallendregion;
     private TextureRegion kirbyDamageregion;
+    private TextureRegion kirbyAbsorbregion;
+    private TextureRegion kirbyAbsorbStayregion;
+    private TextureRegion kirbyAbsorbWalkregion;
+    private TextureRegion kirbyAbsorbJumpregion;
+    private TextureRegion kirbyAbsorbFallregion;
+    private TextureRegion kirbyAbsorbFall2region;
+    private TextureRegion kirbyAbsorbDownregion;
+    private TextureRegion kirbyAbsorbDamageregion;
+    private TextureRegion kirbyAbsorbSpitregion;
     private TextureRegion [] kirbyframeswalk;
     private TextureRegion [] kirbyframesstay;
     private TextureRegion [] kirbyframesdown;
@@ -63,12 +83,22 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private TextureRegion [] kirbyframesflyfall;
     private TextureRegion [] kirbyframesflyfallend;
     private TextureRegion [] kirbyframesdamage;
+    private TextureRegion [] kirbyframesAbsorb;
+    private TextureRegion [] kirbyframesAbsorbStay;
+    private TextureRegion [] kirbyframesAbsorbWalk;
+    private TextureRegion [] kirbyframesAbsorbJump;
+    private TextureRegion [] kirbyframesAbsorbFall;
+    private TextureRegion [] kirbyframesAbsorbFall2;
+    private TextureRegion [] kirbyframesAbsorbDown;
+    private TextureRegion [] kirbyframesAbsorbDamage;
+    private TextureRegion [] kirbyframesAbsorbSpit;
     private Sprite kirbysprite;
     private float duracion = 0;
     private boolean flipX;
     private boolean opuesto;
     private boolean colisionSuelo;
     private boolean realizar;
+    private boolean poder;
     private StateManager stateManager;
     private RunStateKirby stateRun;
     private WalkStateKirby stateWalk;
@@ -79,6 +109,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private DownStateKirby stateDown;
     private FlyStateKirby stateFly;
     private DamageStateKirby stateDamage;
+    private AbsorbStateKirby stateAbsorb;
     private Animation kirbyanimationStay;
     private Animation kirbyanimationWalk;
     private Animation kirbyanimationDown;
@@ -92,10 +123,21 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private Animation kirbyanimationflyfall;
     private Animation kirbyanimationflyfallend;
     private Animation kirbyanimationdamage;
+    private Animation kirbyanimationAbsorb;
+    private Animation kirbyanimationAbsorbStay;
+    private Animation kirbyanimationAbsorbWalk;
+    private Animation kirbyanimationAbsorbRun;
+    private Animation kirbyanimationAbsorbJump;
+    private Animation kirbyanimationAbsorbFall;
+    private Animation kirbyanimationAbsorbFall2;
+    private Animation kirbyanimationAbsorbDown;
+    private Animation kirbyanimationAbsorbDamage;
+    private Animation kirbyanimationAbsorbSpit;
     private Animation currentAnimation;
     private CloudKirby cloudkirby;
-
-    private boolean fireKeyPressed = false; // Bandera para controlar el disparo
+    private Enemy currentEnemy;
+    private SensorKirby sensorKirby;
+    private Star star;
 
 
     private float initialX = 180;
@@ -119,9 +161,12 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         this.stateDown = new DownStateKirby(this);
         this.stateFly = new FlyStateKirby(this);
         this.stateDamage = new DamageStateKirby(this);
+        this.stateAbsorb = new AbsorbStateKirby(this);
         this.stateManager.setState(stateStay);
+        this.poder = false;
+        this.currentEnemy = null;
         createBody(world);
-        texture_animation();
+        load_animation();
     }
 
     public void resetPosition() {
@@ -141,9 +186,82 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         return this.cloudkirby;
     }
 
-
     public boolean getFlipX () {
         return this.flipX;
+    }
+    public Body getBody () {
+        return fixture.getBody();
+    }
+
+    public void setFlipx (boolean flipX) {
+        this.flipX = flipX;
+    }
+
+    public void setOpuesto (boolean opuesto) {
+        this.opuesto = opuesto;
+    }
+
+    public void setColisionSuelo(boolean colisionSuelo) {
+        this.colisionSuelo = colisionSuelo;
+    }
+
+    public boolean getColisionSuelo() {
+        return colisionSuelo;
+    }
+
+    public boolean getRealizar() {
+        return realizar;
+    }
+
+    public Animation getcurrentAnimation () {
+        return currentAnimation;
+    }
+
+    public Animation getAbsorbWalkAnimation () {
+        return kirbyanimationAbsorbWalk;
+    }
+
+    public Animation getAbsorbRunAnimation () {
+        return kirbyanimationAbsorbRun;
+    }
+
+    public void setRealizar (boolean realizar) {
+        this.realizar = realizar;
+    }
+
+    public State getcurrentState () {
+        return stateManager.getState();
+    }
+    public void setSensorkirby (SensorKirby sensorKirby) {
+        this.sensorKirby = sensorKirby;
+    }
+
+    public SensorKirby getSensorkirby () {
+        return sensorKirby;
+    }
+
+    public void setcurrentEnemy (Enemy currentEnemy) {
+        this.currentEnemy = currentEnemy;
+    }
+
+    public Enemy getCurrentEnemy () {
+        return currentEnemy;
+    }
+
+    public Star getStar() {
+        return star;
+    }
+
+    public void setStar (Star star) {
+        this.star = star;
+    }
+
+    public void setPoder (boolean poder) {
+        this.poder = poder;
+    }
+
+    public boolean getPoder () {
+        return poder;
     }
 
     /* Metodo que se utiliza para actualizar la posicion y animacion del Sprite
@@ -167,7 +285,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbyshape.dispose();
     }
 
-    public void texture_animation () {
+    public void load_animation () {
         kirbyStaytexture = main.getManager().get("assets/art/sprites/kirbystay.png");
         kirbyStayregion = new TextureRegion(kirbyStaytexture, 64, 32);
         kirbysprite = new Sprite(kirbyStayregion);
@@ -196,6 +314,24 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbyflyfallendregion = new TextureRegion(kirbyflyfallendtexture, 64,32);
         kirbyDamagetexture = main.getManager().get("assets/art/sprites/kirbyDamage.png");
         kirbyDamageregion = new TextureRegion(kirbyDamagetexture, 960,32);
+        kirbyAbsorbtexture = main.getManager().get("assets/art/sprites/kirbyAbsorb.png");
+        kirbyAbsorbregion = new TextureRegion(kirbyAbsorbtexture, 1600, 32);
+        kirbyAbsorbStaytexture = main.getManager().get("assets/art/sprites/kirbyAbsorbStay.png");
+        kirbyAbsorbStayregion = new TextureRegion(kirbyAbsorbStaytexture, 64, 32);
+        kirbyAbsorbWalktexture = main.getManager().get("assets/art/sprites/kirbyAbsorbWalk.png");
+        kirbyAbsorbWalkregion = new TextureRegion(kirbyAbsorbWalktexture, 416, 32);
+        kirbyAbsorbJumptexture = main.getManager().get("assets/art/sprites/kirbyAbsorbJump.png");
+        kirbyAbsorbJumpregion = new TextureRegion(kirbyAbsorbJumptexture, 32,32);
+        kirbyAbsorbFalltexture = main.getManager().get("assets/art/sprites/kirbyAbsorbFall.png");
+        kirbyAbsorbFallregion = new TextureRegion(kirbyAbsorbFalltexture, 1280, 32);
+        kirbyAbsorbFall2texture = main.getManager().get("assets/art/sprites/kirbyAbsorbFall2.png");
+        kirbyAbsorbFall2region = new TextureRegion(kirbyAbsorbFall2texture, 64, 32);
+        kirbyAbsorbDowntexture = main.getManager().get("assets/art/sprites/kirbyAbsorbDown.png");
+        kirbyAbsorbDownregion = new TextureRegion(kirbyAbsorbDowntexture, 192,32);
+        kirbyAbsorbDamagetexture = main.getManager().get("assets/art/sprites/kirbyAbsorbDamage.png");
+        kirbyAbsorbDamageregion = new TextureRegion(kirbyAbsorbDamagetexture, 32,32);
+        kirbyAbsorbSpittexture = main.getManager().get("assets/art/sprites/kirbyAbsorbSpit.png");
+        kirbyAbsorbSpitregion = new TextureRegion(kirbyAbsorbSpittexture, 160,32);
 
         TextureRegion [][] tempkirbystay = kirbyStayregion.split(64/2,32);
         TextureRegion[][] tempkirbywalk = kirbywalkregion.split(320/10,32);
@@ -209,6 +345,13 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         TextureRegion [][] tempkirbyflyfall = kirbyflyfallregion.split(96/3, 32);
         TextureRegion [][] tempkirbyflyfallend = kirbyflyfallendregion.split(64/2, 32);
         TextureRegion [][] tempkirbydamage = kirbyDamageregion.split(960/30, 32);
+        TextureRegion [][] tempkirbyAbsorb = kirbyAbsorbregion.split(1600/50, 32);
+        TextureRegion [][] tempkirbyAbsorbStay = kirbyAbsorbStayregion.split(64/2, 32);
+        TextureRegion [][] tempkirbyAbsorbWalk = kirbyAbsorbWalkregion.split(416/13,32);
+        TextureRegion [][] tempkirbyAbsorbFall = kirbyAbsorbFallregion.split(1280/40, 32);
+        TextureRegion [][] tempkirbyAbsorbFall2 = kirbyAbsorbFall2region.split(64/2, 32);
+        TextureRegion [][] tempkirbyAbsorbDown = kirbyAbsorbDownregion.split(192/6,32);
+        TextureRegion [][] tempkirbyAbsorbSpit = kirbyAbsorbSpitregion.split(160/5,32);
         kirbyframeswalk = new TextureRegion[tempkirbywalk.length * tempkirbywalk[0].length];
         kirbyframesstay = new TextureRegion [tempkirbystay.length * tempkirbystay[0].length];
         kirbyframesdown = new TextureRegion[tempkirbydown.length * tempkirbydown[0].length];
@@ -223,6 +366,17 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbyframesflyfall = new TextureRegion[tempkirbyflyfall.length * tempkirbyflyfall[0].length];
         kirbyframesflyfallend = new TextureRegion[tempkirbyflyfallend.length * tempkirbyflyfallend[0].length];
         kirbyframesdamage = new TextureRegion[tempkirbydamage.length * tempkirbydamage[0].length];
+        kirbyframesAbsorb = new TextureRegion[tempkirbyAbsorb.length * tempkirbyAbsorb[0].length];
+        kirbyframesAbsorbStay = new TextureRegion[tempkirbyAbsorbStay.length * tempkirbyAbsorbStay[0].length];
+        kirbyframesAbsorbWalk = new TextureRegion[tempkirbyAbsorbWalk.length * tempkirbyAbsorbWalk[0].length];
+        kirbyframesAbsorbJump = new TextureRegion[1];
+        kirbyframesAbsorbJump[0] = kirbyAbsorbJumpregion;
+        kirbyframesAbsorbFall = new TextureRegion [tempkirbyAbsorbFall.length * tempkirbyAbsorbFall[0].length];
+        kirbyframesAbsorbFall2 = new TextureRegion[tempkirbyAbsorbFall2.length * tempkirbyAbsorbFall2[0].length];
+        kirbyframesAbsorbDown = new TextureRegion[tempkirbyAbsorbDown.length * tempkirbyAbsorbDown[0].length];
+        kirbyframesAbsorbDamage = new TextureRegion[1];
+        kirbyframesAbsorbDamage[0] = kirbyAbsorbDamageregion;
+        kirbyframesAbsorbSpit = new TextureRegion[tempkirbyAbsorbSpit.length * tempkirbyAbsorbSpit[0].length];
 
         int id = 0;
         for (int i = 0; i < tempkirbywalk.length; i++) {
@@ -236,6 +390,63 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         for (int i = 0; i < tempkirbydamage.length; i++) {
             for (int j = 0; j < tempkirbydamage[i].length; j++){
                 kirbyframesdamage[id] = tempkirbydamage[i][j];
+                id++;
+            }
+        }
+
+
+        id = 0;
+        for (int i = 0; i < tempkirbyAbsorb.length; i++) {
+            for (int j = 0; j < tempkirbyAbsorb[i].length; j++){
+                kirbyframesAbsorb[id] = tempkirbyAbsorb[i][j];
+                id++;
+            }
+        }
+
+        id = 0;
+        for (int i = 0; i < tempkirbyAbsorbSpit.length; i++) {
+            for (int j = 0; j < tempkirbyAbsorbSpit[i].length; j++){
+                kirbyframesAbsorbSpit[id] = tempkirbyAbsorbSpit[i][j];
+                id++;
+            }
+        }
+
+        id = 0;
+        for (int i = 0; i < tempkirbyAbsorbDown.length; i++) {
+            for (int j = 0; j < tempkirbyAbsorbDown[i].length; j++){
+                kirbyframesAbsorbDown[id] = tempkirbyAbsorbDown[i][j];
+                id++;
+            }
+        }
+
+        id = 0;
+        for (int i = 0; i < tempkirbyAbsorbFall.length; i++) {
+            for (int j = 0; j < tempkirbyAbsorbFall[i].length; j++){
+                kirbyframesAbsorbFall[id] = tempkirbyAbsorbFall[i][j];
+                id++;
+            }
+        }
+
+        id = 0;
+        for (int i = 0; i < tempkirbyAbsorbFall2.length; i++) {
+            for (int j = 0; j < tempkirbyAbsorbFall2[i].length; j++){
+                kirbyframesAbsorbFall2[id] = tempkirbyAbsorbFall2[i][j];
+                id++;
+            }
+        }
+
+        id = 0;
+        for (int i = 0; i < tempkirbyAbsorbStay.length; i++) {
+            for (int j = 0; j < tempkirbyAbsorbStay[i].length; j++){
+                kirbyframesAbsorbStay[id] = tempkirbyAbsorbStay[i][j];
+                id++;
+            }
+        }
+
+        id = 0;
+        for (int i = 0; i < tempkirbyAbsorbWalk.length; i++) {
+            for (int j = 0; j < tempkirbyAbsorbWalk[i].length; j++){
+                kirbyframesAbsorbWalk[id] = tempkirbyAbsorbWalk[i][j];
                 id++;
             }
         }
@@ -312,6 +523,16 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbyanimationflyfall = new Animation(0.08f, kirbyframesflyfall);
         kirbyanimationflyfallend = new Animation(0.1f, kirbyframesflyfallend);
         kirbyanimationdamage = new Animation (0.1f, kirbyframesdamage);
+        kirbyanimationAbsorb = new Animation(0.08f, kirbyframesAbsorb);
+        kirbyanimationAbsorbStay = new Animation(0.8f, kirbyframesAbsorbStay);
+        kirbyanimationAbsorbWalk = new Animation(0.08f, kirbyframesAbsorbWalk);
+        kirbyanimationAbsorbRun = new Animation(0.04f, kirbyframesAbsorbWalk);
+        kirbyanimationAbsorbJump = new Animation(1f, kirbyframesAbsorbJump);
+        kirbyanimationAbsorbFall = new Animation(0.06f, kirbyframesAbsorbFall);
+        kirbyanimationAbsorbFall2 = new Animation(0.06f, kirbyframesAbsorbFall2);
+        kirbyanimationAbsorbDown = new Animation(0.06f, kirbyframesAbsorbDown);
+        kirbyanimationAbsorbDamage = new Animation(1f, kirbyframesAbsorbDamage);
+        kirbyanimationAbsorbSpit = new Animation(0.07f, kirbyframesAbsorbSpit);
         currentAnimation = kirbyanimationStay;
     }
 
@@ -328,37 +549,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         world.destroyBody(body);
     }
 
-    public Body getBody () {
-        return fixture.getBody();
-    }
 
-    public void setFlipx (boolean flipX) {
-        this.flipX = flipX;
-    }
-
-    public void setOpuesto (boolean opuesto) {
-        this.opuesto = opuesto;
-    }
-
-    public void setColisionSuelo(boolean colisionSuelo) {
-        this.colisionSuelo = colisionSuelo;
-    }
-
-    public boolean getColisionSuelo() {
-        return colisionSuelo;
-    }
-
-    public boolean getRealizar() {
-        return realizar;
-    }
-
-    public void setRealizar (boolean realizar) {
-        this.realizar = realizar;
-    }
-
-    public State getcurrentState () {
-        return stateManager.getState();
-    }
 
     /*Metodo que permitira realizar todas las acciones del actor kirby en el escenario
      * */
@@ -371,16 +562,6 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duracion, true);
         kirbysprite.setRegion(frame);
         kirbysprite.flip(flipX,false);
-
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            if (!fireKeyPressed) {
-                shootFire();
-                fireKeyPressed = true;
-            }
-        } else {
-            fireKeyPressed = false;
-        }
-        //System.out.println(body.getPosition().x + " " + body.getPosition().y);
 
     }
 
@@ -428,28 +609,99 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         switch (typestate) {
 
             case RUN:
-                currentAnimation = kirbyanimationRun;
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationRun;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbRun;
+                    }
+                    else{
+                        // Logica cuando tenga el poder de un enemigo
+                    }
+                }
                 break;
             case WALK:
-                currentAnimation = kirbyanimationWalk;
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationWalk;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbWalk;
+                    }
+                    else{
+                        // Logica cuando tenga el poder de un enemigo
+                    }
+                }
                 break;
             case DOWN:
-                currentAnimation = kirbyanimationDown;
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationDown;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbDown;
+                        setcurrentEnemy(null);
+                    }
+                    else{
+                        // Logica cuando tenga el poder de un enemigo
+                    }
+                }
                 break;
             case DASH:
                 currentAnimation = kirbyanimationDash;
                 break;
             case JUMP:
-                currentAnimation = kirbyanimationJump;
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationJump;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbJump;
+                    }
+                    else{
+                        // Logica cuando tenga el poder de un enemigo
+                    }
+                }
                 break;
             case STAY:
-                currentAnimation = kirbyanimationStay;
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationStay;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbStay;
+                    }
+                    else{
+                        // Logica cuando tenga el poder de un enemigo
+                    }
+                }
                 break;
             case FALL:
-                currentAnimation = kirbyanimationfall;
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationfall;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbFall;
+                    }
+                    else{
+                        // Logica cuando tenga el poder de un enemigo
+                    }
+                }
                 break;
             case FALL2:
-                currentAnimation = kirbyanimationfall2;
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationfall2;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbFall2;
+                    }
+                    else{
+                        // Logica cuando tenga el poder de un enemigo
+                    }
+                }
                 break;
             case FLY:
                 currentAnimation = kirbyanimationflybegin;
@@ -464,7 +716,30 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
                 currentAnimation = kirbyanimationflyfallend;
                 break;
             case DAMAGE:
-                currentAnimation = kirbyanimationdamage;
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationdamage;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbDamage;
+                    }
+                    else{
+                        // Logica cuando tenga el poder de un enemigo
+                    }
+                }
+                break;
+            case ABSORB:
+                currentAnimation = kirbyanimationAbsorb;
+                break;
+            case ATTACK:
+                if (!getPoder()) {
+                    currentAnimation = kirbyanimationAbsorbSpit;
+                }
+
+                else{
+
+                }
+                break;
             default:
                 break;
         }
@@ -500,6 +775,10 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
                 break;
             case DAMAGE:
                 stateManager.setState(stateDamage);
+                break;
+            case ABSORB:
+                stateManager.setState(stateAbsorb);
+                break;
             default:
                 break;
 

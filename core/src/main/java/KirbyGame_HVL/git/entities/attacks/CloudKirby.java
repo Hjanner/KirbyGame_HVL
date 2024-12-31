@@ -69,13 +69,15 @@ public class CloudKirby extends Attack {
 
         //este metodo esta al peloooo pelucha
         if (accumulatedtimer > CLOUD_LIFETIME) {
-        if (world != null && body != null) {
+            if (world != null && body != null) {
                 world.destroyBody(body);            //Eliminacion directa del cuerpo fisico ojito! se ejecuta antes de eliminar el actor para evitar referencias fisicas residuales
                 body = null;
+
             }
             remove();                                //se elimina al actor del stage
             dispose();                              //elimina cualquier textura o recurso asociado con la nube
         }
+
     }
 
     public ActorWithBox2d getActor() {

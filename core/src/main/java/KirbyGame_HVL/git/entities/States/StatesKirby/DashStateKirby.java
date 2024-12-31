@@ -38,6 +38,12 @@ public class DashStateKirby extends StateKirby {
             kirby.setAnimation(EnumStates.DOWN);
         }
 
+        else if (!kirby.getColisionSuelo()) {
+            kirby.setState(EnumStates.FALL);
+            kirby.setDuracion(0);
+            kirby.setAnimation(EnumStates.FALL2);
+        }
+
 
 
     }

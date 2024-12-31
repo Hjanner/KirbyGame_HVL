@@ -1,22 +1,31 @@
 package KirbyGame_HVL.git.entities.States.StatesKirby;
 
+import KirbyGame_HVL.git.entities.attacks.Star;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
 public class JumpStateKirby extends StateKirby {
 
+    private float acummulatedtimer;
     public JumpStateKirby(Kirby kirby) {
         super(kirby);
     }
 
     @Override
     public void start() {
+
+        acummulatedtimer = 0;
     }
 
     @Override
     public void update(float delta) {
 
+        acummulatedtimer += delta;
+
+        if (acummulatedtimer > 0.25f) {
+            kirby.setAnimation(EnumStates.JUMP);
+        }
         if (kirby.getBody().getLinearVelocity().y <= 0) {
             kirby.setState(EnumStates.FALL);
             kirby.setDuracion(0);
@@ -34,9 +43,32 @@ public class JumpStateKirby extends StateKirby {
         }
 
         else if (Gdx.input.isKeyPressed(Input.Keys.C)) {
-            kirby.setState(EnumStates.FLY);
-            kirby.setDuracion(0);
-            kirby.setAnimation(EnumStates.FLY);
+            if (kirby.getCurrentEnemy() == null) {
+                kirby.setState(EnumStates.FLY);
+                kirby.setDuracion(0);
+                kirby.setAnimation(EnumStates.FLY);
+            }
+        }
+
+        else if (Gdx.input.isKeyPressed(Input.Keys.Z) && kirby.getCurrentEnemy() != null) {
+            if (!kirby.getPoder()) {
+                kirby.setDuracion(0);
+                kirby.setAnimation(EnumStates.ATTACK);
+                if (kirby.getFlipX()) {
+                    Star star = new Star(kirby.getWorld(), kirby, false);
+                    star.getBody().applyLinearImpulse(-35, 0, star.getBody().getPosition().x, star.getBody().getPosition().y, true);
+                    kirby.setStar(star);
+                    kirby.setcurrentEnemy(null);
+                } else {
+                    Star star = new Star(kirby.getWorld(), kirby, true);
+                    star.getBody().applyLinearImpulse(35, 0, star.getBody().getPosition().x, star.getBody().getPosition().y, true);
+                    kirby.setStar(star);
+                    kirby.setcurrentEnemy(null);
+                }
+                kirby.setState(EnumStates.JUMP);
+            } else {
+
+            }
         }
 
 

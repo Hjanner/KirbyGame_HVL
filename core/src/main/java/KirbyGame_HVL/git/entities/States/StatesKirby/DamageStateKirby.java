@@ -25,13 +25,35 @@ public class DamageStateKirby extends StateKirby {
 
         if (kirby.getFlipX()) {
             if (acummulatedtimer < 0.6f) {
-                kirby.getBody().applyLinearImpulse(10, 5, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
+                if (kirby.getCurrentEnemy() == null) {
+                    kirby.getBody().applyLinearImpulse(10, 5, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
+                }
+                else {
+                    if (!kirby.getPoder()) {
+                        kirby.getBody().applyLinearImpulse(15, 0, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
+                    }
+
+                    else {
+
+                    }
+                }
             }
         }
 
         else {
             if (acummulatedtimer < 0.6f) {
-                kirby.getBody().applyLinearImpulse(-10, 5, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
+                if (kirby.getCurrentEnemy() == null) {
+                    kirby.getBody().applyLinearImpulse(-10, 5, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
+                }
+                else {
+                    if (!kirby.getPoder()) {
+                        kirby.getBody().applyLinearImpulse(-15, 0, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
+                    }
+
+                    else {
+
+                    }
+                }
             }
         }
 
@@ -39,6 +61,10 @@ public class DamageStateKirby extends StateKirby {
 
             acummulatedtimer2 += delta;
             kirby.setOpuesto(true);
+            if (kirby.getSensorkirby() != null) {
+                kirby.getWorld().destroyBody(kirby.getSensorkirby().getBody());
+                kirby.setSensorkirby(null);
+            }
 
             if (acummulatedtimer2 > 2.5f) {
                 if (!kirby.getColisionSuelo()) {

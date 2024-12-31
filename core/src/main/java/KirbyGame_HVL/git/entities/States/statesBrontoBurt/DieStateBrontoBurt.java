@@ -1,5 +1,6 @@
 package KirbyGame_HVL.git.entities.States.statesBrontoBurt;
 
+import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
 import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurt;
 
 public class DieStateBrontoBurt extends StateBrontoBurt {
@@ -23,7 +24,7 @@ public class DieStateBrontoBurt extends StateBrontoBurt {
                 brontoBurt.getBody().getPosition().x,
                 brontoBurt.getBody().getPosition().y, true);
         }
-        brontoBurt.setAnimation(EnumStatesBrontoBurt.DIE);
+        brontoBurt.setAnimation(EnumStateEnemy.DIE);
     }
 
     @Override

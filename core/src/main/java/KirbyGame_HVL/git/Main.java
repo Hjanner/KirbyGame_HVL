@@ -43,6 +43,15 @@ public class Main extends Game {
         manager.load("assets/art/sprites/kirbyflyfall.png", Texture.class);
         manager.load("assets/art/sprites/kirbyflyfallend.png", Texture.class);
         manager.load("assets/art/sprites/kirbyDamage.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorb.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbStay.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbWalk.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbJump.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbFall.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbFall2.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbDown.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbDamage.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbSpit.png", Texture.class);
 
         // Texturas del WaddleDee
         manager.load("assets/art/spritesWaddleDee/WaddleDeeWalk.png", Texture.class);

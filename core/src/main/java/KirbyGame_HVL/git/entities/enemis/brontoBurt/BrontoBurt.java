@@ -4,9 +4,10 @@ import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
 import KirbyGame_HVL.git.entities.States.State;
 import KirbyGame_HVL.git.entities.States.StateManager;
-import KirbyGame_HVL.git.entities.States.StatesWaddleDee.EnumStatesWaddleDee;
+import KirbyGame_HVL.git.entities.States.StatesWaddleDee.AtractStateWaddleDee;
+import KirbyGame_HVL.git.entities.States.statesBrontoBurt.AtractStateBrontoBurt;
+import KirbyGame_HVL.git.entities.States.statesBrontoBurt.Die2StateBrontoBurt;
 import KirbyGame_HVL.git.entities.States.statesBrontoBurt.DieStateBrontoBurt;
-import KirbyGame_HVL.git.entities.States.statesBrontoBurt.EnumStatesBrontoBurt;
 import KirbyGame_HVL.git.entities.States.statesBrontoBurt.FlyStateBrontoBurt;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,8 +17,6 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.math.MathUtils;
-
-import static KirbyGame_HVL.git.entities.States.statesBrontoBurt.EnumStatesBrontoBurt.FLY;
 
 public class BrontoBurt extends Enemy {
     private Texture brontoBurtFlyTexture;
@@ -41,6 +40,8 @@ public class BrontoBurt extends Enemy {
     private StateManager stateManager;
     private FlyStateBrontoBurt flyBrontoBurt;
     private DieStateBrontoBurt dieBrontoBurt;
+    private AtractStateBrontoBurt atractBrontoBurt;
+    private Die2StateBrontoBurt die2BrontoBurt;
     private boolean isDisposed = false;
 
     public BrontoBurt(World world, Main main, float x, float y) {
@@ -49,6 +50,8 @@ public class BrontoBurt extends Enemy {
         this.stateManager = new StateManager();
         this.flyBrontoBurt = new FlyStateBrontoBurt(this);
         this.dieBrontoBurt = new DieStateBrontoBurt(this);
+        this.atractBrontoBurt = new AtractStateBrontoBurt(this);
+        this.die2BrontoBurt = new Die2StateBrontoBurt(this);
         this.stateManager.setState(flyBrontoBurt);
         this.startY = y;
         createBody(world, x, y);
@@ -117,20 +120,11 @@ public class BrontoBurt extends Enemy {
         super.act(delta);
         this.stateManager.update(delta);
         updateAnimation(delta);
-        updateMovement(delta);
     }
 
-    private void updateMovement(float delta) {
-        time += delta;
-        float xVel = (flipX ? -70f : 70f);                                  // Velocidad horizontal
-        float yOffset = amplitude * MathUtils.sin(time * frequency);
 
-        // Actualiza la posicion del cuerpo
-        body.setLinearVelocity(xVel, 0);
-        body.setTransform(body.getPosition().x, startY + yOffset, 0);
-    }
 
-    public void setAnimation(EnumStatesBrontoBurt typeState) {
+    public void setAnimation(EnumStateEnemy typeState) {
         switch (typeState) {
             case FLY:
                 currentAnimation = flyAnimation;
@@ -160,13 +154,15 @@ public class BrontoBurt extends Enemy {
             case DIE:
                 stateManager.setState(dieBrontoBurt);
                 break;
+            case ATRACT:
+                stateManager.setState(atractBrontoBurt);
+                break;
+            case DIE2:
+                stateManager.setState(die2BrontoBurt);
+                break;
             default:
                 break;
         }
-    }
-
-    public void setState(EnumStatesWaddleDee typeState) {
-
     }
 
     public void setflipX(boolean flipX) {

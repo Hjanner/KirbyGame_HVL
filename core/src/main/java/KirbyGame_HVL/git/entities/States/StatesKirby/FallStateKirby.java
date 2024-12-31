@@ -1,5 +1,6 @@
 package KirbyGame_HVL.git.entities.States.StatesKirby;
 
+import KirbyGame_HVL.git.entities.attacks.Star;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -14,6 +15,7 @@ public class FallStateKirby extends StateKirby {
 
     @Override
     public void start() {
+
         accumulatedtimer = 0;
     }
 
@@ -36,10 +38,34 @@ public class FallStateKirby extends StateKirby {
 
 
         if (Gdx.input.isKeyPressed(Input.Keys.C) && !Gdx.input.isKeyPressed(Input.Keys.Z)) {
-            kirby.setState(EnumStates.FLY);
-            kirby.setDuracion(0);
-            kirby.setAnimation(EnumStates.FLY);
-            kirby.getBody().applyLinearImpulse(0,20,kirby.getBody().getPosition().x,kirby.getBody().getPosition().y, true);
+            if (kirby.getCurrentEnemy() == null) {
+                kirby.setState(EnumStates.FLY);
+                kirby.setDuracion(0);
+                kirby.setAnimation(EnumStates.FLY);
+                kirby.getBody().applyLinearImpulse(0, 20, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
+            }
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.Z) && kirby.getCurrentEnemy() != null) {
+            if (!kirby.getPoder()) {
+                kirby.setDuracion(0);
+                kirby.setAnimation(EnumStates.ATTACK);
+                if (kirby.getFlipX()) {
+                    Star star = new Star(kirby.getWorld(), kirby, false);
+                    star.getBody().applyLinearImpulse(-35, 0, star.getBody().getPosition().x, star.getBody().getPosition().y, true);
+                    kirby.setStar(star);
+                    kirby.setcurrentEnemy(null);
+                } else {
+                    Star star = new Star(kirby.getWorld(), kirby, true);
+                    star.getBody().applyLinearImpulse(35, 0, star.getBody().getPosition().x, star.getBody().getPosition().y, true);
+                    kirby.setStar(star);
+                    kirby.setcurrentEnemy(null);
+                }
+                kirby.setRealizar(true);
+                kirby.setState(EnumStates.FALL);
+            } else {
+
+            }
         }
 
         else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {

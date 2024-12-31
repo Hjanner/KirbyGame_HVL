@@ -40,6 +40,12 @@ public class DownStateKirby extends StateKirby {
             kirby.setFlipx(true);
         }
 
+        else if (!kirby.getColisionSuelo()) {
+            kirby.setState(EnumStates.FALL);
+            kirby.setDuracion(0);
+            kirby.setAnimation(EnumStates.FALL2);
+        }
+
 
 
 

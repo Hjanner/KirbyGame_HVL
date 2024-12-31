@@ -4,8 +4,9 @@ import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
 import KirbyGame_HVL.git.entities.States.State;
 import KirbyGame_HVL.git.entities.States.StateManager;
+import KirbyGame_HVL.git.entities.States.StatesWaddleDee.AtractStateWaddleDee;
+import KirbyGame_HVL.git.entities.States.StatesWaddleDee.Die2StateWaddleDee;
 import KirbyGame_HVL.git.entities.States.StatesWaddleDee.DieStateWaddleDee;
-import KirbyGame_HVL.git.entities.States.StatesWaddleDee.EnumStatesWaddleDee;
 import KirbyGame_HVL.git.entities.States.StatesWaddleDee.WalkStateWaddleDee;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
 import com.badlogic.gdx.graphics.Texture;
@@ -27,13 +28,13 @@ public class WaddleDee extends Enemy {
     private Animation dieAnimation;
     private Animation currentAnimation;
     private Sprite waddleDeeSprite;
-
-    private float duration = 0;
     private boolean flipX;
 
     private StateManager stateManager;
     private WalkStateWaddleDee walkWaddleDee;
     private DieStateWaddleDee dieWaddleDee;
+    private AtractStateWaddleDee atractWaddleDee;
+    private Die2StateWaddleDee die2WaddleDee;
     private boolean isDisposed = false;
 
     public WaddleDee(World world, Main main, float x, float y) {
@@ -42,6 +43,8 @@ public class WaddleDee extends Enemy {
         this.stateManager = new StateManager();
         this.walkWaddleDee = new WalkStateWaddleDee(this);
         this.dieWaddleDee = new DieStateWaddleDee(this);
+        this.atractWaddleDee = new AtractStateWaddleDee(this);
+        this.die2WaddleDee = new Die2StateWaddleDee(this);
         this.stateManager.setState(walkWaddleDee);
         createBody(world, x, y);
         loadTextures();
@@ -59,7 +62,7 @@ public class WaddleDee extends Enemy {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 0.5f;
+        fixtureDef.density = 0.1f;
         fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.1f;
 
@@ -107,7 +110,7 @@ public class WaddleDee extends Enemy {
         updateAnimation(delta);
     }
 
-    public void setAnimation (EnumStatesWaddleDee typeState) {
+    public void setAnimation (EnumStateEnemy typeState) {
         switch (typeState) {
             case WALK:
                 currentAnimation = walkAnimation;
@@ -136,6 +139,12 @@ public class WaddleDee extends Enemy {
                 break;
             case DIE:
                 stateManager.setState(dieWaddleDee);
+                break;
+            case ATRACT:
+                stateManager.setState(atractWaddleDee);
+                break;
+            case DIE2:
+                stateManager.setState(die2WaddleDee);
                 break;
             default:
                 break;
