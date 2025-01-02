@@ -23,7 +23,7 @@ public class Platform extends ActorWithBox2d implements Box2dSpace {
         PolygonShape shape = new PolygonShape();
         for (MapObject object : map.getMap().getLayers().get(layerindex).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject)object).getRectangle();
-            bodydef.type = BodyDef.BodyType.DynamicBody;
+            bodydef.type = BodyDef.BodyType.StaticBody;
             bodydef.position.set((rectangle.x + rectangle.width  / 2), (rectangle.y + rectangle.height  /2));
             body = world.createBody(bodydef);
             shape.setAsBox(rectangle.width / 2 ,rectangle.height  / 2);

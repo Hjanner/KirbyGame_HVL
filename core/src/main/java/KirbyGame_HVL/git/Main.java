@@ -1,8 +1,5 @@
 package KirbyGame_HVL.git;
 
-import KirbyGame_HVL.git.entities.player.Kirby;
-import KirbyGame_HVL.git.systems.GameStateManager;
-import KirbyGame_HVL.git.systems.ScreenManager;
 import KirbyGame_HVL.git.systems.rendering.miniGames.culebrita.GamePanelCulebrita;
 import KirbyGame_HVL.git.systems.rendering.miniGames.viejita.GamePanelViejita;
 import KirbyGame_HVL.git.screens.gameplay.GameScreen;
@@ -22,16 +19,11 @@ public class Main extends Game {
     public GamePanelCulebrita gameCulebrita;
     public GamePanelViejita gameViejita;
 
-    private ScreenManager screenManager;
-    private GameStateManager gameStateManager;
-
     @Override
     public void create() {
         batch = new SpriteBatch();
         manager = new AssetManager();
-        gameStateManager = new GameStateManager();
-        screenManager = new ScreenManager(this);
-
+        gameScreen = new GameScreen(this);
         pantallaini = new PantallaGui(this);
         gameCulebrita = new GamePanelCulebrita(this);
         gameViejita = new GamePanelViejita();
@@ -51,6 +43,15 @@ public class Main extends Game {
         manager.load("assets/art/sprites/kirbyflyfall.png", Texture.class);
         manager.load("assets/art/sprites/kirbyflyfallend.png", Texture.class);
         manager.load("assets/art/sprites/kirbyDamage.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorb.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbStay.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbWalk.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbJump.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbFall.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbFall2.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbDown.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbDamage.png", Texture.class);
+        manager.load("assets/art/sprites/kirbyAbsorbSpit.png", Texture.class);
 
         // Texturas del WaddleDee
         manager.load("assets/art/spritesWaddleDee/WaddleDeeWalk.png", Texture.class);
@@ -76,12 +77,5 @@ public class Main extends Game {
         return manager;
     }
 
-    public GameStateManager getGameStateManager() {
-        return gameStateManager;
-    }
-
-    public ScreenManager getScreenManager() {
-        return screenManager;
-    }
 }
 

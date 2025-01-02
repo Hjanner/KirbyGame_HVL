@@ -1,6 +1,8 @@
 package KirbyGame_HVL.git.entities.States.statesBrontoBurt;
 
+import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
 import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurt;
+import com.badlogic.gdx.math.MathUtils;
 
 public class FlyStateBrontoBurt extends StateBrontoBurt {
     private float movementSpeed = 40f;
@@ -16,7 +18,7 @@ public class FlyStateBrontoBurt extends StateBrontoBurt {
 
     @Override
     public void start() {
-        brontoBurt.setAnimation(EnumStatesBrontoBurt.FLY);
+        brontoBurt.setAnimation(EnumStateEnemy.FLY);
     }
 
     @Override
@@ -43,6 +45,13 @@ public class FlyStateBrontoBurt extends StateBrontoBurt {
         float currentY = brontoBurt.getStartY() + yOffset;
         float currentX = brontoBurt.getBody().getPosition().x;
         brontoBurt.getBody().setTransform(currentX, currentY, 0);
+        time += delta;
+        float xVel = (brontoBurt.getflipX() ? -70f : 70f);                                  // Velocidad horizontal
+        float yOffset2 = amplitude * MathUtils.sin(time * frequency);
+
+        // Actualiza la posicion del cuerpo
+        brontoBurt.getBody().setLinearVelocity(xVel, 0);
+        brontoBurt.getBody().setTransform(brontoBurt.getBody().getPosition().x, brontoBurt.getStartY() + yOffset2, 0);
     }
 
     @Override

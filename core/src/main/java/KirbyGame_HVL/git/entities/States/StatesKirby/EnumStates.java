@@ -16,6 +16,7 @@ public enum EnumStates {
     DAMAGE,
     JUMP,
     ABSORB,
+    ATTACK,
 
 
 

@@ -1,5 +1,6 @@
 package KirbyGame_HVL.git.entities.States.StatesWaddleDee;
 
+import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
 import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDee;
 
 public class DieStateWaddleDee extends StateWaddleDee {
@@ -21,7 +22,7 @@ public class DieStateWaddleDee extends StateWaddleDee {
         else {
             waddleDee.getBody().applyLinearImpulse(50,50,waddleDee.getBody().getPosition().x, waddleDee.getBody().getPosition().y, true);
         }
-        waddleDee.setAnimation(EnumStatesWaddleDee.DIE);
+        waddleDee.setAnimation(EnumStateEnemy.DIE);
     }
 
     @Override

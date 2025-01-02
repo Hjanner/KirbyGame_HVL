@@ -1,6 +1,7 @@
 package KirbyGame_HVL.git.systems.rendering.miniGames.culebrita;
 
 import KirbyGame_HVL.git.Main;
+import KirbyGame_HVL.git.screens.gameplay.GameScreen;
 import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -19,7 +20,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class GamePanelCulebrita extends Pantalla implements Screen {
+public class GamePanelCulebrita extends Pantalla  implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
     private ShapeRenderer shapeRenderer;
@@ -50,6 +51,8 @@ public class GamePanelCulebrita extends Pantalla implements Screen {
 
     private ArrayList<String> odsImages;
     private final String ODS_IMAGES_PATH = "assets/art/minijuegos/ods/";
+
+    private GameScreen gameScreen;
 
     public GamePanelCulebrita(Main main) {
         super(main);
@@ -107,7 +110,7 @@ public class GamePanelCulebrita extends Pantalla implements Screen {
         font.draw(batch, "SCORE : " + score, 20, viewport.getWorldHeight() - 20);
         font.draw(batch, "ODS   : " + ods_image + " / 10", 20, viewport.getWorldHeight() - 60);
 
-        if (ods_image == 10){
+        if (ods_image == 2){
             gameOver = true;
             font.getData().setScale(3);
             font.setColor(0, 1, 0, 1);
@@ -115,9 +118,14 @@ public class GamePanelCulebrita extends Pantalla implements Screen {
             font.draw(batch, "Final Score: " + score, viewport.getWorldWidth()/2 - 80, viewport.getWorldHeight()/2);
             font.draw(batch, "Presiona ESPACIO para avanzar", viewport.getWorldWidth()/2 -200, viewport.getWorldHeight()/2 - 40);
 
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                //de aqui debe lanzar al siguiente nivel
+                System.out.println("hola");
+                gameCompleted(1001);
+            }
         }
 
-        if (gameOver && ods_image != 10) {
+        if (gameOver && ods_image != 2) {
             ods_image = 0;
             //batch.draw(gameOverTexture, gameOverT.x, gameOverT.y, gameOverT.width, gameOverT.height );
             font.getData().setScale(3);
@@ -126,6 +134,7 @@ public class GamePanelCulebrita extends Pantalla implements Screen {
             font.getData().setScale(2);
             font.draw(batch, "Final Score: " + score, viewport.getWorldWidth()/2 - 80, viewport.getWorldHeight()/2 );
             font.draw(batch, "Presiona SPACE para reiniciar", viewport.getWorldWidth()/2 - 180, viewport.getWorldHeight()/2 - 40);
+
         }
         batch.end();
 
@@ -133,11 +142,6 @@ public class GamePanelCulebrita extends Pantalla implements Screen {
             initGame();
         }
 
-        if (ods_image == 1 && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            //de aqui debe lanzar al siguiente nivel
-            System.out.println("hola");
-            gameCompleted(1001);
-        }
     }
 
     private void create() {
@@ -380,10 +384,7 @@ public class GamePanelCulebrita extends Pantalla implements Screen {
     }
 
     public void gameCompleted(int score) {
-//        main.getGameStateManager().updateScoreFromMinigame(main.gameScreen, score);
-//        main.getGameStateManager().resumeGameState(main.gameScreen);
-//        main.setScreen(main.gameScreen);
-        main.getScreenManager().returnFromMinigame(score);
+        main.setScreen(main.gameScreen);
 
     }
 

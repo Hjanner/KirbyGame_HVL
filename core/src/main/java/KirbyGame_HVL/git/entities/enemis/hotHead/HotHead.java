@@ -177,6 +177,11 @@ public class HotHead extends Enemy {
     }
 
     @Override
+    public void setAnimation(EnumStateEnemy typestate) {
+
+    }
+
+    @Override
     public State getcurrentState() {
         return null;
     }
