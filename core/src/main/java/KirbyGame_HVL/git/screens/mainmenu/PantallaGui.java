@@ -77,8 +77,8 @@ public class PantallaGui extends Pantalla {
         singleplayer.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
-                //main.setScreen(main.gameScreen);
-                main.getScreenManager().startNewGame();
+                main.setScreen(main.gameScreen);
+                //main.getScreenManager().startNewGame();
             }
         });
 

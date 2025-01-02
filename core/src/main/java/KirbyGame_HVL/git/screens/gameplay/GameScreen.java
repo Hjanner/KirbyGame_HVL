@@ -75,7 +75,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         {{700, 1020}, {850, 1020}, {900, 1020}},                        // z 2 - BrontoBurts
         {{500, 1100}, {600, 1150}, {750, 1050}},                        // z 3 - BrontoBurts
         {{1200, 1040}, {1250, 1040}, {1300, 1040}},                      // z 4 - WaddleDees
-        {{100, 1010}, {1400, 1010}, {1500, 1010}}                       //g 5 - HotHeads
+        {{1000, 1010}, {1400, 1010}, {1500, 1010}}                       //g 5 - HotHeads
     };
 
     //ataques
@@ -601,25 +601,75 @@ private ArrayList<Attack> attacks;
 
     @Override
     public void dispose() {
-        stage.dispose();
-        world.dispose();
-        kirby.dispose();
+        // Dispose Stage and Box2D World
+        if (stage != null) {
+            stage.dispose();
+        }
+        if (world != null) {
+            world.dispose();
+        }
+        if (map != null) {
+            map.dispose();
+        }
+        if (bdr != null) {
+            bdr.dispose();
+        }
 
-        for (ArrayList<Enemy> zoneEnemies : enemiesList) {
-            for (Enemy enemy : zoneEnemies) {
-                enemy.dispose();
+        // Dispose Kirby
+        if (kirby != null) {
+            kirby.dispose();
+        }
+
+        // Dispose Enemies
+        if (enemiesList != null) {
+            for (ArrayList<Enemy> zoneEnemies : enemiesList) {
+                for (Enemy enemy : zoneEnemies) {
+                    if (enemy != null) {
+                        enemy.dispose();
+                    }
+                }
+                zoneEnemies.clear();
             }
+            enemiesList.clear();
         }
 
-        for (Key key : keys) {
-            key.dispose();
+        // Dispose Keys
+        if (keys != null) {
+            for (Key key : keys) {
+                if (key != null) {
+                    key.dispose();
+                }
+            }
+            keys.clear();
         }
-        font.dispose();
-        keyIconTexture.dispose();
+
+        // Dispose Platforms
+        if (platforms != null) {
+            for (PlatformMoved platform : platforms) {
+                if (platform != null) {
+                    platform.dispose();
+                }
+            }
+            platforms.clear();
+        }
+
+        // Dispose UI elements
+        if (font != null) {
+            font.dispose();
+        }
+        if (keyIconTexture != null) {
+            keyIconTexture.dispose();
+        }
+        if (door != null) {
+            door.dispose();
+        }
+
+        // Clear collections
+        if (enemiesToRemove != null) enemiesToRemove.clear();
+        if (keysToRemove != null) keysToRemove.clear();
+        if (attacksToRemove != null) attacksToRemove.clear();
+        if (firesToRemove != null) firesToRemove.clear();
+        if (attacks != null) attacks.clear();
     }
-
-//    if (door != null) {
-//        door.dispose();
-//    }
 
 }
