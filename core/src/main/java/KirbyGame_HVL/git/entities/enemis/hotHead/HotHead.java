@@ -5,6 +5,7 @@ import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
 import KirbyGame_HVL.git.entities.States.State;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
 import KirbyGame_HVL.git.entities.attacks.Fire;
+import KirbyGame_HVL.git.entities.enemis.EnumEnemyType;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -51,6 +52,7 @@ public class HotHead extends Enemy {
     public HotHead(World world, Main main, float x, float y) {
         this.world = world;
         this.main = main;
+        this.type = EnumEnemyType.HOTHEAD;
         currentSpeed = normalSpeed;
         createBody(world, x, y);
         loadTextures();

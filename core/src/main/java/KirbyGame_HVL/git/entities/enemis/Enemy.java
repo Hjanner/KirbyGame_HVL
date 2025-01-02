@@ -18,6 +18,7 @@ public abstract class Enemy extends ActorWithBox2d {
     protected Main main;
     protected boolean flipX;
     protected Object currentState;
+    protected EnumEnemyType type;
 
     public Enemy() {
         this.flipX = false;
@@ -43,6 +44,14 @@ public abstract class Enemy extends ActorWithBox2d {
 
     public void setflipX(boolean flipX) {
         this.flipX = flipX;
+    }
+
+    public Enemy(EnumEnemyType type) {
+        this.type = type;
+    }
+
+    public EnumEnemyType getType() {
+        return type;
     }
 
     public void dispose() {

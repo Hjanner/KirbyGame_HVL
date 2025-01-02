@@ -77,14 +77,15 @@ public class PantallaGui extends Pantalla {
         singleplayer.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
-                main.setScreen(main.gameScreen);
+                //main.setScreen(main.gameScreen);
+                main.getScreenManager().startNewGame();
             }
         });
 
         acerca_De.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
-                main.setScreen(main.gameCulebrita);
+                //main.setScreen(main.gameCulebrita);
             }
         });
 

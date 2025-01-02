@@ -44,7 +44,6 @@ public class GamePanelViejita implements Screen {
     private final String ODS_IMAGES_PATH = "assets/art/minijuegos/ods/";
 
     public GamePanelViejita() {
-        //this.game = game;
         shapeRenderer = new ShapeRenderer();
         batch = new SpriteBatch();
         font = new BitmapFont();

@@ -177,6 +177,46 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         stage.draw();
 
         renderKeyContador();
+        renderScore();
+    }
+
+    private void renderKeyContador() {
+        Batch batch = stage.getBatch();
+        batch.begin();
+
+        batch.setProjectionMatrix(stage.getCamera().combined);
+
+        float baseX = Math.round(cam.position.x - cam.viewportWidth/2 * cam.zoom + 10);
+        float baseY = Math.round(cam.position.y + cam.viewportHeight/2 * cam.zoom - 20);
+
+        // Dibuja las llaves
+        for (int i = 0; i < TOTAL_KEYS; i++) {
+            keyIconSprite.setPosition(baseX + (i * 20), baseY + 2);
+            keyIconSprite.setAlpha(i < keysCollected ? 1f : 0.5f); // llaves no recolectadas transparentes
+            keyIconSprite.draw(batch);
+        }
+
+        // Dibuja el contador
+        font.getData().setScale(.5f);
+        font.draw(batch, keysCollected + "/" + TOTAL_KEYS,
+            baseX + (TOTAL_KEYS * 20) + 5,
+            baseY + 9);
+
+        batch.end();
+    }
+
+    private void renderScore() {
+        Batch batch = stage.getBatch();
+        batch.begin();
+
+        float scoreX = Math.round( cam.position.x + cam.viewportWidth/2 * cam.zoom - 65);
+        float scoreY = Math.round(cam.position.y + cam.viewportHeight/2 * cam.zoom - 10);
+        font.getData().setScale(.5f);
+        font.draw(batch, "Score: " + kirby.getCurrentScore(),
+            scoreX,
+            scoreY);
+
+        batch.end();
     }
 
     public void update () {
@@ -249,6 +289,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             if (!enemiesToRemove.contains(enemy, true)) {
                 enemy.setflipX(kirby.getFlipX());
                 enemy.setState(EnumStateEnemy.DIE);
+                kirby.addPointsPerEnemy(enemy);                 //agrega puntos por eliminacion de enemy
                 enemiesToRemove.add(enemy);
                 kirby.setState(EnumStates.STAY);
             }
@@ -292,6 +333,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             platform.act(delta);
         }
     }
+
 //ITEMS
     //keys
     private void loadAssetsKey(){
@@ -315,31 +357,6 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
     }
 
-    private void renderKeyContador() {
-        Batch batch = stage.getBatch();
-        batch.begin();
-
-        batch.setProjectionMatrix(stage.getCamera().combined);
-
-        float baseX = cam.position.x - cam.viewportWidth/2 * cam.zoom + 10;                             //posicion en pantalla
-        float baseY = cam.position.y + cam.viewportHeight/2 * cam.zoom - 20;
-
-        // Dibuja las llaves
-        for (int i = 0; i < TOTAL_KEYS; i++) {
-            keyIconSprite.setPosition(baseX + (i * 20), baseY);
-            keyIconSprite.setAlpha(i < keysCollected ? 1f : 0.5f); // Llaves no recolectadas semi-transparentes
-            keyIconSprite.draw(batch);
-        }
-
-        // Dibuja el contador
-        font.getData().setScale(.8f);
-        font.draw(batch, keysCollected + "/" + TOTAL_KEYS,
-                baseX + (TOTAL_KEYS * 20) + 5,
-                baseY + 9);
-
-        batch.end();
-    }
-
     private void deleteKeys(){
         for (Key key : keysToRemove) {
             world.destroyBody(key.getBody());
@@ -355,6 +372,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             }
         }
         keysCollected++;
+        kirby.addPointsPerItems(EnumItemType.KEY);
         //un  mensaje en pantalla ir en pantalla
     }
 
@@ -385,6 +403,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         if (!enemiesToRemove.contains(enemy, true)) {
             enemy.setflipX(kirby.getFlipX());
             enemy.setState(EnumStateEnemy.DIE);
+            kirby.addPointsPerEnemy(enemy);                 //agrega puntos por eliminacion de enemy
             enemiesToRemove.add(enemy);
         }
     }
@@ -398,6 +417,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         //animaciones de muerte del kirby y debe ir logica de puntos
         kirby.setState(EnumStates.DAMAGE);
         kirby.setAnimation(EnumStates.DAMAGE);
+        kirby.subPointsPerItem(EnumItemType.KEY);               //resta punto por ser atacado por un enemigo
 
         if (!attacksToRemove.contains(attack, true)) {                                  // en lo que haga contacto desaparece
             attacksToRemove.add(attack);
@@ -437,6 +457,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             Door door = (Door) (userDataA instanceof Door ? userDataA : userDataB);
             if (keysCollected >= TOTAL_KEYS && !levelCompleted) {
                 levelCompleted = true;
+                kirby.addPointsPerItems(EnumItemType.DOOR);
                 miniGame();
             }
         }
@@ -456,6 +477,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
                 // debe llamar tambien a manejadorEnemyColition aqui para la logica de los puntos perdidos
                 kirby.setState(EnumStates.DAMAGE);
                 kirby.setAnimation(EnumStates.DAMAGE);
+                kirby.subPointsPerItem(EnumItemType.ENEMY);
             }
         }
 
@@ -489,12 +511,14 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         if (setContact(contact, this.kirby, "spikes")) {
             kirby.setState(EnumStates.DAMAGE);
             kirby.setAnimation(EnumStates.DAMAGE);
+            kirby.subPointsPerItem(EnumItemType.SPIKES);
         }
 
         if ((setContact(contact, this.kirby, "Hole"))) {
             puedoResetKirby = true;
             kirby.setState(EnumStates.STAY);
             kirby.setAnimation(EnumStates.STAY);
+            kirby.subPointsPerItem(EnumItemType.HOLE);
         } else {
             puedoResetKirby = false;
         }

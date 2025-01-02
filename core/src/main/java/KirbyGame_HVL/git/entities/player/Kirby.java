@@ -5,6 +5,9 @@ import KirbyGame_HVL.git.entities.States.*;
 import KirbyGame_HVL.git.entities.States.StatesKirby.*;
 import KirbyGame_HVL.git.entities.attacks.CloudKirby;
 import KirbyGame_HVL.git.entities.attacks.Fire;
+import KirbyGame_HVL.git.entities.enemis.Enemy;
+import KirbyGame_HVL.git.entities.items.EnumItemType;
+import KirbyGame_HVL.git.systems.ScoreManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
@@ -94,8 +97,9 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private Animation kirbyanimationdamage;
     private Animation currentAnimation;
     private CloudKirby cloudkirby;
+    private ScoreManager scoreManager;
 
-    private boolean fireKeyPressed = false; // Bandera para controlar el disparo
+    private boolean fireKeyPressed = false;                 // Bandera para controlar el disparo
 
 
     private float initialX = 180;
@@ -106,7 +110,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
        todos los movimientos. Se extraen de las texturas frame por frame con el split para luego
        pasarlo a un array unidimensional mediante un bucle for, para luego inicializar las respectivas animaciones.
     * */
-    public Kirby (World world, Main main) {
+    public Kirby (World world, Main main)  {
         this.world = world;
         this.main = main;
         this.stateManager = new StateManager();
@@ -120,6 +124,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         this.stateFly = new FlyStateKirby(this);
         this.stateDamage = new DamageStateKirby(this);
         this.stateManager.setState(stateStay);
+        this.scoreManager = new ScoreManager();
         createBody(world);
         texture_animation();
     }
@@ -505,4 +510,25 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
 
         }
     }
+
+    public void subPointsPerItem(EnumItemType damageType){
+        scoreManager.recibirDamage(damageType);         //resta puntos segun el tipo de item
+    }
+
+    public void addPointsPerItems(EnumItemType type){
+        scoreManager.takeItems(type);                   //recibe punto por items tomados, llave puerta
+    }
+
+    public void addPointsPerEnemy(Enemy enemy){
+        scoreManager.enemyDelete(enemy);                //agrega puntos segun el enemigo eliminado
+    }
+
+    public int getCurrentScore() {
+        return scoreManager.getCurrentScore();
+    }
+
+    public void setCurrentScore(int score) {
+        scoreManager.setCurrentScore(score);
+    }
+
 }

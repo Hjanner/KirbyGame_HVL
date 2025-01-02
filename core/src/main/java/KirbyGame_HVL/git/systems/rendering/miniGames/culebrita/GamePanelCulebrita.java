@@ -1,5 +1,7 @@
 package KirbyGame_HVL.git.systems.rendering.miniGames.culebrita;
 
+import KirbyGame_HVL.git.Main;
+import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -17,8 +19,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class GamePanelCulebrita implements Screen {
-    private final Game game;
+public class GamePanelCulebrita extends Pantalla implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
     private ShapeRenderer shapeRenderer;
@@ -50,8 +51,8 @@ public class GamePanelCulebrita implements Screen {
     private ArrayList<String> odsImages;
     private final String ODS_IMAGES_PATH = "assets/art/minijuegos/ods/";
 
-    public GamePanelCulebrita(final Game game) {
-        this.game = game;
+    public GamePanelCulebrita(Main main) {
+        super(main);
         this.random = new Random();
         this.odsImages = new ArrayList<>();
         loadODSImages();
@@ -113,6 +114,7 @@ public class GamePanelCulebrita implements Screen {
             font.draw(batch, "GANADOR", viewport.getWorldWidth()/2 - 100, viewport.getWorldHeight()/2 + 50);
             font.draw(batch, "Final Score: " + score, viewport.getWorldWidth()/2 - 80, viewport.getWorldHeight()/2);
             font.draw(batch, "Presiona ESPACIO para avanzar", viewport.getWorldWidth()/2 -200, viewport.getWorldHeight()/2 - 40);
+
         }
 
         if (gameOver && ods_image != 10) {
@@ -127,14 +129,14 @@ public class GamePanelCulebrita implements Screen {
         }
         batch.end();
 
-        //ciclo del juego
         if (gameOver && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             initGame();
         }
 
-        if (ods_image == 10 && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        if (ods_image == 1 && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             //de aqui debe lanzar al siguiente nivel
-            initGame();
+            System.out.println("hola");
+            gameCompleted(1001);
         }
     }
 
@@ -375,6 +377,14 @@ public class GamePanelCulebrita implements Screen {
         Rectangle tail = snakeBody.get(snakeBody.size() - 1);
         Rectangle newSegment = new Rectangle(tail.x, tail.y, GRID_SIZE, GRID_SIZE);
         snakeBody.add(newSegment);
+    }
+
+    public void gameCompleted(int score) {
+//        main.getGameStateManager().updateScoreFromMinigame(main.gameScreen, score);
+//        main.getGameStateManager().resumeGameState(main.gameScreen);
+//        main.setScreen(main.gameScreen);
+        main.getScreenManager().returnFromMinigame(score);
+
     }
 
     @Override

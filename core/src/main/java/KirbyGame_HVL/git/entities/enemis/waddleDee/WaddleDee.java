@@ -8,6 +8,7 @@ import KirbyGame_HVL.git.entities.States.StatesWaddleDee.DieStateWaddleDee;
 import KirbyGame_HVL.git.entities.States.StatesWaddleDee.EnumStatesWaddleDee;
 import KirbyGame_HVL.git.entities.States.StatesWaddleDee.WalkStateWaddleDee;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
+import KirbyGame_HVL.git.entities.enemis.EnumEnemyType;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -39,6 +40,7 @@ public class WaddleDee extends Enemy {
     public WaddleDee(World world, Main main, float x, float y) {
         this.world = world;
         this.main = main;
+        this.type = EnumEnemyType.WADDLE;
         this.stateManager = new StateManager();
         this.walkWaddleDee = new WalkStateWaddleDee(this);
         this.dieWaddleDee = new DieStateWaddleDee(this);
