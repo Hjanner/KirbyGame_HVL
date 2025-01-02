@@ -10,6 +10,7 @@ import KirbyGame_HVL.git.entities.States.statesBrontoBurt.Die2StateBrontoBurt;
 import KirbyGame_HVL.git.entities.States.statesBrontoBurt.DieStateBrontoBurt;
 import KirbyGame_HVL.git.entities.States.statesBrontoBurt.FlyStateBrontoBurt;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
+import KirbyGame_HVL.git.entities.enemis.EnumEnemyType;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -54,6 +55,7 @@ public class BrontoBurt extends Enemy {
         this.die2BrontoBurt = new Die2StateBrontoBurt(this);
         this.stateManager.setState(flyBrontoBurt);
         this.startY = y;
+        this.type = EnumEnemyType.BRONTO;
         createBody(world, x, y);
         loadTextures();
     }
