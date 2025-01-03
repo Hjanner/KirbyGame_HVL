@@ -61,8 +61,17 @@ public class Main extends Game {
         manager.load("assets/art/spritesBrontoBurt/BrontoBurtFly.png", Texture.class);
         manager.load("assets/art/spritesBrontoBurt/BrontoBurtDie.png", Texture.class);
 
+        // Texturas del HotHead
+        manager.load("assets/art/spritesHotHead/HotHeadWalk.png", Texture.class);
+        manager.load("assets/art/spritesHotHead/HotHeadDie.png", Texture.class);
+        manager.load("assets/art/spritesHotHead/HotHeadDie2.png", Texture.class);
+        manager.load("assets/art/spritesHotHead/HotHeadAttack.png", Texture.class);
+
         // Texturas de la plataforma movil
         manager.load("assets/art/tilesets/Platform.png", Texture.class);
+
+        // Texturas de la llave
+        manager.load("assets/art/spritesKey/Key.png", Texture.class);
 
         manager.finishLoading();
         setScreen(pantallaini);

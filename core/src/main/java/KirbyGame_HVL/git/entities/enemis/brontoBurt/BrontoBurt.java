@@ -32,7 +32,6 @@ public class BrontoBurt extends Enemy {
     private Sprite brontoBurtSprite;
 
     private float duration = 0;
-    private boolean flipX;
     private float startY;
     private float amplitude = 30f;                          // amplitud del movimiento ondulado
     private float frequency = 2f;                           // frecuencia cambio de  movimiento
@@ -48,6 +47,7 @@ public class BrontoBurt extends Enemy {
     public BrontoBurt(World world, Main main, float x, float y) {
         this.world = world;
         this.main = main;
+        this.flipX = false;
         this.stateManager = new StateManager();
         this.flyBrontoBurt = new FlyStateBrontoBurt(this);
         this.dieBrontoBurt = new DieStateBrontoBurt(this);
@@ -64,7 +64,7 @@ public class BrontoBurt extends Enemy {
     public void createBody(World world, float x, float y) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(x, y);
-        bodyDef.type = BodyDef.BodyType.KinematicBody;      // KinematicBody no lo afecta la gravedad
+        bodyDef.type = BodyDef.BodyType.DynamicBody;      // KinematicBody no lo afecta la gravedad
         body = world.createBody(bodyDef);
 
         CircleShape shape = new CircleShape();
@@ -167,11 +167,13 @@ public class BrontoBurt extends Enemy {
         }
     }
 
+    @Override
     public void setflipX(boolean flipX) {
         this.flipX = flipX;
     }
 
-    public boolean getflipX() {
+    @Override
+    public boolean getFlipX() {
         return flipX;
     }
 

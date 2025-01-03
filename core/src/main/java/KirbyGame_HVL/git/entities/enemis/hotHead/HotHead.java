@@ -3,6 +3,8 @@ package KirbyGame_HVL.git.entities.enemis.hotHead;
 import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.entities.States.EnumStateEnemy;
 import KirbyGame_HVL.git.entities.States.State;
+import KirbyGame_HVL.git.entities.States.StateManager;
+import KirbyGame_HVL.git.entities.States.stateHotHead.*;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
 import KirbyGame_HVL.git.entities.attacks.Fire;
 import KirbyGame_HVL.git.entities.enemis.EnumEnemyType;
@@ -16,47 +18,74 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
 public class HotHead extends Enemy {
-    private World world;
-    private Main main;
-    private Body body;
-    private Fixture fixture;
 
-    private Texture hotHeadTexture;
-    private TextureRegion hotHeadRegion;
-    private TextureRegion[] hotHeadFrames;
-    private Animation walkAnimation;
+
+    private Texture hotHeadWalkTexture;
+    private Texture hotHeadDieTexture;
+    private Texture hotHeadDie2Texture;
+    private Texture hotHeadAttackTexture;
+    private TextureRegion hotHeadWalkRegion;
+    private TextureRegion hotHeadDieRegion;
+    private TextureRegion hotHeadDie2Region;
+    private TextureRegion hotHeadAttackRegion;
+    private TextureRegion[] hotHeadWalkFrames;
+    private TextureRegion[] hotHeadDieFrames;
+    private TextureRegion[] hotHeadDie2Frames;
+    private TextureRegion[] hotHeadAttackFrames;
+    private Animation HotHeadWalkAnimation;
+    private Animation HotHeadDieAnimation;
+    private Animation HotHeadDie2Animation;
+    private Animation HotHeadAttackAnimation;
+    private Animation currentAnimation;
     private Sprite hotHeadSprite;
-
-    private float duration = 0;
-    private boolean flipX = false;
-    private float movementSpeed = 25f;
-    private float movementTime = 0;
-    private float cambioDireccion = MathUtils.random(1.5f, 3.0f);
-
-    private float detectionRadius = 50f;                                       // rango de detecccion del Kirby
-    private boolean isAggressive = false;
-    private float agresiveSpeed = 40f;
-    private float normalSpeed = 25f;
-    private float currentSpeed;
 
     private boolean isDead = false;
     private boolean isDisposed = false;
-    private float accumulatedtimer = 0;
 
-    private boolean canShootFire = true;
-    private float fireTimer = 0f;
-    private static final float FIRE_COOLDOWN = 2.0f;
+    private boolean canShootFire;
 
-    private Body kirbyBody;
+    private StateManager stateManager;
+    private WalkStateHotHead stateWalk;
+    private DieStateHotHead stateDie;
+    private Die2StateHotHead stateDie2;
+    private AtractStateHotHead stateAtract;
+    private AttackStateHotHead stateAttack;
 
     public HotHead(World world, Main main, float x, float y) {
         this.world = world;
         this.main = main;
+        this.flipX = false;
         this.type = EnumEnemyType.HOTHEAD;
-        currentSpeed = normalSpeed;
+        this.stateManager = new StateManager();
+        this.stateWalk = new WalkStateHotHead(this);
+        this.stateDie = new DieStateHotHead(this);
+        this.stateDie2 = new Die2StateHotHead(this);
+        this.stateAtract = new AtractStateHotHead(this);
+        this.stateAttack = new AttackStateHotHead(this);
+        this.canShootFire = true;
+        stateManager.setState(stateWalk);
         createBody(world, x, y);
         loadTextures();
     }
+
+    @Override
+    public boolean getFlipX () {
+        return flipX;
+    }
+
+    @Override
+    public void setflipX (boolean flipX) {
+        this.flipX = flipX;
+    }
+
+    public void setCanShootFire (boolean canShootFire) {
+        this.canShootFire = canShootFire;
+    }
+
+    public boolean getCanShootFire () {
+        return canShootFire;
+    }
+
 
     public void createBody(World world, float x, float y) {
         BodyDef bodyDef = new BodyDef();
@@ -65,11 +94,11 @@ public class HotHead extends Enemy {
         body = world.createBody(bodyDef);
 
         CircleShape shape = new CircleShape();
-        shape.setRadius(6);
+        shape.setRadius(4.5f);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
+        fixtureDef.density = 0.5f;
         fixtureDef.friction = 0.8f;
         fixtureDef.restitution = 0.0f;
 
@@ -80,23 +109,50 @@ public class HotHead extends Enemy {
         shape.dispose();
     }
 
-    private void loadTextures() {
-        hotHeadTexture = main.getManager().get("assets/art/spritesWaddleDee/WaddleDeeDie.png");
-        hotHeadRegion = new TextureRegion(hotHeadTexture, 128, 32);
 
-        TextureRegion[][] tempFrames = hotHeadRegion.split(32, 32);
-        hotHeadFrames = new TextureRegion[4];
+    private void loadTextures() {
+        hotHeadWalkTexture = main.getManager().get("assets/art/spritesHotHead/HotHeadWalk.png");
+        hotHeadWalkRegion = new TextureRegion(hotHeadWalkTexture, 256, 32);
+        hotHeadDieTexture = main.getManager().get("assets/art/spritesHotHead/HotHeadDie.png");
+        hotHeadDieRegion = new TextureRegion(hotHeadDieTexture, 32,32);
+        hotHeadDie2Texture = main.getManager().get("assets/art/spritesHotHead/HotHeadDie2.png");
+        hotHeadDie2Region = new TextureRegion(hotHeadDie2Texture, 32,32);
+        hotHeadAttackTexture = main.getManager().get("assets/art/spritesHotHead/HotHeadAttack.png");
+        hotHeadAttackRegion = new TextureRegion(hotHeadAttackTexture, 384,32);
+        hotHeadSprite = new Sprite(hotHeadWalkRegion);
+        hotHeadSprite.setSize(18, 18);
+
+        TextureRegion[][] tempFramesWalk = hotHeadWalkRegion.split(256/8, 32);
+        TextureRegion[][] tempFramesAttack = hotHeadAttackRegion.split(384/12,32);
+        hotHeadWalkFrames = new TextureRegion[tempFramesWalk.length * tempFramesWalk[0].length];
+        hotHeadDieFrames = new TextureRegion[1];
+        hotHeadDie2Frames = new TextureRegion[1];
+        hotHeadAttackFrames = new TextureRegion[tempFramesAttack.length * tempFramesAttack[0].length];
+        hotHeadDieFrames[0] = hotHeadDieRegion;
+        hotHeadDie2Frames[0] = hotHeadDie2Region;
+
 
         int index = 0;
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 4; j++) {
-                hotHeadFrames[index++] = tempFrames[i][j];
+        for (int i = 0; i < tempFramesWalk.length; i++) {
+            for (int j = 0; j < tempFramesWalk[i].length; j++) {
+                hotHeadWalkFrames[index] = tempFramesWalk[i][j];
+                index++;
             }
         }
 
-        walkAnimation = new Animation(0.15f, hotHeadFrames);
-        hotHeadSprite = new Sprite(hotHeadFrames[0]);
-        hotHeadSprite.setSize(24, 24);
+        index = 0;
+        for (int i = 0; i < tempFramesAttack.length; i++) {
+            for (int j = 0; j < tempFramesAttack[i].length; j++) {
+                hotHeadAttackFrames[index] = tempFramesAttack[i][j];
+                index++;
+            }
+        }
+
+        HotHeadWalkAnimation = new Animation(0.15f, hotHeadWalkFrames);
+        HotHeadDieAnimation = new Animation(1f, hotHeadDieFrames);
+        HotHeadDie2Animation = new Animation(1f, hotHeadDie2Frames);
+        HotHeadAttackAnimation = new Animation(0.1f, hotHeadAttackFrames);
+        currentAnimation = HotHeadWalkAnimation;
     }
 
     @Override
@@ -105,68 +161,18 @@ public class HotHead extends Enemy {
             return;
         }
         super.act(delta);
-        updateComportamiento(delta);
+        stateManager.update(delta);
         updateAnimation(delta);
     }
 
-    private void updateComportamiento(float delta) {
-        movementTime += delta;
-        accumulatedtimer += delta;
-
-        if (movementTime > cambioDireccion) {                   //cambio de direccion
-            movementTime = 0;
-            flipX = !flipX;
-            movementSpeed = -movementSpeed;
-            cambioDireccion = MathUtils.random(1.5f, 5.0f);
-        }
-
-        if (movementSpeed > 0) {
-            flipX = !flipX;
-        }
-
-        //manejo de deteccion de kirby cerca
-        if (kirbyBody != null) {
-            Vector2 kirbyPos = kirbyBody.getPosition();
-            Vector2 hotHeadPos = body.getPosition();
-            float distance = kirbyPos.dst(hotHeadPos);
-
-            isAggressive = distance <= detectionRadius;
-
-            if (isAggressive) {
-                // se mueve hacie el kirby
-                float direction = kirbyPos.x > hotHeadPos.x ? 1 : -1;
-                movementSpeed = agresiveSpeed * direction;
-                flipX = direction < 0;
-            }
-        }
-
-        updateAttack(delta);
-        body.setLinearVelocity(movementSpeed, body.getLinearVelocity().y);                                              //movimiento
-    }
-
-    private void updateAttack(float delta) {
-        if (!canShootFire) {
-            fireTimer += delta;
-            if (fireTimer >= FIRE_COOLDOWN) {
-                canShootFire = true;
-                fireTimer = 0f;
-            }
-        }
-
-        if (isAggressive && canShootFire) {
-            shootFire();
-            canShootFire = false;
-        }
-    }
-
-    private void shootFire() {
+    public void shootFire() {
         Fire fire = new Fire(world, this, !flipX);
         getStage().addActor(fire);
     }
 
     public void updateAnimation(float delta) {
         duration += delta;
-        TextureRegion frame = (TextureRegion) walkAnimation.getKeyFrame(duration, true);
+        TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duration, true);
         hotHeadSprite.setRegion(frame);
         hotHeadSprite.setFlip(flipX, false);
     }
@@ -174,22 +180,53 @@ public class HotHead extends Enemy {
     @Override
     public void setState(EnumStateEnemy typeState) {
 
+        switch (typeState) {
+
+            case WALK:
+                stateManager.setState(stateWalk);
+                break;
+            case DIE:
+                stateManager.setState(stateDie);
+                break;
+            case DIE2:
+                stateManager.setState(stateDie2);
+                break;
+            case ATRACT:
+                stateManager.setState(stateAtract);
+                break;
+            case ATTACK:
+                stateManager.setState(stateAttack);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     public void setAnimation(EnumStateEnemy typestate) {
 
+        switch (typestate) {
+
+            case WALK:
+                currentAnimation = HotHeadWalkAnimation;
+                break;
+            case DIE:
+                currentAnimation = HotHeadDieAnimation;
+                break;
+            case DIE2:
+                currentAnimation = HotHeadDie2Animation;
+                break;
+            case ATTACK:
+                currentAnimation = HotHeadAttackAnimation;
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     public State getcurrentState() {
-        return null;
-    }
-
-    public void die() {
-        isDead = true;
-        dispose();
-        remove();
+        return stateManager.getState();
     }
 
     @Override
@@ -197,25 +234,18 @@ public class HotHead extends Enemy {
         if (isDisposed || isDead) {
             return;
         }
-        hotHeadSprite.setPosition(body.getPosition().x - 12, body.getPosition().y - 6);
+        hotHeadSprite.setPosition(body.getPosition().x - 11, body.getPosition().y - 6);
         hotHeadSprite.draw(batch);
     }
 
     public Body getBody() {return body;}
 
-    public void setKirbyBody(Body kirbyBody) {this.kirbyBody = kirbyBody;}
-
-    public Body getKirbyBody() {return kirbyBody;}
+    public World getWorld () {
+        return this.world;
+    }
 
     public void dispose() {
         if (!isDisposed) {
-            if (world != null && body != null) {
-                world.destroyBody(body);
-                body = null;
-            }
-            if (hotHeadTexture != null) {
-                hotHeadTexture.dispose();
-            }
             isDisposed = true;
             this.remove();
         }

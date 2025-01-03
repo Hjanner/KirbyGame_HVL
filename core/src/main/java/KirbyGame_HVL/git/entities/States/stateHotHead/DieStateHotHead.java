@@ -15,7 +15,7 @@ public class DieStateHotHead extends StateHotHead {
     public void start() {
 
         acummulatedtimer = 0;
-        if (hotHead.getflipX()){
+        if (hotHead.getFlipX()){
             hotHead.getBody().applyLinearImpulse(-50,50,
                 hotHead.getBody().getPosition().x,
                 hotHead.getBody().getPosition().y, true);
@@ -39,7 +39,7 @@ public class DieStateHotHead extends StateHotHead {
         }
 
         // Impulso continuo durante la muerte
-        if (hotHead.getflipX()) {
+        if (hotHead.getFlipX()) {
             hotHead.getBody().applyLinearImpulse(-100, 30,
                 hotHead.getBody().getPosition().x,
                 hotHead.getBody().getPosition().y, true);

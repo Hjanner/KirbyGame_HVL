@@ -27,6 +27,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 import com.badlogic.gdx.math.Vector2;
@@ -59,6 +60,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private ArrayList<Key> keys;
     private Array<Key> keysToRemove;
     private Texture keyIconTexture;
+    private TextureRegion keyIconRegion;
     private Sprite keyIconSprite;
     private int keysCollected = 0;
     private final int TOTAL_KEYS = 3;
@@ -75,7 +77,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         {{700, 1020}, {850, 1020}, {900, 1020}},                        // z 2 - BrontoBurts
         {{500, 1100}, {600, 1150}, {750, 1050}},                        // z 3 - BrontoBurts
         {{1200, 1040}, {1250, 1040}, {1300, 1040}},                      // z 4 - WaddleDees
-        {{1000, 1010}, {1400, 1010}, {1500, 1010}}                       //g 5 - HotHeads
+        {{500, 1010}, {1400, 1010}, {1500, 1010}}                       //g 5 - HotHeads
     };
 
     //ataques
@@ -176,7 +178,6 @@ private ArrayList<Attack> attacks;
         deleteEnemies();
         deleteKeys();
         deleteAttacks();
-        loadEnemies();
 
         updateMovementPlataforms(delta);
         stage.act();
@@ -257,7 +258,7 @@ private ArrayList<Attack> attacks;
             Enemy enemy = factory.createEnemy(world, main, coordenada[0], coordenada[1]);
 
             if (enemy instanceof HotHead){
-                ((HotHead) enemy).setKirbyBody(kirby.getBody());
+                enemy.setKirby(kirby);
             }
 
             stage.addActor(enemy);
@@ -266,10 +267,6 @@ private ArrayList<Attack> attacks;
     }
 
     private void loadEnemies() {
-        if (enemiesList.isEmpty()) {
-            createEnemies();
-            return;
-        }
 
         // si se eliminan todos los enemies de una zona o grupo se realiza un respawn
         for (int zona = 0; zona < enemyZonaCoordenadas.length; zona++) {
@@ -284,9 +281,6 @@ private ArrayList<Attack> attacks;
         for (ArrayList<Enemy> zoneEnemies : enemiesList) {
             for (Enemy enemy : new ArrayList<>(zoneEnemies)) {                          //  una copia para evitar errores
                 if (enemiesToRemove.contains(enemy, true)) {
-                    if (enemy instanceof HotHead){
-                        ((HotHead) enemy).die();
-                    }
                     zoneEnemies.remove(enemy);                          // Eliminar de la lista de la zona
                 }
             }
@@ -302,7 +296,6 @@ private ArrayList<Attack> attacks;
                 enemy.setState(EnumStateEnemy.DIE);
                 kirby.addPointsPerEnemy(enemy);                 //agrega puntos por eliminacion de enemy
                 enemiesToRemove.add(enemy);
-                kirby.setState(EnumStates.STAY);
             }
         } else {
             //kirby recibe daño
@@ -348,8 +341,9 @@ private ArrayList<Attack> attacks;
 //ITEMS
     //keys
     private void loadAssetsKey(){
-        keyIconTexture = main.getManager().get("assets/art/sprites/kirbystay.png");
-        keyIconSprite = new Sprite(keyIconTexture);
+        keyIconTexture = main.getManager().get("assets/art/spritesKey/Key.png");
+        keyIconRegion = new TextureRegion(keyIconTexture, 32,32);
+        keyIconSprite = new Sprite(keyIconRegion);
         keyIconSprite.setSize(16, 16);
     }
 
@@ -419,7 +413,7 @@ private ArrayList<Attack> attacks;
         }
 
         if (!enemiesToRemove.contains(enemy, true)) {
-            enemy.setflipX(kirby.getFlipX());
+            enemy.setflipX(!attack.getSentido());
             enemy.setState(EnumStateEnemy.DIE);
             kirby.addPointsPerEnemy(enemy);                 //agrega puntos por eliminacion de enemy
             enemiesToRemove.add(enemy);
@@ -442,18 +436,12 @@ private ArrayList<Attack> attacks;
         }
     }
 
-    private void manejadorAttackSpace(Attack attack) {
-        if (!attacksToRemove.contains(attack, true)) {                                  // en lo que haga contacto desaparece
-            attacksToRemove.add(attack);
-        }
-    }
-
     private void manejadorEnemyKirbyAbsorbCollition(Kirby kirby, Enemy enemy) {
         kirby.setcurrentEnemy(enemy);
         if (!enemiesToRemove.contains(enemy, true)) {
             enemy.setState(EnumStateEnemy.DIE2);
+            kirby.addPointsPerEnemy(enemy);
             enemiesToRemove.add(enemy);
-            kirby.setState(EnumStates.STAY);
 
         }
     }

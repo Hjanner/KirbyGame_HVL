@@ -26,13 +26,13 @@ public class DashStateKirby extends StateKirby {
         if (acummulatedtimer > 0.5f) {
             kirby.setOpuesto(true);
         }
-        if (!Gdx.input.isKeyPressed(Input.Keys.DOWN) && kirby.getBody().getLinearVelocity().x == 0) {
+        if (!Gdx.input.isKeyPressed(Input.Keys.DOWN) && kirby.getColisionSuelo() && !Gdx.input.isKeyPressed(Input.Keys.RIGHT) && !Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             kirby.setState(EnumStates.STAY);
             kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.STAY);
         }
 
-        else if (Gdx.input.isKeyPressed(Input.Keys.DOWN) && kirby.getBody().getLinearVelocity().x == 0) {
+        else if (Gdx.input.isKeyPressed(Input.Keys.DOWN) && kirby.getColisionSuelo() && !Gdx.input.isKeyPressed(Input.Keys.RIGHT) && !Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             kirby.setState(EnumStates.DOWN);
             kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.DOWN);

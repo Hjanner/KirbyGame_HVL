@@ -23,6 +23,7 @@ public class CloudKirby extends Attack {
     public CloudKirby (World world, ActorWithBox2d actor, boolean sentido) {
         this.world = world;
         this.actor = actor;
+        this.sentido = sentido;
         this.kirbyCloudTexture = new Texture("assets/art/sprites/kirbycloud.png");
         this.kirbyCloudRegion = new TextureRegion(kirbyCloudTexture, 32,32);
         this.kirbycloudsprite = new Sprite(kirbyCloudRegion);

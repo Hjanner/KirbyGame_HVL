@@ -15,7 +15,7 @@ public class DieStateWaddleDee extends StateWaddleDee {
     public void start() {
 
         acummulatedtimer = 0;
-        if (waddleDee.getflipX()){
+        if (waddleDee.getFlipX()){
             waddleDee.getBody().applyLinearImpulse(-50,50,waddleDee.getBody().getPosition().x, waddleDee.getBody().getPosition().y, true);
         }
 
@@ -33,7 +33,7 @@ public class DieStateWaddleDee extends StateWaddleDee {
             waddleDee.getWorld().destroyBody(waddleDee.getBody());
         }
 
-        if (waddleDee.getflipX()){
+        if (waddleDee.getFlipX()){
             waddleDee.getBody().applyLinearImpulse(-120,20,waddleDee.getBody().getPosition().x, waddleDee.getBody().getPosition().y, true);
         }
 
