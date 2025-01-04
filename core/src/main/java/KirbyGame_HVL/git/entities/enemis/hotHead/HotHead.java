@@ -69,9 +69,9 @@ public class HotHead extends Enemy {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
+        fixtureDef.density = 0.001f;
         fixtureDef.friction = 0.8f;
-        fixtureDef.restitution = 0.0f;
+        fixtureDef.restitution = 0.1f;
 
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
@@ -141,7 +141,8 @@ public class HotHead extends Enemy {
         }
 
         updateAttack(delta);
-        body.setLinearVelocity(movementSpeed, body.getLinearVelocity().y);                                              //movimiento
+        body.setLinearVelocity(movementSpeed, body.getLinearVelocity().y);
+        getBody().applyLinearImpulse(0, -9.8f, getBody().getPosition().x,getBody().getPosition().y, true);       // gravedad
     }
 
     private void updateAttack(float delta) {

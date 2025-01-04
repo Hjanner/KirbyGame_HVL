@@ -2,8 +2,8 @@ package KirbyGame_HVL.git.systems.rendering.miniGames.culebrita;
 
 import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.screens.gameplay.GameScreen;
-import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
-import com.badlogic.gdx.Game;
+import KirbyGame_HVL.git.systems.MinigameManager;
+import KirbyGame_HVL.git.systems.MinigameWindow;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class GamePanelCulebrita extends Pantalla  implements Screen {
+public class GamePanelCulebrita extends MinigameWindow implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
     private ShapeRenderer shapeRenderer;
@@ -29,16 +29,16 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
     private Texture foodTexture;
     private Texture backgroundTexture;
     private Texture obstacleTexture;
-    private final int OBSTACLE_SIZE_MIN = 40;                   //tamanos obstaculos
+    private final int OBSTACLE_SIZE_MIN = 40;
     private final int OBSTACLE_SIZE_MAX = 80;
 
-    private static final float WORLD_WIDTH = 1000;              //tamano de la pantalla
+    private static final float WORLD_WIDTH = 1000;
     private static final float WORLD_HEIGHT = 600;
-    private static final int GRID_SIZE = 30;                    //tamano de la grilla
+    private static final int GRID_SIZE = 30;
     private static final float MOVE_TIME = 0.1f;
 
     private ArrayList<Rectangle> snakeBody;
-    private Rectangle food, gameOverT;
+    private Rectangle food;
     private ArrayList<Rectangle> obstacles;
     private int direction = Input.Keys.RIGHT;
     private float timer = 0;
@@ -47,19 +47,35 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
     private boolean shouldGrow = false;
     private int score = 0;
     private int ods_image = 0;
-    private Texture gameOverTexture;
+    private Main main;
+    private MinigameManager minigameManager;
 
     private ArrayList<String> odsImages;
     private final String ODS_IMAGES_PATH = "assets/art/minijuegos/ods/";
 
-    private GameScreen gameScreen;
-
-    public GamePanelCulebrita(Main main) {
-        super(main);
+    public GamePanelCulebrita(Main main, MinigameManager manager) {
+        super(manager);
+        this.main = main;
+        this.minigameManager = manager;
         this.random = new Random();
         this.odsImages = new ArrayList<>();
         loadODSImages();
         create();
+    }
+
+    @Override
+    public void create() {
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
+        viewport.apply();
+        camera.position.set(WORLD_WIDTH/2, WORLD_HEIGHT/2, 0);
+
+        shapeRenderer = new ShapeRenderer();
+        batch = new SpriteBatch();
+        font = new BitmapFont();
+
+        loadAssets();
+        initGame();
     }
 
     @Override
@@ -75,21 +91,20 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
         batch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
 
-        // Dibujar el fondo
+        renderGame();
+
+        if (gameOver) {
+            handleGameOver();
+        }
+    }
+
+    private void renderGame() {
+        //fondo
         batch.begin();
-        // Ajustar el fondo para que cubra toda la pantalla
-        float backgroundWidth = viewport.getWorldWidth();
-        float backgroundHeight = viewport.getWorldHeight();
-        batch.draw(backgroundTexture, 0, 0, 0, 0,
-            backgroundWidth, backgroundHeight,
-            1, 1, 0, 0, 0,
-            backgroundTexture.getWidth(),
-            backgroundTexture.getHeight(), // Región de la textura (fin)
-            false, false
-        );           // Flip
+        batch.draw(backgroundTexture, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
         batch.end();
 
-        // Dibujar la serpiente
+        // dibujo serpiente
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(1, 0.41f, 0.71f, 1);
         for (Rectangle segment : snakeBody) {
@@ -97,71 +112,80 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
         }
         shapeRenderer.end();
 
-        // Dibujar obstáculos y comida
+        // obstaculos y ds
         batch.begin();
         for (Rectangle obstacle : obstacles) {
             batch.draw(obstacleTexture, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
         }
         batch.draw(foodTexture, food.x, food.y, food.width, food.height);
 
-        // Dibujar UI
+        // UI
+        renderUI();
+        batch.end();
+    }
+
+    private void renderUI() {
         font.getData().setScale(1.5f);
         font.setColor(1, 1, 1, 1);
         font.draw(batch, "SCORE : " + score, 20, viewport.getWorldHeight() - 20);
         font.draw(batch, "ODS   : " + ods_image + " / 10", 20, viewport.getWorldHeight() - 60);
 
-        if (ods_image == 2){
+        if (ods_image == 10) {
             gameOver = true;
-            font.getData().setScale(3);
-            font.setColor(0, 1, 0, 1);
-            font.draw(batch, "GANADOR", viewport.getWorldWidth()/2 - 100, viewport.getWorldHeight()/2 + 50);
-            font.draw(batch, "Final Score: " + score, viewport.getWorldWidth()/2 - 80, viewport.getWorldHeight()/2);
-            font.draw(batch, "Presiona ESPACIO para avanzar", viewport.getWorldWidth()/2 -200, viewport.getWorldHeight()/2 - 40);
-
-            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-                //de aqui debe lanzar al siguiente nivel
-                System.out.println("hola");
-                gameCompleted(1001);
-            }
+            renderWinScreen();
+        } else if (gameOver) {
+            renderGameOverScreen();
         }
-
-        if (gameOver && ods_image != 2) {
-            ods_image = 0;
-            //batch.draw(gameOverTexture, gameOverT.x, gameOverT.y, gameOverT.width, gameOverT.height );
-            font.getData().setScale(3);
-            font.setColor(1, 0, 0, 1);
-            font.draw(batch, "GAME OVER", viewport.getWorldWidth()/2 - 140, viewport.getWorldHeight()/2 + 50);
-            font.getData().setScale(2);
-            font.draw(batch, "Final Score: " + score, viewport.getWorldWidth()/2 - 80, viewport.getWorldHeight()/2 );
-            font.draw(batch, "Presiona SPACE para reiniciar", viewport.getWorldWidth()/2 - 180, viewport.getWorldHeight()/2 - 40);
-
-        }
-        batch.end();
-
-        if (gameOver && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            initGame();
-        }
-
     }
 
-    private void create() {
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
-        viewport.apply();
-        camera.position.set(WORLD_WIDTH/2, WORLD_HEIGHT/2, 0);
+    private void renderWinScreen() {
+        font.getData().setScale(3);
+        font.setColor(0, 1, 0, 1);
+        font.draw(batch, "GANADOR", viewport.getWorldWidth()/2 - 100, viewport.getWorldHeight()/2 + 50);
+        font.draw(batch, "Final Score: " + score, viewport.getWorldWidth()/2 - 80, viewport.getWorldHeight()/2);
+        font.draw(batch, "Presiona ESPACIO para avanzar", viewport.getWorldWidth()/2 - 200, viewport.getWorldHeight()/2 - 40);
 
-        shapeRenderer = new ShapeRenderer();
-        batch = new SpriteBatch();
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            gameCompleted();
+        }
+    }
 
-//        Texture texture =  new Texture(Gdx.files.internal("assets/font/Quicksand.png"));
-//        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-//        font = new BitmapFont(Gdx.files.internal("assets/font/Quicksand.fnt"));
-//        font.getData().setScale(1f);
-        font = new BitmapFont();
+    private void renderGameOverScreen() {
+        font.getData().setScale(3);
+        font.setColor(1, 0, 0, 1);
+        font.draw(batch, "GAME OVER", viewport.getWorldWidth()/2 - 140, viewport.getWorldHeight()/2 + 50);
+        font.getData().setScale(2);
+        font.draw(batch, "Final Score: " + score, viewport.getWorldWidth()/2 - 80, viewport.getWorldHeight()/2);
+        font.draw(batch, "Presiona SPACE para reiniciar", viewport.getWorldWidth()/2 - 180, viewport.getWorldHeight()/2 - 40);
+    }
 
-        loadAssets();
+    private void handleGameOver() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            if (ods_image == 10) {
+                gameCompleted();
+            } else {
+                initGame();
+            }
+        }
+    }
 
-        initGame();
+    @Override
+    public void sendScore(int score) {
+        MinigameManager.setScore(score);
+    }
+
+    private void gameCompleted() {
+        int totalScore = minigameManager.getSavedKirbyScore() + score;
+        sendScore(totalScore);
+
+        GameScreen game = new GameScreen(
+            main,
+            minigameManager.getPosKirbyX(),
+            minigameManager.getPosKirbyY(),
+            totalScore,
+            2
+        );
+        main.setScreen(game);
     }
 
     private void initGame() {
@@ -173,6 +197,7 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
         createObstacles();
         spawnFood();            //cargar ods
         gameOver = false;
+        ods_image = 0;
         score = 0;
         direction = Input.Keys.RIGHT;
     }
@@ -189,7 +214,7 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
                 throw new RuntimeException("No se encontraron imagenes de IDS en " + ODS_IMAGES_PATH);
             }
         } catch (Exception e) {
-            System.err.println("Error cargando imágenes de comida: " + e.getMessage());
+            System.err.println("Error cargando imagenes de comida: " + e.getMessage());
             odsImages.add("logito.png");
         }
     }
@@ -208,7 +233,7 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
             backgroundTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
             obstacleTexture = new Texture(Gdx.files.internal("assets/art/minijuegos/imagen.png"));
             foodTexture = getRandomFoodTexture(); // Inicializar con una imagen aleatoria
-            gameOverTexture = new Texture(Gdx.files.internal("assets/art/minijuegos/game_over.png"));
+            //gameOverTexture = new Texture(Gdx.files.internal("assets/art/minijuegos/game_over.png"));
         } catch (Exception e) {
             System.err.println("Error al cargar las textura: " + e.getMessage());
             Gdx.app.exit();
@@ -315,7 +340,7 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
         float newX = head.x;
         float newY = head.y;
 
-        // Move the body
+        // mueve el cuerpo
         for (int i = snakeBody.size() - 1; i > 0; i--) {
             Rectangle current = snakeBody.get(i);
             Rectangle previous = snakeBody.get(i - 1);
@@ -323,7 +348,7 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
             current.y = previous.y;
         }
 
-        // Move the head
+        // mueve la cabeza
         switch (direction) {
             case Input.Keys.LEFT:
                 newX -= GRID_SIZE;
@@ -339,7 +364,6 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
                 break;
         }
 
-        // Wrap around
         if (newX >= WORLD_WIDTH) newX = 0;
         if (newX < 0) newX = WORLD_WIDTH - GRID_SIZE;
         if (newY >= WORLD_HEIGHT) newY = 0;
@@ -352,7 +376,7 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
     private void checkCollisions() {
         Rectangle head = snakeBody.get(0);
 
-        // ods collision
+        // ods colision
         if (head.overlaps(food)) {
             shouldGrow = true;
             score += 100;
@@ -360,7 +384,7 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
             spawnFood();
         }
 
-        // obstaculo collision
+        // obstaculo colision
         for (Rectangle obstacle : obstacles) {
             if (head.overlaps(obstacle)) {
                 gameOver = true;
@@ -384,8 +408,7 @@ public class GamePanelCulebrita extends Pantalla  implements Screen {
     }
 
     public void gameCompleted(int score) {
-        main.setScreen(main.gameScreen);
-
+        //main.setScreen(main.gameScreen);
     }
 
     @Override

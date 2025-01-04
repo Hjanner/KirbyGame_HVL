@@ -140,7 +140,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private Animation kirbyanimationAbsorbSpit;
     private Animation currentAnimation;
     private CloudKirby cloudkirby;
-    private ScoreManager scoreManager;
+    private static ScoreManager scoreManager;
 
     private boolean fireKeyPressed = false;                 // Bandera para controlar el disparo
     private Enemy currentEnemy;
@@ -148,15 +148,15 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     private Star star;
 
 
-    private float initialX = 180;
-    private float initialY = 1010;
+    private float initialX;
+    private float initialY;
 
 
     /* Constructor en donde se van a cargar todas las texturas y se incializan las regiones de
        todos los movimientos. Se extraen de las texturas frame por frame con el split para luego
        pasarlo a un array unidimensional mediante un bucle for, para luego inicializar las respectivas animaciones.
     * */
-    public Kirby (World world, Main main)  {
+    public Kirby (World world, Main main, float initialX, float initialY)  {
         this.world = world;
         this.main = main;
         this.stateManager = new StateManager();
@@ -174,17 +174,51 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         this.scoreManager = new ScoreManager();
         this.poder = false;
         this.currentEnemy = null;
-        createBody(world);
+        this.initialX = initialX;
+        this.initialY = initialY;
+        createBody(world, initialX, initialY);
         load_animation();
     }
 
+    public void setPosition(float x, float y) {
+        if (body != null) {
+            body.setTransform(x, y, 0);
+            body.setAwake(true);
+        }
+    }
+
+//    public void resetPosition() {
+//        body.setTransform(new Vector2(initialX, initialY), 0);
+//        body.setLinearVelocity(0, 0);
+//    }
+
     public void resetPosition() {
-        body.setTransform(new Vector2(initialX, initialY), 0);
-        body.setLinearVelocity(0, 0);
+        if (body != null) {
+            body.setTransform(initialX, initialY, 0);
+            body.setLinearVelocity(0, 0);
+            body.setAngularVelocity(0);
+            body.setAwake(true);
+        }
     }
 
     public World getWorld () {
         return this.world;
+    }
+
+    public float getInitialX() {
+        return initialX;
+    }
+
+    public void setInitialX(float initialX) {
+        this.initialX = initialX;
+    }
+
+    public float getInitialY() {
+        return initialY;
+    }
+
+    public void setInitialY(float initialY) {
+        this.initialY = initialY;
     }
 
     public void setCloud (CloudKirby cloudKirby) {
@@ -281,9 +315,9 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbysprite.draw(batch);
     }
 
-    public void createBody (World world) {
+    public void createBody (World world, float initialX, float initialY) {
         BodyDef kirbybodydef = new BodyDef();
-        kirbybodydef.position.set(180,1010);
+        kirbybodydef.position.set(initialX,initialY);
         kirbybodydef.type = BodyDef.BodyType.DynamicBody;
         body = this.world.createBody(kirbybodydef);
         CircleShape kirbyshape = new CircleShape();
@@ -571,7 +605,6 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duracion, true);
         kirbysprite.setRegion(frame);
         kirbysprite.flip(flipX,false);
-
     }
 
     private void shootFire() {
@@ -813,5 +846,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
     public void setCurrentScore(int score) {
         scoreManager.setCurrentScore(score);
     }
+
+    public Main getMain(){ return main;}
 
 }

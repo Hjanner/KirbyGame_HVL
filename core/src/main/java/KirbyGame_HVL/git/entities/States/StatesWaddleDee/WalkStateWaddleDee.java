@@ -35,9 +35,7 @@ public class WalkStateWaddleDee extends StateWaddleDee {
         }
 
         waddleDee.getBody().setLinearVelocity(movementSpeed, waddleDee.getBody().getLinearVelocity().y);                                              // aplica movimiento
-
-        //waddleDee.getBody().applyLinearImpulse(0, -9.8f, waddleDee.getBody().getPosition().x, waddleDee.getBody().getPosition().y, true);       // gravedad
-
+        waddleDee.getBody().applyLinearImpulse(0, -9.8f, waddleDee.getBody().getPosition().x, waddleDee.getBody().getPosition().y, true);       // gravedad
     }
 
     @Override
