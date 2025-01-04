@@ -6,6 +6,7 @@ import KirbyGame_HVL.git.entities.States.StatesKirby.*;
 import KirbyGame_HVL.git.entities.attacks.CloudKirby;
 import KirbyGame_HVL.git.entities.attacks.Star;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
+import KirbyGame_HVL.git.entities.enemis.hotHead.HotHead;
 import KirbyGame_HVL.git.entities.items.SensorKirby;
 import KirbyGame_HVL.git.entities.attacks.Fire;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
@@ -588,6 +589,17 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbyslidetexture.dispose();
         kirbydowntexture.dispose();
         kirbyruntexture.dispose();
+        kirbyAbsorbDamagetexture.dispose();
+        kirbyAbsorbDowntexture.dispose();
+        kirbyAbsorbFall2texture.dispose();
+        kirbyAbsorbFalltexture.dispose();
+        kirbyAbsorbJumptexture.dispose();
+        kirbyAbsorbSpittexture.dispose();
+        kirbyAbsorbtexture.dispose();
+        kirbyfall2texture.dispose();
+        kirbyDamagetexture.dispose();
+        kirbyflybegintexture.dispose();
+        kirbyflyfallendtexture.dispose();
         body.destroyFixture(fixture);
         world.destroyBody(body);
     }
@@ -605,6 +617,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duracion, true);
         kirbysprite.setRegion(frame);
         kirbysprite.flip(flipX,false);
+
     }
 
     private void shootFire() {
@@ -659,7 +672,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
                         currentAnimation = kirbyanimationAbsorbRun;
                     }
                     else{
-                        // Logica cuando tenga el poder de un enemigo
+
                     }
                 }
                 break;

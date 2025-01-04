@@ -18,9 +18,8 @@ public abstract class Enemy extends ActorWithBox2d {
     protected Fixture fixture;
     protected Main main;
     protected boolean flipX;
-    protected Object currentState;
     protected EnumEnemyType type;
-    protected float duration;
+    protected float duration = 0;
     protected Kirby kirby;
 
     public Enemy() {

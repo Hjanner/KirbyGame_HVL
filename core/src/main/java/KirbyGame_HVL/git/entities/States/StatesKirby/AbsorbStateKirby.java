@@ -25,7 +25,7 @@ public class AbsorbStateKirby extends StateKirby {
 
         if (!Gdx.input.isKeyPressed(Input.Keys.Z) && kirby.getColisionSuelo()) {
             acummulatedtimer += delta;
-            if (acummulatedtimer > 0.5f) {
+            if (acummulatedtimer > 0.8f) {
                 kirby.setState(EnumStates.STAY);
                 kirby.setDuracion(0);
                 kirby.setAnimation(EnumStates.STAY);

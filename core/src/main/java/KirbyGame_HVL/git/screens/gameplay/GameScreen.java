@@ -30,6 +30,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 import com.badlogic.gdx.math.Vector2;
@@ -43,7 +44,6 @@ import java.util.Map;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.Texture;
-
 
 public class GameScreen extends Pantalla implements ContactListener, Screen {
 
@@ -62,6 +62,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private ArrayList<Key> keys;
     private Array<Key> keysToRemove;
     private Texture keyIconTexture;
+    private TextureRegion keyIconRegion;
     private Sprite keyIconSprite;
     private int keysCollected = 0;
     private final int TOTAL_KEYS = 3;
@@ -69,17 +70,16 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private Door door;
     private boolean levelCompleted = false;
 
-
     //enemies
     private ArrayList<ArrayList<Enemy>> enemiesList;
     private Array<Enemy> enemiesToRemove;
     private Map<Integer, EnemyFactory> zonaFactories;           // Define que factory usar en cada zona
     private int[][][] enemyZonaCoordenadas = {
-        {{140, 1030}, {550, 1030}, {600, 1010}},           // zona 1 - WaddleDees
+        {{140, 1030}, {550, 1030}, {600, 1010}},                         // zona 1 - WaddleDees
         {{1550, 1020}, {850, 1020}, {900, 1020}},                        // z 2 - BrontoBurts
         {{1475, 1100}, {600, 1150}, {750, 1050}},                        // z 3 - BrontoBurts
         {{1445, 1040}, {1250, 1040}, {1300, 1040}},                      // z 4 - WaddleDees
-        {{1800, 1010}, {1400, 1010}, {1500, 1010}}                       //g 5 - HotHeads
+        {{180, 1010}, {1400, 1010}, {1500, 1010}}                        //g 5 - HotHeads
     };
 
     //ataques
@@ -204,7 +204,6 @@ private ArrayList<Attack> attacks;
         deleteEnemies();
         deleteKeys();
         deleteAttacks();
-        loadEnemies();
 
         updateMovementPlataforms(delta);
         stage.act();
@@ -283,7 +282,7 @@ private ArrayList<Attack> attacks;
             Enemy enemy = factory.createEnemy(world, main, coordenada[0], coordenada[1]);
 
             if (enemy instanceof HotHead){
-                ((HotHead) enemy).setKirbyBody(kirby.getBody());
+                enemy.setKirby(kirby);
             }
 
             stage.addActor(enemy);
@@ -292,10 +291,6 @@ private ArrayList<Attack> attacks;
     }
 
     private void loadEnemies() {
-        if (enemiesList.isEmpty()) {
-            createEnemies();
-            return;
-        }
 
         // si se eliminan todos los enemies de una zona o grupo se realiza un respawn
         for (int zona = 0; zona < enemyZonaCoordenadas.length; zona++) {
@@ -325,7 +320,6 @@ private ArrayList<Attack> attacks;
                 enemy.setState(EnumStateEnemy.DIE);
                 kirby.addPointsPerEnemy(enemy);                 //agrega puntos por eliminacion de enemy
                 enemiesToRemove.add(enemy);
-                kirby.setState(EnumStates.STAY);
             }
         } else {
             //kirby recibe daño
@@ -371,8 +365,9 @@ private ArrayList<Attack> attacks;
 //ITEMS
     //keys
     private void loadAssetsKey(){
-        keyIconTexture = main.getManager().get("assets/art/sprites/kirbystay.png");
-        keyIconSprite = new Sprite(keyIconTexture);
+        keyIconTexture = main.getManager().get("assets/art/spritesKey/Key.png");
+        keyIconRegion = new TextureRegion(keyIconTexture, 32,32);
+        keyIconSprite = new Sprite(keyIconRegion);
         keyIconSprite.setSize(16, 16);
     }
 
@@ -442,7 +437,7 @@ private ArrayList<Attack> attacks;
         }
 
         if (!enemiesToRemove.contains(enemy, true)) {
-            enemy.setflipX(kirby.getFlipX());
+            enemy.setflipX(!attack.getSentido());
             enemy.setState(EnumStateEnemy.DIE);
             kirby.addPointsPerEnemy(enemy);                 //agrega puntos por eliminacion de enemy
             enemiesToRemove.add(enemy);
@@ -469,8 +464,9 @@ private ArrayList<Attack> attacks;
         kirby.setcurrentEnemy(enemy);
         if (!enemiesToRemove.contains(enemy, true)) {
             enemy.setState(EnumStateEnemy.DIE2);
+            kirby.addPointsPerEnemy(enemy);
             enemiesToRemove.add(enemy);
-            kirby.setState(EnumStates.STAY);
+
         }
     }
 

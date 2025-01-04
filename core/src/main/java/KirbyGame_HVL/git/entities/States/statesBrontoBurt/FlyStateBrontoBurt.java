@@ -46,7 +46,7 @@ public class FlyStateBrontoBurt extends StateBrontoBurt {
         float currentX = brontoBurt.getBody().getPosition().x;
         brontoBurt.getBody().setTransform(currentX, currentY, 0);
         time += delta;
-        float xVel = (brontoBurt.getflipX() ? -70f : 70f);                                  // Velocidad horizontal
+        float xVel = (brontoBurt.getFlipX() ? -70f : 70f);                                  // Velocidad horizontal
         float yOffset2 = amplitude * MathUtils.sin(time * frequency);
 
         // Actualiza la posicion del cuerpo

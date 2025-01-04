@@ -20,12 +20,11 @@ public class Star extends Attack {
     private float accumulatedtimer;
     private static final float STAR_LIFETIME = 2f;
     private float duracion;
-    private boolean flipX;
 
     public Star (World world, ActorWithBox2d actor, boolean sentido) {
         this.world = world;
         this.actor = actor;
-        this.flipX = sentido;
+        this.sentido = sentido;
         load_animation();
         this.accumulatedtimer = 0;
         this.duracion = 0;
@@ -90,7 +89,7 @@ public class Star extends Attack {
         duracion += delta;
         TextureRegion frame = (TextureRegion) kirbyanimationStar.getKeyFrame(duracion, true);
         kirbyStarsprite.setRegion(frame);
-        kirbyStarsprite.flip(flipX,false);
+        kirbyStarsprite.flip(sentido,false);
         this.accumulatedtimer += delta;
 
         //este metodo esta al peloooo pelucha

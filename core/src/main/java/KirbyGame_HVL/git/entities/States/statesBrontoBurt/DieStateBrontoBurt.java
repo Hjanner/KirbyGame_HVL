@@ -15,12 +15,12 @@ public class DieStateBrontoBurt extends StateBrontoBurt {
         acummulatedtimer = 0;
 
         // Impulso mas vertical que el Waddle Dee ya que es un enemigo volador
-        if (brontoBurt.getflipX()) {
-            brontoBurt.getBody().applyLinearImpulse(-30, 70,
+        if (brontoBurt.getFlipX()) {
+            brontoBurt.getBody().applyLinearImpulse(-90, 50,
                 brontoBurt.getBody().getPosition().x,
                 brontoBurt.getBody().getPosition().y, true);
         } else {
-            brontoBurt.getBody().applyLinearImpulse(30, 70,
+            brontoBurt.getBody().applyLinearImpulse(90, 50,
                 brontoBurt.getBody().getPosition().x,
                 brontoBurt.getBody().getPosition().y, true);
         }
@@ -36,12 +36,12 @@ public class DieStateBrontoBurt extends StateBrontoBurt {
         }
 
         // Impulso continuo durante la muerte
-        if (brontoBurt.getflipX()) {
-            brontoBurt.getBody().applyLinearImpulse(-100, 30,
+        if (brontoBurt.getFlipX()) {
+            brontoBurt.getBody().applyLinearImpulse(-150, 30,
                 brontoBurt.getBody().getPosition().x,
                 brontoBurt.getBody().getPosition().y, true);
         } else {
-            brontoBurt.getBody().applyLinearImpulse(100, 30,
+            brontoBurt.getBody().applyLinearImpulse(150, 30,
                 brontoBurt.getBody().getPosition().x,
                 brontoBurt.getBody().getPosition().y, true);
         }

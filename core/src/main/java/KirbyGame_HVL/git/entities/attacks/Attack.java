@@ -14,14 +14,14 @@ public abstract class Attack extends ActorWithBox2d {
     protected boolean sentido;
     protected boolean attackOfkirby = false;
 
-    public Attack (){
-        sentido = false;
-    }
-
     public abstract void createBody(World world, ActorWithBox2d actor, boolean sentido);
 
-    public void sentido(boolean sentido){
+    public void setSentido(boolean sentido){
         this.sentido = sentido;
+    }
+
+    public boolean getSentido() {
+        return sentido;
     }
 
     public boolean getAttackOfKirby(){
