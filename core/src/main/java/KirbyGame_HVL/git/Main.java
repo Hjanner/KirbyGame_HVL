@@ -1,10 +1,10 @@
 package KirbyGame_HVL.git;
 
 import KirbyGame_HVL.git.screens.gameplay.GameScreen;
+import KirbyGame_HVL.git.screens.mainmenu.AboutScreen;
+import KirbyGame_HVL.git.screens.mainmenu.HelpScreen;
 import KirbyGame_HVL.git.screens.mainmenu.PantallaGui;
-import KirbyGame_HVL.git.systems.MinigameManager;
-import KirbyGame_HVL.git.systems.rendering.miniGames.culebrita.GamePanelCulebrita;
-import KirbyGame_HVL.git.systems.rendering.miniGames.viejita.GamePanelViejita;
+import KirbyGame_HVL.git.screens.minigames.culebrita.GamePanelCulebrita;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,13 +16,17 @@ public class Main extends Game {
     public SpriteBatch batch;
     public PantallaGui pantallaini;
     public GameScreen gameScreen;
+    public HelpScreen helpScreen;
+    public AboutScreen aboutScreen;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         assetManager = new AssetManager();
-        gameScreen = new GameScreen(this, 100, 1030, 0, 1);
+        gameScreen = new GameScreen(this, 2600, 1350, 0, 1);
         pantallaini = new PantallaGui(this);
+        helpScreen = new HelpScreen(this);
+        aboutScreen = new AboutScreen(this);
 
         // Cargar texturas usando assetManager en lugar de manager
         assetManager.load("assets/art/sprites/kirbystay.png", Texture.class);

@@ -618,6 +618,7 @@ public class Kirby extends ActorWithBox2d implements Box2dPlayer {
         kirbysprite.setRegion(frame);
         kirbysprite.flip(flipX,false);
 
+
     }
 
     private void shootFire() {

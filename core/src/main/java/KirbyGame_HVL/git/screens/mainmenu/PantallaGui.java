@@ -24,7 +24,7 @@ public class PantallaGui extends Pantalla {
     private Stage stage;
     private Skin skin;
     private Table tabla, tabla2;
-    private TextButton jugar, ayuda, acerca_De, salir, singleplayer, multijugador;
+    private TextButton jugar, ayuda, acerca_De, salir, singleplayer, multijugador, backButton;
     private SpriteBatch batch;
 
     /*Constructor en donde preparamos nuestro batch para utilizarlo
@@ -47,18 +47,19 @@ public class PantallaGui extends Pantalla {
         tabla2.setFillParent(true);
 
         jugar = new TextButton("Jugar", skin);
-        ayuda = new TextButton("Ayuda de juego", skin);
-        acerca_De = new TextButton("Acerca de", skin);
+        ayuda = new TextButton("Ayuda", skin);
+        acerca_De = new TextButton("Acerca De", skin);
         salir = new TextButton("Salir",skin);
         singleplayer = new TextButton("Singleplayer", skin);
         multijugador = new TextButton("Multijugador", skin);
+        backButton = new TextButton("Volver", skin);
 
         tabla.add(jugar).width(400).height(80).space(25).row();
         tabla.add(ayuda).width(400).height(80).space(25).row();
         tabla.add(acerca_De).width(400).height(80).space(25).row();
         tabla.add(salir).width(400).height(80).space(25).row();
-        tabla2.add(singleplayer).width (400).height(200).space(25).row();
-        tabla2.add(multijugador).width (400).height(200).space(25).row();
+        tabla2.add(singleplayer).width (400).height(100).space(25).row();
+        tabla2.add(multijugador).width (400).height(100).space(25).row();
 
         /*Si se pulsa el boton de jugar mostrara la segunda tabla con una animacion
          * */
@@ -68,7 +69,7 @@ public class PantallaGui extends Pantalla {
                 tabla.addAction(Actions.parallel(Actions.moveBy(0,1000,1.5f), Actions.fadeOut(2)));
                 stage.addActor(tabla2);
                 tabla2.addAction(Actions.sequence(Actions.fadeOut(0.01f), Actions.fadeIn(3)));
-
+                tabla2.add(backButton).width(200).height(80).space(40).row();
             }
         });
 
@@ -85,14 +86,14 @@ public class PantallaGui extends Pantalla {
         acerca_De.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
-                //main.setScreen(main.gameCulebrita);
+                main.setScreen(main.aboutScreen);
             }
         });
 
         ayuda.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
-                //main.setScreen(main.gameViejita);
+                main.setScreen(main.helpScreen);
             }
         });
 
@@ -105,6 +106,13 @@ public class PantallaGui extends Pantalla {
 
         stage.addActor(tabla);
         Gdx.input.setInputProcessor(stage);
+
+        backButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                main.setScreen(main.pantallaini);
+            }
+        });
     }
 
     /*Actualiza el escenario

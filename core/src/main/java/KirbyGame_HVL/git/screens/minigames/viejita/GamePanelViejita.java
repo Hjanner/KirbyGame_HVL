@@ -1,4 +1,4 @@
-package KirbyGame_HVL.git.systems.rendering.miniGames.viejita;
+package KirbyGame_HVL.git.screens.minigames.viejita;
 
 import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.screens.gameplay.GameScreen;
@@ -34,8 +34,8 @@ public class GamePanelViejita extends MinigameWindow implements Screen {
     private float boardX;
     private float boardY;
 
-    private final Color LIGHT_PINK = new Color(1, 0.8f, 0.9f, 1); // Rosa claro
-    private final Color DARK_PINK = new Color(0.8f, 0.4f, 0.6f, 1); // Rosa oscuro
+    private static final Color LIGHT_PINK = new Color(1, 0.8f, 0.9f, 1); // Rosa claro
+    private static final Color DARK_PINK = new Color(0.8f, 0.4f, 0.6f, 1); // Rosa oscuro
 
     private Cell[][] board;
     private boolean isPlayerTurn;

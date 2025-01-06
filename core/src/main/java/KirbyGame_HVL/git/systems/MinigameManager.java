@@ -1,9 +1,6 @@
 package KirbyGame_HVL.git.systems;
 
 import KirbyGame_HVL.git.entities.player.Kirby;
-import KirbyGame_HVL.git.systems.rendering.miniGames.culebrita.GamePanelCulebrita;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MinigameManager {
 

@@ -6,22 +6,18 @@ import KirbyGame_HVL.git.entities.States.StatesKirby.AbsorbStateKirby;
 import KirbyGame_HVL.git.entities.States.StatesKirby.DashStateKirby;
 import KirbyGame_HVL.git.entities.States.StatesKirby.EnumStates;
 import KirbyGame_HVL.git.entities.attacks.Attack;
-import KirbyGame_HVL.git.entities.attacks.CloudKirby;
 import KirbyGame_HVL.git.entities.attacks.Fire;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
 import KirbyGame_HVL.git.entities.enemis.EnemyFactory;
-import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurdFactory;
 import KirbyGame_HVL.git.entities.enemis.hotHead.HotHead;
 import KirbyGame_HVL.git.entities.enemis.hotHead.HotHeadFactory;
-import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDee;
 import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDeeFactory;
 import KirbyGame_HVL.git.entities.items.*;
-import KirbyGame_HVL.git.entities.player.ActorWithBox2d;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
 import KirbyGame_HVL.git.systems.MinigameManager;
-import KirbyGame_HVL.git.systems.rendering.miniGames.culebrita.GamePanelCulebrita;
-import KirbyGame_HVL.git.systems.rendering.miniGames.viejita.GamePanelViejita;
+import KirbyGame_HVL.git.screens.minigames.culebrita.GamePanelCulebrita;
+import KirbyGame_HVL.git.screens.minigames.laberinto.GamePanelLaberinto;
 import KirbyGame_HVL.git.utils.helpers.TiledMapHelper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -45,6 +41,10 @@ import java.util.Map;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.Texture;
 
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+
+
 public class GameScreen extends Pantalla implements ContactListener, Screen {
 
     private Stage stage;
@@ -65,7 +65,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private TextureRegion keyIconRegion;
     private Sprite keyIconSprite;
     private int keysCollected = 0;
-    private final int TOTAL_KEYS = 3;
+    private final int TOTAL_KEYS = 5;
     private BitmapFont font;
     private Door door;
     private boolean levelCompleted = false;
@@ -139,21 +139,21 @@ private ArrayList<Attack> attacks;
     }
 
     public void miniGame() {
-        if (nivel == 2){
-            minigameManager = new MinigameManager(kirby);                                                                   //toma los datos del kirby
-            GamePanelCulebrita minigame = new GamePanelCulebrita(main, minigameManager);
-            main.setScreen(minigame);
+        minigameManager = new MinigameManager(kirby);                                                                   //toma los datos del kirby
 
-        }else if (nivel == 1){
-            //miniGame() = null;
-            minigameManager = new MinigameManager(kirby);                                                                   //toma los datos del kirby
-            GamePanelViejita minigame = new GamePanelViejita(main, minigameManager);
-            main.setScreen(minigame);
+        if (nivel == 1){
+            GamePanelCulebrita minigame1 = new GamePanelCulebrita(main, minigameManager);
+            main.setScreen(minigame1);
+        }else if (nivel == 2){
+            //GamePanelViejita minigame2 = new GamePanelViejita(main, minigameManager);
+            GamePanelLaberinto minigame2 = new GamePanelLaberinto(main, minigameManager);
+            main.setScreen(minigame2);
         }
     }
 
     @Override
     public void show() {
+        super.show();
         world = new World (new Vector2(0, 0), true);
         world.setContactListener(this);                                 // listener de contactos
 
@@ -214,6 +214,10 @@ private ArrayList<Attack> attacks;
 
         renderKeyContador();
         renderScore();
+
+        //IU
+        uiStage.act(delta);
+        uiStage.draw();
     }
 
     private void renderKeyContador() {
@@ -239,6 +243,8 @@ private ArrayList<Attack> attacks;
             baseY + 9);
 
         batch.end();
+
+        System.out.println(nivel);
     }
 
     private void renderScore() {
@@ -330,7 +336,7 @@ private ArrayList<Attack> attacks;
 
 //objetos mapa
     private void createDoor() {
-        door = new Door(world, main, 100, 1050);
+        door = new Door(world, main, 2500, 1350);
         stage.addActor(door);
     }
 
@@ -372,13 +378,17 @@ private ArrayList<Attack> attacks;
     }
 
     private void createKeys(){
-        Key key1 = new Key(world, main, 80, 1010);
-        Key key2 = new Key(world, main, 110, 1010);
-        Key key3 = new Key(world, main, 200, 1010);
+        Key key1 = new Key(world, main, 105, 2120);
+        Key key2 = new Key(world, main, 110, 1080);
+        Key key3 = new Key(world, main, 370, 460);
+        Key key4 = new Key(world, main, 3750, 1440);
+        Key key5 = new Key(world, main, 3740, 2070);
 
         keys.add(key1);
         keys.add(key2);
         keys.add(key3);
+        keys.add(key4);
+        keys.add(key5);
 
         // Añade las llaves al stage
         for (Key key : keys) {
@@ -500,13 +510,12 @@ private ArrayList<Attack> attacks;
             (userDataB instanceof Kirby && userDataA instanceof Door)) {
 
             Door door = (Door) (userDataA instanceof Door ? userDataA : userDataB);
-            if (keysCollected >= TOTAL_KEYS && !levelCompleted) {
+            if (keysCollected >= 0 ) {
                 levelCompleted = true;
                 kirby.addPointsPerItems(EnumItemType.DOOR);
                 miniGame();
             }
         }
-
 
 //ENEMIES
         //colision kirby-enemies y dash
@@ -612,6 +621,12 @@ private ArrayList<Attack> attacks;
 
     public void setScoreInGame(int helperScore){
         kirby.setCurrentScore(helperScore);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        stage.getViewport().update(width, height, true);
     }
 
     @Override
