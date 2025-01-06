@@ -6,6 +6,7 @@ import KirbyGame_HVL.git.entities.States.StatesKirby.AbsorbStateKirby;
 import KirbyGame_HVL.git.entities.States.StatesKirby.DashStateKirby;
 import KirbyGame_HVL.git.entities.States.StatesKirby.EnumStates;
 import KirbyGame_HVL.git.entities.attacks.Attack;
+import KirbyGame_HVL.git.entities.attacks.Beam;
 import KirbyGame_HVL.git.entities.attacks.CloudKirby;
 import KirbyGame_HVL.git.entities.attacks.Fire;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
@@ -15,13 +16,12 @@ import KirbyGame_HVL.git.entities.enemis.hotHead.HotHead;
 import KirbyGame_HVL.git.entities.enemis.hotHead.HotHeadFactory;
 import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDee;
 import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDeeFactory;
+import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDoo;
+import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDooFactory;
 import KirbyGame_HVL.git.entities.items.*;
 import KirbyGame_HVL.git.entities.player.ActorWithBox2d;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
-import KirbyGame_HVL.git.systems.MinigameManager;
-import KirbyGame_HVL.git.systems.rendering.miniGames.culebrita.GamePanelCulebrita;
-import KirbyGame_HVL.git.systems.rendering.miniGames.viejita.GamePanelViejita;
 import KirbyGame_HVL.git.utils.helpers.TiledMapHelper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -44,6 +44,7 @@ import java.util.Map;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.Texture;
+
 
 public class GameScreen extends Pantalla implements ContactListener, Screen {
 
@@ -75,15 +76,17 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private Array<Enemy> enemiesToRemove;
     private Map<Integer, EnemyFactory> zonaFactories;           // Define que factory usar en cada zona
     private int[][][] enemyZonaCoordenadas = {
-        {{140, 1030}, {550, 1030}, {600, 1010}},                         // zona 1 - WaddleDees
-        {{1550, 1020}, {850, 1020}, {900, 1020}},                        // z 2 - BrontoBurts
-        {{1475, 1100}, {600, 1150}, {750, 1050}},                        // z 3 - BrontoBurts
-        {{1445, 1040}, {1250, 1040}, {1300, 1040}},                      // z 4 - WaddleDees
-        {{180, 1010}, {1400, 1010}, {1500, 1010}}                        //g 5 - HotHeads
+        {{700, 1010}, {850, 1010}, {600, 1010}},           // zona 1 - WaddleDees
+        {{700, 1020}, {850, 1020}, {900, 1020}},                        // z 2 - BrontoBurts
+        {{500, 1100}, {600, 1150}, {750, 1050}},                        // z 3 - BrontoBurts
+        {{1200, 1040}, {1250, 1040}, {1300, 1040}},                      // z 4 - WaddleDees
+        {{500, 1010}, {1400, 1010}, {1500, 1010}},                         //g 5 - HotHeads
+        {{250, 1010}, {550, 1010}, {600, 1010}}                          // z 6 - WaddleDoo
     };
 
     //ataques
     private Array<Fire> firesToRemove;
+
 
 //nubes
 private ArrayList<Attack> attacks;
@@ -99,29 +102,21 @@ private ArrayList<Attack> attacks;
 
     //helpers
     private boolean puedoResetKirby = false;
-    private MinigameManager minigameManager;
-    private float initialX;
-    private float initialY;
-    private int nivel;
-    private int helperScore = 0;
 
-    public GameScreen(Main main, float initialX, float initialY, int helperScore, int nivel) {
+    public GameScreen(Main main) {
         super(main);
-        this.initialX = initialX ;
-        this.initialY = initialY ;
-        this.nivel = nivel;
         this.main = main;
-        this.helperScore = helperScore;
         stage = new Stage ();
 
         enemiesList = new ArrayList<>();
         enemiesToRemove = new Array<>();
         zonaFactories = new HashMap<>();
         zonaFactories.put(0, new WaddleDeeFactory());                   //se define el factory a usar por grupo
-        zonaFactories.put(1, new WaddleDeeFactory());
-        zonaFactories.put(2, new WaddleDeeFactory());
+        zonaFactories.put(1, new BrontoBurdFactory());
+        zonaFactories.put(2, new BrontoBurdFactory());
         zonaFactories.put(3, new WaddleDeeFactory());
         zonaFactories.put(4, new HotHeadFactory());
+        zonaFactories.put(5, new WaddleDooFactory());
         for (int i = 0; i < enemyZonaCoordenadas.length; i++) {         //se crean ls grupos
             enemiesList.add(new ArrayList<>());
         }
@@ -138,31 +133,15 @@ private ArrayList<Attack> attacks;
         font.setColor(Color.WHITE);
     }
 
-    public void miniGame() {
-        if (nivel == 2){
-            minigameManager = new MinigameManager(kirby);                                                                   //toma los datos del kirby
-            GamePanelCulebrita minigame = new GamePanelCulebrita(main, minigameManager);
-            main.setScreen(minigame);
-
-        }else if (nivel == 1){
-            //miniGame() = null;
-            minigameManager = new MinigameManager(kirby);                                                                   //toma los datos del kirby
-            GamePanelViejita minigame = new GamePanelViejita(main, minigameManager);
-            main.setScreen(minigame);
-        }
-    }
-
     @Override
     public void show() {
         world = new World (new Vector2(0, 0), true);
         world.setContactListener(this);                                 // listener de contactos
 
-        kirby = new Kirby(world, main, initialX, initialY);
-        setScoreInGame(helperScore);
-
+        kirby = new Kirby(world, main);
         stage.addActor(kirby);
         cam = (OrthographicCamera) stage.getCamera();
-        cam.zoom = 0.30f;
+        cam.zoom = 0.34f;
 
         //UI
         //loadAssetsKey();
@@ -255,6 +234,8 @@ private ArrayList<Attack> attacks;
         batch.end();
     }
 
+
+
     public void update () {
         cam.position.set(kirby.getBody().getPosition(),0);
         cam.update();
@@ -281,23 +262,12 @@ private ArrayList<Attack> attacks;
         for (int[] coordenada : coordenadas) {
             Enemy enemy = factory.createEnemy(world, main, coordenada[0], coordenada[1]);
 
-            if (enemy instanceof HotHead){
+            if (enemy instanceof HotHead || enemy instanceof WaddleDoo){
                 enemy.setKirby(kirby);
             }
 
             stage.addActor(enemy);
             zonaEnemies.add(enemy);
-        }
-    }
-
-    private void loadEnemies() {
-
-        // si se eliminan todos los enemies de una zona o grupo se realiza un respawn
-        for (int zona = 0; zona < enemyZonaCoordenadas.length; zona++) {
-            ArrayList<Enemy> zoneEnemies = enemiesList.get(zona);
-            if (zoneEnemies.isEmpty()) {
-                createEnemiesZona(zona);
-            }
         }
     }
 
@@ -316,21 +286,26 @@ private ArrayList<Attack> attacks;
         if (kirby.getcurrentState() instanceof DashStateKirby) {
             //eliminacion de enemy por dash
             if (!enemiesToRemove.contains(enemy, true)) {
-                enemy.setflipX(kirby.getFlipX());
+                enemy.setFlipX(kirby.getFlipX());
                 enemy.setState(EnumStateEnemy.DIE);
                 kirby.addPointsPerEnemy(enemy);                 //agrega puntos por eliminacion de enemy
                 enemiesToRemove.add(enemy);
             }
         } else {
             //kirby recibe daño
+            if (kirby.getPoder()) {
+                kirby.setcurrentEnemy(null);
+            }
+            kirby.setDamageFire(false);
             kirby.setState(EnumStates.DAMAGE);
             kirby.setAnimation(EnumStates.DAMAGE);
+            kirby.subPointsPerItem(EnumItemType.ENEMY);
         }
     }
 
 //objetos mapa
     private void createDoor() {
-        door = new Door(world, main, 100, 1050);
+        door = new Door(world, main, 100, 1050, true);
         stage.addActor(door);
     }
 
@@ -365,7 +340,7 @@ private ArrayList<Attack> attacks;
 //ITEMS
     //keys
     private void loadAssetsKey(){
-        keyIconTexture = main.getManager().get("assets/art/spritesKey/Key.png");
+        keyIconTexture = main.getManager().get("assets/art/sprites/spritesItems/Key.png");
         keyIconRegion = new TextureRegion(keyIconTexture, 32,32);
         keyIconSprite = new Sprite(keyIconRegion);
         keyIconSprite.setSize(16, 16);
@@ -432,12 +407,19 @@ private ArrayList<Attack> attacks;
     }
 
     private void manejadorAttackEnemyCollision(Attack attack, Enemy enemy) {
-        if (!attacksToRemove.contains(attack, true)) {                                       // en lo que haga contacto desaparece
-            attacksToRemove.add(attack);
+        if (!attacksToRemove.contains(attack, true)) {                                       // en lo que haga contacto desaparece menos el Beam
+            if (!(attack instanceof Beam)) {
+                attacksToRemove.add(attack);
+            }
         }
 
         if (!enemiesToRemove.contains(enemy, true)) {
-            enemy.setflipX(!attack.getSentido());
+            if (attack instanceof Fire || attack instanceof Beam) {
+                enemy.setFlipX(attack.getSentido());
+            }
+            else {
+                enemy.setFlipX(!attack.getSentido());
+            }
             enemy.setState(EnumStateEnemy.DIE);
             kirby.addPointsPerEnemy(enemy);                 //agrega puntos por eliminacion de enemy
             enemiesToRemove.add(enemy);
@@ -451,12 +433,25 @@ private ArrayList<Attack> attacks;
         }
 
         //animaciones de muerte del kirby y debe ir logica de puntos
+        if (attack instanceof Fire) {
+            kirby.setDamageFire(true);
+        }
+
+        else{
+            kirby.setDamageFire(false);
+        }
+        if (kirby.getPoder()){
+            kirby.setcurrentEnemy(null);
+        }
+        kirby.setFlipx(!attack.getSentido());
         kirby.setState(EnumStates.DAMAGE);
         kirby.setAnimation(EnumStates.DAMAGE);
-        kirby.subPointsPerItem(EnumItemType.ENEMY);               //resta punto por ser atacado por un enemigo
+        kirby.subPointsPerItem(EnumItemType.ATTACK);               //resta punto por ser atacado por un enemigo
 
         if (!attacksToRemove.contains(attack, true)) {                                  // en lo que haga contacto desaparece
-            attacksToRemove.add(attack);
+            if (!(attack instanceof Beam)) {
+                attacksToRemove.add(attack);
+            }
         }
     }
 
@@ -516,17 +511,13 @@ private ArrayList<Attack> attacks;
             Kirby kirby = (Kirby) (userDataA instanceof Kirby ? userDataA : userDataB);
             Enemy enemy = (Enemy) (userDataA instanceof Enemy ? userDataA : userDataB);
 
-            if (kirby.getcurrentState() instanceof DashStateKirby) {
-                manejadorEnemyColition(kirby, enemy);
-            }
-            else if (kirby.getcurrentState() instanceof AbsorbStateKirby) {
+            if (kirby.getcurrentState() instanceof AbsorbStateKirby) {
                 manejadorEnemyKirbyAbsorbCollition(kirby, enemy);
 
             }
             else {
-                kirby.setState(EnumStates.DAMAGE);
-                kirby.setAnimation(EnumStates.DAMAGE);
-                kirby.subPointsPerItem(EnumItemType.ENEMY);
+                // debe llamar tambien a manejadorEnemyColition aqui para la logica de los puntos perdidos
+                manejadorEnemyColition(kirby, enemy);
             }
         }
 
@@ -567,6 +558,7 @@ private ArrayList<Attack> attacks;
 
 
         if (setContact(contact, this.kirby, "spikes")) {
+            kirby.setDamageFire(false);
             kirby.setState(EnumStates.DAMAGE);
             kirby.setAnimation(EnumStates.DAMAGE);
             kirby.subPointsPerItem(EnumItemType.SPIKES);
@@ -584,9 +576,22 @@ private ArrayList<Attack> attacks;
 
     @Override
     public void endContact(Contact contact) {
+        Fixture fixtureA = contact.getFixtureA();
+        Fixture fixtureB = contact.getFixtureB();
+
+        Object userDataA = fixtureA.getUserData();
+        Object userDataB = fixtureB.getUserData();
+
         if (setContact(contact, this.kirby, "suelo")
             || setContact(contact, this.kirby, "Plataforma")) {
             kirby.setColisionSuelo(false);
+        }
+
+        if ((userDataA instanceof SensorKirby && userDataB instanceof Enemy) ||
+            (userDataB instanceof SensorKirby && userDataA instanceof Enemy)) {
+
+            Enemy enemy = (Enemy) (userDataA instanceof Enemy ? userDataA : userDataB);
+            enemy.setState(EnumStateEnemy.WALK);
         }
     }
 
@@ -600,18 +605,14 @@ private ArrayList<Attack> attacks;
 
     }
 
-//    public void miniGame(){
-//        //dispose();
-//        //aqui puede ir un mensaje
-//        main.setScreen(main.gameCulebrita);
-//    }
+    public void miniGame(){
+        //dispose();
+        //aqui puede ir un mensaje
+        main.setScreen(main.gameCulebrita);
+    }
 
     public Kirby getKirby() {
         return kirby;
-    }
-
-    public void setScoreInGame(int helperScore){
-        kirby.setCurrentScore(helperScore);
     }
 
     @Override

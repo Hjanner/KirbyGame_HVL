@@ -1,83 +1,132 @@
 package KirbyGame_HVL.git;
 
-import KirbyGame_HVL.git.screens.gameplay.GameScreen;
-import KirbyGame_HVL.git.screens.mainmenu.PantallaGui;
-import KirbyGame_HVL.git.systems.MinigameManager;
 import KirbyGame_HVL.git.systems.rendering.miniGames.culebrita.GamePanelCulebrita;
 import KirbyGame_HVL.git.systems.rendering.miniGames.viejita.GamePanelViejita;
+import KirbyGame_HVL.git.screens.gameplay.GameScreen;
+import KirbyGame_HVL.git.screens.mainmenu.PantallaGui;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
 
-    private AssetManager assetManager;
+    private AssetManager manager;
     public SpriteBatch batch;
     public PantallaGui pantallaini;
     public GameScreen gameScreen;
+    public GamePanelCulebrita gameCulebrita;
+    public GamePanelViejita gameViejita;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
-        assetManager = new AssetManager();
-        gameScreen = new GameScreen(this, 100, 1030, 0, 1);
+        manager = new AssetManager();
+        gameScreen = new GameScreen(this);
         pantallaini = new PantallaGui(this);
+        gameCulebrita = new GamePanelCulebrita(this);
+        gameViejita = new GamePanelViejita();
+        manager = new AssetManager();
 
-        // Cargar texturas usando assetManager en lugar de manager
-        assetManager.load("assets/art/sprites/kirbystay.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbywalking.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbydown.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyslide.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyrun.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyjump.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyfall.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyfall2.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyfly.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyflybegin.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyflyfall.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyflyfallend.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyDamage.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyAbsorb.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyAbsorbStay.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyAbsorbWalk.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyAbsorbJump.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyAbsorbFall.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyAbsorbFall2.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyAbsorbDown.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyAbsorbDamage.png", Texture.class);
-        assetManager.load("assets/art/sprites/kirbyAbsorbSpit.png", Texture.class);
+        // Texturas del Kirby Normal
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbystay.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbywalking.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbydown.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbydash.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyrun.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyjump.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyfall.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyfall2.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyfly.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyflybegin.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyflyfall.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyflyfallend.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyDamage.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyAbsorb.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyAbsorbStay.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyAbsorbWalk.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyAbsorbJump.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyAbsorbFall.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyAbsorbFall2.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyAbsorbDown.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyAbsorbDamage.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/kirbyAbsorbSpit.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/KirbyDamageFire.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesNormalKirby/KirbyAbsorbDamageFire.png", Texture.class);
+
+        // Texturas del Fire Kirby
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyStay.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyDown.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyWalk.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyRun.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyDash.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyJump.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyFall.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyFall2.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyFlyBegin.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyFly.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyFlyFall.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyFlyFallEnd.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesFireKirby/FireKirbyAttack.png", Texture.class);
+
+        // Beam Kirby
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyStay.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyDown.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyWalk.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyDash.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyRun.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyJump.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyFall.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyFall2.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyFlyBegin.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyFly.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyFlyFall.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyFlyFallEnd.png", Texture.class);
+        manager.load("assets/art/sprites/SpritesBeamKirby/BeamKirbyAttack.png", Texture.class);
 
         // Texturas del WaddleDee
-        assetManager.load("assets/art/spritesWaddleDee/WaddleDeeWalk.png", Texture.class);
-        assetManager.load("assets/art/spritesWaddleDee/WaddleDeeDie.png", Texture.class);
+        manager.load("assets/art/sprites/spritesWaddleDee/WaddleDeeWalk.png", Texture.class);
+        manager.load("assets/art/sprites/spritesWaddleDee/WaddleDeeDie.png", Texture.class);
 
         // Texturas del BrontoBurt
-        assetManager.load("assets/art/spritesBrontoBurt/BrontoBurtFly.png", Texture.class);
-        assetManager.load("assets/art/spritesBrontoBurt/BrontoBurtDie.png", Texture.class);
+        manager.load("assets/art/sprites/spritesBrontoBurt/BrontoBurtFly.png", Texture.class);
+        manager.load("assets/art/sprites/spritesBrontoBurt/BrontoBurtDie.png", Texture.class);
 
         // Texturas del HotHead
-        assetManager.load("assets/art/spritesHotHead/HotHeadWalk.png", Texture.class);
-        assetManager.load("assets/art/spritesHotHead/HotHeadDie.png", Texture.class);
-        assetManager.load("assets/art/spritesHotHead/HotHeadDie2.png", Texture.class);
-        assetManager.load("assets/art/spritesHotHead/HotHeadAttack.png", Texture.class);
+        manager.load("assets/art/sprites/spritesHotHead/HotHeadWalk.png", Texture.class);
+        manager.load("assets/art/sprites/spritesHotHead/HotHeadDie.png", Texture.class);
+        manager.load("assets/art/sprites/spritesHotHead/HotHeadDie2.png", Texture.class);
+        manager.load("assets/art/sprites/spritesHotHead/HotHeadAttack.png", Texture.class);
+
+        // Texturas del WaddleDoo
+        manager.load("assets/art/sprites/spritesWaddleDoo/WaddleDooWalk.png", Texture.class);
+        manager.load("assets/art/sprites/spritesWaddleDoo/WaddleDooDie.png", Texture.class);
+        manager.load("assets/art/sprites/spritesWaddleDoo/WaddleDooAttack.png", Texture.class);
+
 
         // Texturas de la plataforma movil
-        assetManager.load("assets/art/tilesets/Platform.png", Texture.class);
+        manager.load("assets/art/tilesets/Platform.png", Texture.class);
 
-        assetManager.finishLoading();
         // Texturas de la llave
-        assetManager.load("assets/art/spritesKey/Key.png", Texture.class);
+        manager.load("assets/art/sprites/spritesItems/Key.png", Texture.class);
 
-        assetManager.finishLoading();
+        // Texturas de las puertas de minijuegos
+        manager.load("assets/art/sprites/spritesItems/Door1.png", Texture.class);
+        manager.load("assets/art/sprites/spritesItems/Door2.png", Texture.class);
+
+        manager.finishLoading();
         setScreen(pantallaini);
+
     }
 
-    public SpriteBatch getBatch() {
+    public SpriteBatch getBatch () {
         return batch;
     }
 
-    public AssetManager getManager() {
-        return assetManager;
+    public AssetManager getManager () {
+        return manager;
     }
+
 }
+

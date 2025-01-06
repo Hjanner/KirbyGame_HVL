@@ -41,14 +41,6 @@ public abstract class Enemy extends ActorWithBox2d {
         this.body = body;
     }
 
-    public boolean getFlipX() {
-        return flipX;
-    }
-
-    public void setflipX(boolean flipX) {
-        this.flipX = flipX;
-    }
-
     public Enemy(EnumEnemyType type) {
         this.type = type;
     }

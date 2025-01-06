@@ -16,13 +16,9 @@ public class Fire extends Attack {
     private TextureRegion fireRegion;
     private TextureRegion[] fireFrames;
     private Sprite fireSprite;
-    private ActorWithBox2d actor;
-    private float accumulatedTimer;
     private static final float FIRE_LIFETIME = 1.2f;
     private float fireSpeed = 60f;
     private Animation fireanimation;
-
-    private float duracion;
 
     public Fire(World world, ActorWithBox2d actor, boolean sentido) {
         this.world = world;
@@ -30,7 +26,7 @@ public class Fire extends Attack {
         this.sentido = !sentido;
         this.duracion = 0;
         load_textures();
-        this.accumulatedTimer = 0;
+        this.accumulatedtimer = 0;
         if (actor instanceof Kirby) {this.attackOfkirby = true;}
         createBody(this.world, this.actor, sentido);
     }
@@ -45,11 +41,23 @@ public class Fire extends Attack {
     public void createBody(World world, ActorWithBox2d actor, boolean direction) {
         BodyDef bodyDef = new BodyDef();
         if (direction) {
-            bodyDef.position.set(actor.getBody().getPosition().x + 8f,
-                actor.getBody().getPosition().y + 2);
+            if (actor instanceof Kirby) {
+                bodyDef.position.set(actor.getBody().getPosition().x + 13f,
+                    actor.getBody().getPosition().y + 2);
+            }
+            else {
+                bodyDef.position.set(actor.getBody().getPosition().x + 8f,
+                    actor.getBody().getPosition().y + 2);
+            }
         } else {
-            bodyDef.position.set(actor.getBody().getPosition().x - 8f,
-                actor.getBody().getPosition().y + 2);
+            if (actor instanceof Kirby) {
+                bodyDef.position.set(actor.getBody().getPosition().x - 13f,
+                    actor.getBody().getPosition().y + 2);
+            }
+            else {
+                bodyDef.position.set(actor.getBody().getPosition().x - 8f,
+                    actor.getBody().getPosition().y + 2);
+            }
         }
 
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -74,7 +82,7 @@ public class Fire extends Attack {
     }
 
     private void load_textures () {
-        fireTexture = new Texture("assets/art/spritesHotHead/fireball.png");
+        fireTexture = new Texture("assets/art/sprites/SpritesAttacks/fireball.png");
         fireRegion = new TextureRegion(fireTexture, 128, 32);
         fireSprite = new Sprite(fireRegion);
         TextureRegion[][] tempFire = fireRegion.split(128/4,32);
@@ -97,7 +105,7 @@ public class Fire extends Attack {
     public void act(float delta) {
         super.act(delta);
         updateAnimation(delta);
-        accumulatedTimer += delta;
+        accumulatedtimer += delta;
 
         float currentXVel = body.getLinearVelocity().x;
         float desiredXVel = !sentido ? fireSpeed : -fireSpeed;
@@ -107,7 +115,7 @@ public class Fire extends Attack {
         body.applyLinearImpulse(new Vector2(impulse, 0), body.getWorldCenter(), true);
 
         // autodestruccion automatica del fuego  de cierto tiempo
-        if (accumulatedTimer > FIRE_LIFETIME) {
+        if (accumulatedtimer > FIRE_LIFETIME) {
             if (world != null && body != null) {
                 world.destroyBody(body);
                 body = null;

@@ -84,9 +84,9 @@ public class BrontoBurt extends Enemy {
     }
 
     private void loadTextures() {
-        brontoBurtFlyTexture = main.getManager().get("assets/art/spritesBrontoBurt/BrontoBurtFly.png");
+        brontoBurtFlyTexture = main.getManager().get("assets/art/sprites/spritesBrontoBurt/BrontoBurtFly.png");
         brontoBurtFlyRegion = new TextureRegion(brontoBurtFlyTexture, 96, 32);
-        brontoBurtDieTexture = main.getManager().get("assets/art/spritesBrontoBurt/BrontoBurtDie.png");
+        brontoBurtDieTexture = main.getManager().get("assets/art/sprites/spritesBrontoBurt/BrontoBurtDie.png");
         brontoBurtDieRegion = new TextureRegion(brontoBurtDieTexture, 32, 32);
 
         TextureRegion[][] tempFrames = brontoBurtFlyRegion.split(96/3, 32);
@@ -168,7 +168,7 @@ public class BrontoBurt extends Enemy {
     }
 
     @Override
-    public void setflipX(boolean flipX) {
+    public void setFlipX(boolean flipX) {
         this.flipX = flipX;
     }
 

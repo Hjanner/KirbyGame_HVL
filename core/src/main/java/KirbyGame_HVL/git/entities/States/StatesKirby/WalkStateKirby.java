@@ -1,6 +1,8 @@
 package KirbyGame_HVL.git.entities.States.StatesKirby;
 
 import KirbyGame_HVL.git.entities.attacks.Star;
+import KirbyGame_HVL.git.entities.enemis.hotHead.HotHead;
+import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDoo;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -17,6 +19,8 @@ public class WalkStateKirby extends StateKirby {
 
         acummulatedtimer = 0;
         acummulatedtimer2 = 0;
+        kirby.setFireKeyPressed(true);
+        kirby.setBeamKeyPressed(true);
     }
 
     @Override
@@ -71,10 +75,21 @@ public class WalkStateKirby extends StateKirby {
         if (kirby.getcurrentAnimation() != kirby.getAbsorbWalkAnimation()) {
             acummulatedtimer2 += delta;
             if (acummulatedtimer2 > 0.2f) {
-                if (Gdx.input.isKeyPressed(Input.Keys.Z) && kirby.getCurrentEnemy() == null) {
-                    kirby.setState(EnumStates.ABSORB);
-                    kirby.setDuracion(0);
-                    kirby.setAnimation(EnumStates.ABSORB);
+                if (Gdx.input.isKeyPressed(Input.Keys.Z)) {
+                    if (kirby.getCurrentEnemy() == null) {
+                        kirby.setState(EnumStates.ABSORB);
+                        kirby.setDuracion(0);
+                        kirby.setAnimation(EnumStates.ABSORB);
+                    }
+
+                    else {
+                        if ((kirby.getCurrentEnemy() instanceof HotHead || kirby.getCurrentEnemy() instanceof WaddleDoo) && kirby.getPoder()) {
+                            kirby.setOpuesto(true);
+                            kirby.setState(EnumStates.ATTACK);
+                            kirby.setDuracion(0);
+                            kirby.setAnimation(EnumStates.ATTACK);
+                        }
+                    }
 
                 }
             }
@@ -98,8 +113,6 @@ public class WalkStateKirby extends StateKirby {
                         kirby.setcurrentEnemy(null);
                     }
                     kirby.setState(EnumStates.WALK);
-                } else {
-
                 }
             }
         }

@@ -16,15 +16,13 @@ public class CloudKirby extends Attack {
     private Texture kirbyCloudTexture;
     private TextureRegion kirbyCloudRegion;
     private Sprite kirbycloudsprite;
-    private ActorWithBox2d actor;
-    private float accumulatedtimer;
     private static final float CLOUD_LIFETIME = 0.8f;
 
     public CloudKirby (World world, ActorWithBox2d actor, boolean sentido) {
         this.world = world;
         this.actor = actor;
         this.sentido = sentido;
-        this.kirbyCloudTexture = new Texture("assets/art/sprites/kirbycloud.png");
+        this.kirbyCloudTexture = new Texture("assets/art/sprites/SpritesAttacks/kirbycloud.png");
         this.kirbyCloudRegion = new TextureRegion(kirbyCloudTexture, 32,32);
         this.kirbycloudsprite = new Sprite(kirbyCloudRegion);
         this.kirbycloudsprite.setSize(25,25);

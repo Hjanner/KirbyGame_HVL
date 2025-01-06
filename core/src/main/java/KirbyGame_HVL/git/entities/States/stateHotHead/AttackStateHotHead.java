@@ -28,7 +28,10 @@ public class AttackStateHotHead extends StateHotHead {
             hotHead.setDuration(0);
             hotHead.setAnimation(EnumStateEnemy.WALK);
         }
+
+        hotHead.getBody().applyLinearImpulse(0,-40f, hotHead.getBody().getPosition().x, hotHead.getBody().getPosition().y, true);
     }
+
 
     @Override
     public void end() {

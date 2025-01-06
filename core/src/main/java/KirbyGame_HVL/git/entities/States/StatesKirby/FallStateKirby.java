@@ -1,6 +1,8 @@
 package KirbyGame_HVL.git.entities.States.StatesKirby;
 
 import KirbyGame_HVL.git.entities.attacks.Star;
+import KirbyGame_HVL.git.entities.enemis.hotHead.HotHead;
+import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDoo;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -8,6 +10,7 @@ import com.badlogic.gdx.Input;
 public class FallStateKirby extends StateKirby {
 
     private float accumulatedtimer;
+    private float accumulatedtimer2;
 
     public FallStateKirby(Kirby kirby) {
         super(kirby);
@@ -17,6 +20,10 @@ public class FallStateKirby extends StateKirby {
     public void start() {
 
         accumulatedtimer = 0;
+        accumulatedtimer2 = 0;
+        kirby.setFireKeyPressed(true);
+        kirby.setBeamKeyPressed(true);
+        kirby.setDamageFire(false);
     }
 
     @Override
@@ -38,7 +45,7 @@ public class FallStateKirby extends StateKirby {
 
 
         if (Gdx.input.isKeyPressed(Input.Keys.C) && !Gdx.input.isKeyPressed(Input.Keys.Z)) {
-            if (kirby.getCurrentEnemy() == null) {
+            if (kirby.getCurrentEnemy() == null || kirby.getPoder()) {
                 kirby.setState(EnumStates.FLY);
                 kirby.setDuracion(0);
                 kirby.setAnimation(EnumStates.FLY);
@@ -47,6 +54,7 @@ public class FallStateKirby extends StateKirby {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.Z) && kirby.getCurrentEnemy() != null) {
+            accumulatedtimer2 += delta;
             if (!kirby.getPoder()) {
                 kirby.setDuracion(0);
                 kirby.setAnimation(EnumStates.ATTACK);
@@ -64,6 +72,14 @@ public class FallStateKirby extends StateKirby {
                 kirby.setRealizar(true);
                 kirby.setState(EnumStates.FALL);
             } else {
+                if ((kirby.getCurrentEnemy() instanceof HotHead || kirby.getCurrentEnemy() instanceof WaddleDoo) && kirby.getPoder()) {
+                    if (accumulatedtimer2 > 0.16f) {
+                        kirby.setOpuesto(false);
+                        kirby.setState(EnumStates.ATTACK);
+                        kirby.setDuracion(0);
+                        kirby.setAnimation(EnumStates.ATTACK);
+                    }
+                }
 
             }
         }

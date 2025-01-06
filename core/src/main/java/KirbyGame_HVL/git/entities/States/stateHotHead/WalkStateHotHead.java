@@ -40,13 +40,13 @@ public class WalkStateHotHead extends StateHotHead {
 
         if (movementTime > cambioDireccion) {                   //cambio de direccion
             movementTime = 0;
-            hotHead.setflipX(true);
+            hotHead.setFlipX(true);
             movementSpeed = -movementSpeed;
             cambioDireccion = MathUtils.random(1.5f, 5.0f);
         }
 
         if (movementSpeed > 0) {
-            hotHead.setflipX(false);
+            hotHead.setFlipX(false);
         }
 
         //manejo de deteccion de kirby cerca
@@ -61,7 +61,7 @@ public class WalkStateHotHead extends StateHotHead {
                 // se mueve hacia el kirby
                 float direction = kirbyPos.x > hotHeadPos.x ? 1 : -1;
                 movementSpeed = agresiveSpeed * direction;
-                hotHead.setflipX(direction < 0);
+                hotHead.setFlipX(direction < 0);
             }
         }
 
@@ -80,7 +80,7 @@ public class WalkStateHotHead extends StateHotHead {
         }
 
         hotHead.getBody().setLinearVelocity(movementSpeed, 0);
-        hotHead.getBody().applyLinearImpulse(0,-9.8f, hotHead.getBody().getPosition().x, hotHead.getBody().getPosition().y, true);
+        hotHead.getBody().applyLinearImpulse(0,-40, hotHead.getBody().getPosition().x, hotHead.getBody().getPosition().y, true);
 
     }
 

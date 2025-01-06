@@ -26,12 +26,12 @@ public class WalkStateWaddleDee extends StateWaddleDee {
         // cambiar de direccion
         if (movementTime > cambioDireccionIntervalo) {
             movementTime = 0;
-            waddleDee.setflipX(true);
+            waddleDee.setFlipX(true);
             movementSpeed = -movementSpeed;
         }
 
         if (movementSpeed > 0) {
-            waddleDee.setflipX(false);
+            waddleDee.setFlipX(false);
         }
 
         waddleDee.getBody().setLinearVelocity(movementSpeed, waddleDee.getBody().getLinearVelocity().y);                                              // aplica movimiento
