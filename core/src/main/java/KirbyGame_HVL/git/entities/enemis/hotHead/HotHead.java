@@ -100,7 +100,7 @@ public class HotHead extends Enemy {
         fixtureDef.shape = shape;
         fixtureDef.density = 0.5f;
         fixtureDef.friction = 0.8f;
-        fixtureDef.restitution = 0.0f;
+        fixtureDef.restitution = 0.1f;
 
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);

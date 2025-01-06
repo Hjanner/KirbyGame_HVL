@@ -19,6 +19,9 @@ import KirbyGame_HVL.git.entities.items.*;
 import KirbyGame_HVL.git.entities.player.ActorWithBox2d;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
+import KirbyGame_HVL.git.systems.MinigameManager;
+import KirbyGame_HVL.git.systems.rendering.miniGames.culebrita.GamePanelCulebrita;
+import KirbyGame_HVL.git.systems.rendering.miniGames.viejita.GamePanelViejita;
 import KirbyGame_HVL.git.utils.helpers.TiledMapHelper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -41,7 +44,6 @@ import java.util.Map;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.Texture;
-
 
 public class GameScreen extends Pantalla implements ContactListener, Screen {
 
@@ -73,16 +75,15 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private Array<Enemy> enemiesToRemove;
     private Map<Integer, EnemyFactory> zonaFactories;           // Define que factory usar en cada zona
     private int[][][] enemyZonaCoordenadas = {
-        {{700, 1010}, {850, 1010}, {600, 1010}},           // zona 1 - WaddleDees
-        {{700, 1020}, {850, 1020}, {900, 1020}},                        // z 2 - BrontoBurts
-        {{500, 1100}, {600, 1150}, {750, 1050}},                        // z 3 - BrontoBurts
-        {{1200, 1040}, {1250, 1040}, {1300, 1040}},                      // z 4 - WaddleDees
-        {{500, 1010}, {1400, 1010}, {1500, 1010}}                       //g 5 - HotHeads
+        {{140, 1030}, {550, 1030}, {600, 1010}},                         // zona 1 - WaddleDees
+        {{1550, 1020}, {850, 1020}, {900, 1020}},                        // z 2 - BrontoBurts
+        {{1475, 1100}, {600, 1150}, {750, 1050}},                        // z 3 - BrontoBurts
+        {{1445, 1040}, {1250, 1040}, {1300, 1040}},                      // z 4 - WaddleDees
+        {{180, 1010}, {1400, 1010}, {1500, 1010}}                        //g 5 - HotHeads
     };
 
     //ataques
     private Array<Fire> firesToRemove;
-
 
 //nubes
 private ArrayList<Attack> attacks;
@@ -98,18 +99,27 @@ private ArrayList<Attack> attacks;
 
     //helpers
     private boolean puedoResetKirby = false;
+    private MinigameManager minigameManager;
+    private float initialX;
+    private float initialY;
+    private int nivel;
+    private int helperScore = 0;
 
-    public GameScreen(Main main) {
+    public GameScreen(Main main, float initialX, float initialY, int helperScore, int nivel) {
         super(main);
+        this.initialX = initialX ;
+        this.initialY = initialY ;
+        this.nivel = nivel;
         this.main = main;
+        this.helperScore = helperScore;
         stage = new Stage ();
 
         enemiesList = new ArrayList<>();
         enemiesToRemove = new Array<>();
         zonaFactories = new HashMap<>();
         zonaFactories.put(0, new WaddleDeeFactory());                   //se define el factory a usar por grupo
-        zonaFactories.put(1, new BrontoBurdFactory());
-        zonaFactories.put(2, new BrontoBurdFactory());
+        zonaFactories.put(1, new WaddleDeeFactory());
+        zonaFactories.put(2, new WaddleDeeFactory());
         zonaFactories.put(3, new WaddleDeeFactory());
         zonaFactories.put(4, new HotHeadFactory());
         for (int i = 0; i < enemyZonaCoordenadas.length; i++) {         //se crean ls grupos
@@ -128,15 +138,31 @@ private ArrayList<Attack> attacks;
         font.setColor(Color.WHITE);
     }
 
+    public void miniGame() {
+        if (nivel == 2){
+            minigameManager = new MinigameManager(kirby);                                                                   //toma los datos del kirby
+            GamePanelCulebrita minigame = new GamePanelCulebrita(main, minigameManager);
+            main.setScreen(minigame);
+
+        }else if (nivel == 1){
+            //miniGame() = null;
+            minigameManager = new MinigameManager(kirby);                                                                   //toma los datos del kirby
+            GamePanelViejita minigame = new GamePanelViejita(main, minigameManager);
+            main.setScreen(minigame);
+        }
+    }
+
     @Override
     public void show() {
         world = new World (new Vector2(0, 0), true);
         world.setContactListener(this);                                 // listener de contactos
 
-        kirby = new Kirby(world, main);
+        kirby = new Kirby(world, main, initialX, initialY);
+        setScoreInGame(helperScore);
+
         stage.addActor(kirby);
         cam = (OrthographicCamera) stage.getCamera();
-        cam.zoom = 0.34f;
+        cam.zoom = 0.30f;
 
         //UI
         //loadAssetsKey();
@@ -228,8 +254,6 @@ private ArrayList<Attack> attacks;
 
         batch.end();
     }
-
-
 
     public void update () {
         cam.position.set(kirby.getBody().getPosition(),0);
@@ -429,7 +453,7 @@ private ArrayList<Attack> attacks;
         //animaciones de muerte del kirby y debe ir logica de puntos
         kirby.setState(EnumStates.DAMAGE);
         kirby.setAnimation(EnumStates.DAMAGE);
-        kirby.subPointsPerItem(EnumItemType.KEY);               //resta punto por ser atacado por un enemigo
+        kirby.subPointsPerItem(EnumItemType.ENEMY);               //resta punto por ser atacado por un enemigo
 
         if (!attacksToRemove.contains(attack, true)) {                                  // en lo que haga contacto desaparece
             attacksToRemove.add(attack);
@@ -500,7 +524,6 @@ private ArrayList<Attack> attacks;
 
             }
             else {
-                // debe llamar tambien a manejadorEnemyColition aqui para la logica de los puntos perdidos
                 kirby.setState(EnumStates.DAMAGE);
                 kirby.setAnimation(EnumStates.DAMAGE);
                 kirby.subPointsPerItem(EnumItemType.ENEMY);
@@ -577,14 +600,18 @@ private ArrayList<Attack> attacks;
 
     }
 
-    public void miniGame(){
-        //dispose();
-        //aqui puede ir un mensaje
-        main.setScreen(main.gameCulebrita);
-    }
+//    public void miniGame(){
+//        //dispose();
+//        //aqui puede ir un mensaje
+//        main.setScreen(main.gameCulebrita);
+//    }
 
     public Kirby getKirby() {
         return kirby;
+    }
+
+    public void setScoreInGame(int helperScore){
+        kirby.setCurrentScore(helperScore);
     }
 
     @Override

@@ -1,5 +1,9 @@
 package KirbyGame_HVL.git.systems.rendering.miniGames.viejita;
 
+import KirbyGame_HVL.git.Main;
+import KirbyGame_HVL.git.screens.gameplay.GameScreen;
+import KirbyGame_HVL.git.systems.MinigameManager;
+import KirbyGame_HVL.git.systems.MinigameWindow;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -15,10 +19,8 @@ import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 import java.util.Random;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.Files.FileType;
 
-public class GamePanelViejita implements Screen {
+public class GamePanelViejita extends MinigameWindow implements Screen {
     private ShapeRenderer shapeRenderer;
     private SpriteBatch batch;
     private BitmapFont font;
@@ -39,11 +41,19 @@ public class GamePanelViejita implements Screen {
     private boolean isPlayerTurn;
     private boolean gameOver;
     private String winner;
+    private Main main;
 
     private ArrayList<String> odsImages;
     private final String ODS_IMAGES_PATH = "assets/art/minijuegos/ods/";
 
-    public GamePanelViejita() {
+    private MinigameManager minigameManager;
+    private int score = 0;
+    private boolean levelCompleted;
+
+    public GamePanelViejita(Main main, MinigameManager manager) {
+        super(manager);
+        this.main = main;
+        this.minigameManager = manager;
         shapeRenderer = new ShapeRenderer();
         batch = new SpriteBatch();
         font = new BitmapFont();
@@ -55,8 +65,8 @@ public class GamePanelViejita implements Screen {
         backgroundTexture = new Texture(Gdx.files.internal("assets/art/minijuegos/logito.png"));
 
         loadODSTextures();
-
         preloadResources();
+
         initGame();
     }
 
@@ -72,36 +82,54 @@ public class GamePanelViejita implements Screen {
         batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.end();
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);        //rectangulo
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(LIGHT_PINK);
         shapeRenderer.rect(boardX - 20, boardY - 20,
             CELL_SIZE * BOARD_SIZE + 40,
             CELL_SIZE * BOARD_SIZE + 40);
         shapeRenderer.end();
 
-        drawBoard();                                                //lineas
-        drawPieces();                                               //ods y x
+        drawBoard();
+        drawPieces();
 
-        if (!gameOver && isPlayerTurn) {
-            handleInput();
-        } else if (!gameOver && !isPlayerTurn) {
-            makeComputerMove();                 // Turno de la computadora
+        // Game Logic
+        if (!gameOver) {
+            if (isPlayerTurn) {
+                handleInput();
+            } else {
+                makeComputerMove();
+            }
         }
 
-        // UI
+        // UI Rendering
         batch.begin();
         String message;
         if (gameOver) {
-            message = winner != null ? "¡Ganó " + winner + "!" : "¡Empate!";
+            if (winner != null) {
+                font.draw(batch, "¡Ganó " + winner + "!", 10, Gdx.graphics.getHeight() - 10);
+                if (winner.equals("Jugador")) {
+                    font.draw(batch, "¡Presiona ESPACIO para continuar!", 10, Gdx.graphics.getHeight() - 40);
+                } else {
+                    font.draw(batch, "¡Presiona ESPACIO para reintentar!", 10, Gdx.graphics.getHeight() - 40);
+                }
+            } else {
+                font.draw(batch, "¡Empate!", 10, Gdx.graphics.getHeight() - 10);
+                font.draw(batch, "¡Presiona ESPACIO para reintentar!", 10, Gdx.graphics.getHeight() - 40);
+            }
         } else {
             message = isPlayerTurn ? "Tu turno" : "Turno de la computadora";
+            font.draw(batch, message, 10, Gdx.graphics.getHeight() - 10);
         }
-        font.draw(batch, message, 10, Gdx.graphics.getHeight() - 10);
         batch.end();
 
-        //ciclo
+        // Handle game completion or restart
         if (gameOver && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            initGame();
+            if (winner != null && winner.equals("Jugador")) {
+                levelCompleted = true;
+                gameCompleted();
+            } else {
+                initGame();
+            }
         }
     }
 
@@ -120,6 +148,44 @@ public class GamePanelViejita implements Screen {
         boardY = (Gdx.graphics.getHeight() - (CELL_SIZE * BOARD_SIZE)) / 2;
     }
 
+//    private void gameCompleted() {
+//        int totalScore = minigameManager.getSavedKirbyScore() + score;
+//        sendScore(totalScore);
+//
+//        GameScreen game = new GameScreen(
+//            main,
+//            minigameManager.getPosKirbyX(),
+//            minigameManager.getPosKirbyY(),
+//            totalScore,
+//            2
+//        );
+//        main.setScreen(game);
+//    }
+
+    private void gameCompleted() {
+        if (!levelCompleted) {
+            return;
+        }
+
+        int totalScore = minigameManager.getSavedKirbyScore() + score;
+        sendScore(totalScore);
+
+        GameScreen game = new GameScreen(
+            main,
+            minigameManager.getPosKirbyX(),
+            minigameManager.getPosKirbyY(),
+            totalScore,
+            2
+        );
+        main.setScreen(game);
+    }
+
+
+    @Override
+    public void sendScore(int score) {
+        MinigameManager.setScore(score);
+    }
+
     private class Cell {
         char type;                  // 'X' para X, 'O' para ODS, ' ' para vacío
         Texture odsTexture;          // null si no es ODS
@@ -132,7 +198,6 @@ public class GamePanelViejita implements Screen {
 
     private void preloadResources() {
         try {
-            // Asegurarse de que las colecciones estén vacías
             odsTextures.clear();
             odsImages.clear();
 
@@ -177,7 +242,6 @@ public class GamePanelViejita implements Screen {
             }
         }
     }
-
 
     private void loadODSTextures() {
         try {
@@ -245,13 +309,13 @@ public class GamePanelViejita implements Screen {
                     // Dibujar X
                     shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
                     shapeRenderer.setColor(DARK_PINK);
-                        shapeRenderer.line(x + 20, y + 20, x + CELL_SIZE - 20, y + CELL_SIZE - 20);
-                        shapeRenderer.line(x + CELL_SIZE - 20, y + 20, x + 20, y + CELL_SIZE - 20);
+                    shapeRenderer.line(x + 20, y + 20, x + CELL_SIZE - 20, y + CELL_SIZE - 20);
+                    shapeRenderer.line(x + CELL_SIZE - 20, y + 20, x + 20, y + CELL_SIZE - 20);
                     shapeRenderer.end();
                 } else if (board[i][j].type == 'O' && board[i][j].odsTexture != null) {
                     // Dibujar imagen ODS
                     batch.begin();
-                        batch.draw(board[i][j].odsTexture, x + 10, y + 10,
+                    batch.draw(board[i][j].odsTexture, x + 10, y + 10,
                         CELL_SIZE - 20, CELL_SIZE - 20);
                     batch.end();
                 }
@@ -275,27 +339,14 @@ public class GamePanelViejita implements Screen {
                 if (selectedTexture != null && selectedTexture.isManaged()) {
                     board[boardI][boardJ].type = 'O';
                     board[boardI][boardJ].odsTexture = selectedTexture;
-                }
-
-                if (checkWin(boardI, boardJ)) {
-                    gameOver = true;
-                    winner = "Jugador";
-                } else if (checkDraw()) {
-                    gameOver = true;
-                    winner = null;
-                } else {
-                    isPlayerTurn = false;
+                    checkGameEnd(boardI, boardJ);
                 }
             }
         }
-
-        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.R)) {
-            initGame();
-        }
     }
 
+
     private void makeComputerMove() {
-        // Encontrar casillas vacias
         Array<int[]> emptyCells = new Array<>();
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -306,21 +357,12 @@ public class GamePanelViejita implements Screen {
         }
 
         if (emptyCells.size > 0) {
-            // Seleccionar una casilla vacía al azar
             int[] move = emptyCells.random();
             board[move[0]][move[1]].type = 'X';
-
-            if (checkWin(move[0], move[1])) {
-                gameOver = true;
-                winner = "Computadora";
-            } else if (checkDraw()) {
-                gameOver = true;
-                winner = null;
-            } else {
-                isPlayerTurn = true;
-            }
+            checkGameEnd(move[0], move[1]);
         }
     }
+
 
     private boolean checkWin(int row, int col) {
         char player = board[row][col].type;
@@ -381,8 +423,29 @@ public class GamePanelViejita implements Screen {
         return true;
     }
 
+    private void checkGameEnd(int row, int col) {
+        if (checkWin(row, col)) {
+            gameOver = true;
+            winner = isPlayerTurn ? "Jugador" : "Computadora";
+            if (winner.equals("Jugador")) {
+                score += 100;  // Add points for winning
+            }
+        } else if (checkDraw()) {
+            gameOver = true;
+            winner = null;
+        } else {
+            isPlayerTurn = !isPlayerTurn;
+        }
+    }
+
+
     @Override
     public void show() {
+    }
+
+    @Override
+    public void create() {
+
     }
 
     @Override
@@ -405,10 +468,10 @@ public class GamePanelViejita implements Screen {
 
     @Override
     public void dispose() {
-        shapeRenderer.dispose();
-        batch.dispose();
-        font.dispose();
-        backgroundTexture.dispose();
+        if (shapeRenderer != null) shapeRenderer.dispose();
+        if (batch != null) batch.dispose();
+        if (font != null) font.dispose();
+        if (backgroundTexture != null) backgroundTexture.dispose();
         for (Texture texture : odsTextures) {
             texture.dispose();
         }

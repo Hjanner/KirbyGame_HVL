@@ -7,6 +7,7 @@ public class GameStateManager {
     private float savedCamY;
     private int savedScore;
     private boolean isPaused = false;
+    private ScoreManager scoreManager;
 
     public void saveGameState(GameScreen gameScreen) {
         isPaused = true;

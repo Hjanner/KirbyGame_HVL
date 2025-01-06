@@ -4,7 +4,7 @@ import KirbyGame_HVL.git.entities.enemis.Enemy;
 import KirbyGame_HVL.git.entities.items.EnumItemType;
 
 public class ScoreManager {
-    private int currentScore;
+    private static int currentScore;
     private final int POINTS_DELETE_WADDLE  = 20;
     private final int POINTS_DELETE_BRONTO  = 30;
     private final int POINTS_DELETE_HOTHEAD = 50;

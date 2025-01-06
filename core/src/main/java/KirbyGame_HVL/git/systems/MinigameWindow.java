@@ -1,4 +1,4 @@
-package KirbyGame_HVL.git.lwjgl3;
+package KirbyGame_HVL.git.systems;
 
 import com.badlogic.gdx.Game;
 
