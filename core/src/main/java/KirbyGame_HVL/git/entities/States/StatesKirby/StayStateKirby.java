@@ -2,6 +2,8 @@ package KirbyGame_HVL.git.entities.States.StatesKirby;
 
 import KirbyGame_HVL.git.entities.attacks.CloudKirby;
 import KirbyGame_HVL.git.entities.attacks.Star;
+import KirbyGame_HVL.git.entities.enemis.hotHead.HotHead;
+import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDoo;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -19,6 +21,9 @@ public class StayStateKirby extends StateKirby {
 
         kirby.setOpuesto(false);
         accumulatedtimer = 0;
+        kirby.setFireKeyPressed(true);
+        kirby.setBeamKeyPressed(true);
+        kirby.setDamageFire(false);
 
     }
 
@@ -34,7 +39,7 @@ public class StayStateKirby extends StateKirby {
             kirby.setAnimation(EnumStates.STAY);
         }
 
-        if (kirby.getBody().getLinearVelocity().y < -0.5f && !kirby.getColisionSuelo()) {
+        if (!kirby.getColisionSuelo()) {
             kirby.setOpuesto(false);
             kirby.setState(EnumStates.FALL);
             kirby.setDuracion(0);
@@ -56,6 +61,7 @@ public class StayStateKirby extends StateKirby {
         }
 
         else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+
             kirby.setState(EnumStates.DOWN);
             kirby.setDuracion(0);
             kirby.setAnimation(EnumStates.DOWN);
@@ -68,10 +74,21 @@ public class StayStateKirby extends StateKirby {
             kirby.getBody().applyLinearImpulse(0,50, kirby.getBody().getPosition().x,kirby.getBody().getPosition().y, true);
         }
         if (accumulatedtimer > 0.16f) {
-            if (Gdx.input.isKeyPressed(Input.Keys.Z) && kirby.getCurrentEnemy() == null) {
-                kirby.setState(EnumStates.ABSORB);
-                kirby.setDuracion(0);
-                kirby.setAnimation(EnumStates.ABSORB);
+            if (Gdx.input.isKeyPressed(Input.Keys.Z)) {
+                if (kirby.getCurrentEnemy() == null) {
+                    kirby.setState(EnumStates.ABSORB);
+                    kirby.setDuracion(0);
+                    kirby.setAnimation(EnumStates.ABSORB);
+                }
+
+                else {
+                    if ((kirby.getCurrentEnemy() instanceof HotHead || kirby.getCurrentEnemy() instanceof WaddleDoo) && kirby.getPoder()) {
+                        kirby.setOpuesto(true);
+                        kirby.setState(EnumStates.ATTACK);
+                        kirby.setDuracion(0);
+                        kirby.setAnimation(EnumStates.ATTACK);
+                    }
+                }
 
             }
         }
@@ -95,8 +112,6 @@ public class StayStateKirby extends StateKirby {
                         kirby.setcurrentEnemy(null);
                     }
                     kirby.setState(EnumStates.STAY);
-                } else {
-
                 }
             }
         }

@@ -41,7 +41,7 @@ public class WaddleDee extends Enemy {
         this.world = world;
         this.main = main;
         this.flipX = false;
-        this.type = EnumEnemyType.WADDLE;
+        this.type = EnumEnemyType.WADDLEDEE;
         this.stateManager = new StateManager();
         this.walkWaddleDee = new WalkStateWaddleDee(this);
         this.dieWaddleDee = new DieStateWaddleDee(this);
@@ -53,7 +53,7 @@ public class WaddleDee extends Enemy {
     }
 
     @Override
-    public void setflipX (boolean flipX) {
+    public void setFlipX (boolean flipX) {
         this.flipX = flipX;
     }
 
@@ -86,9 +86,9 @@ public class WaddleDee extends Enemy {
     }
 
     private void loadTextures() {
-        waddleDeeWalkTexture = main.getManager().get("assets/art/spritesWaddleDee/WaddleDeeWalk.png");
+        waddleDeeWalkTexture = main.getManager().get("assets/art/sprites/spritesWaddleDee/WaddleDeeWalk.png");
         waddleDeeWalkRegion = new TextureRegion(waddleDeeWalkTexture, 256, 32); // probar con 320 de width
-        waddleDeeDieTexture = main.getManager().get("assets/art/spritesWaddleDee/WaddleDeeDie.png");
+        waddleDeeDieTexture = main.getManager().get("assets/art/sprites/spritesWaddleDee/WaddleDeeDie.png");
         waddleDeeDieRegion = new TextureRegion(waddleDeeDieTexture, 32, 32);
 
 
@@ -107,7 +107,7 @@ public class WaddleDee extends Enemy {
         // crear animation y y sprite
         walkAnimation = new Animation(0.1f, waddleDeeWalkFrames);
         dieAnimation = new Animation(1, waddleDeeDieFrames);
-        waddleDeeSprite = new Sprite(waddleDeeWalkFrames[0]);
+        waddleDeeSprite = new Sprite(waddleDeeWalkRegion);
         waddleDeeSprite.setSize(15, 15);
         currentAnimation = walkAnimation;
     }

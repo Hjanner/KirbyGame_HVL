@@ -29,12 +29,12 @@ public class FlyStateBrontoBurt extends StateBrontoBurt {
         // Cambiar direccion rango
         if (movementTime > cambioDireccionIntervalo) {
             movementTime = 0;
-            brontoBurt.setflipX(true);
+            brontoBurt.setFlipX(true);
             movementSpeed = -movementSpeed;
         }
 
         if (movementSpeed > 0) {
-            brontoBurt.setflipX(false);
+            brontoBurt.setFlipX(false);
         }
 
         // mov horizontal

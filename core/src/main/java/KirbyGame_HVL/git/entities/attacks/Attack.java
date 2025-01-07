@@ -13,6 +13,9 @@ public abstract class Attack extends ActorWithBox2d {
     protected Main main;
     protected boolean sentido;
     protected boolean attackOfkirby = false;
+    protected ActorWithBox2d actor;
+    protected float duracion;
+    protected float accumulatedtimer;
 
     public abstract void createBody(World world, ActorWithBox2d actor, boolean sentido);
 

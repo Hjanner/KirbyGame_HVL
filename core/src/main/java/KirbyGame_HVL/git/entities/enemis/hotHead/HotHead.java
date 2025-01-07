@@ -74,7 +74,7 @@ public class HotHead extends Enemy {
     }
 
     @Override
-    public void setflipX (boolean flipX) {
+    public void setFlipX (boolean flipX) {
         this.flipX = flipX;
     }
 
@@ -84,6 +84,17 @@ public class HotHead extends Enemy {
 
     public boolean getCanShootFire () {
         return canShootFire;
+    }
+
+    public Body getBody() {return body;}
+
+    public World getWorld () {
+        return this.world;
+    }
+
+    @Override
+    public State getcurrentState() {
+        return stateManager.getState();
     }
 
 
@@ -111,13 +122,13 @@ public class HotHead extends Enemy {
 
 
     private void loadTextures() {
-        hotHeadWalkTexture = main.getManager().get("assets/art/spritesHotHead/HotHeadWalk.png");
+        hotHeadWalkTexture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadWalk.png");
         hotHeadWalkRegion = new TextureRegion(hotHeadWalkTexture, 256, 32);
-        hotHeadDieTexture = main.getManager().get("assets/art/spritesHotHead/HotHeadDie.png");
+        hotHeadDieTexture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadDie.png");
         hotHeadDieRegion = new TextureRegion(hotHeadDieTexture, 32,32);
-        hotHeadDie2Texture = main.getManager().get("assets/art/spritesHotHead/HotHeadDie2.png");
+        hotHeadDie2Texture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadDie2.png");
         hotHeadDie2Region = new TextureRegion(hotHeadDie2Texture, 32,32);
-        hotHeadAttackTexture = main.getManager().get("assets/art/spritesHotHead/HotHeadAttack.png");
+        hotHeadAttackTexture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadAttack.png");
         hotHeadAttackRegion = new TextureRegion(hotHeadAttackTexture, 384,32);
         hotHeadSprite = new Sprite(hotHeadWalkRegion);
         hotHeadSprite.setSize(18, 18);
@@ -225,23 +236,12 @@ public class HotHead extends Enemy {
     }
 
     @Override
-    public State getcurrentState() {
-        return stateManager.getState();
-    }
-
-    @Override
     public void draw(Batch batch, float parentAlpha) {
         if (isDisposed || isDead) {
             return;
         }
-        hotHeadSprite.setPosition(body.getPosition().x - 11, body.getPosition().y - 6);
+        hotHeadSprite.setPosition(body.getPosition().x - 10, body.getPosition().y - 5);
         hotHeadSprite.draw(batch);
-    }
-
-    public Body getBody() {return body;}
-
-    public World getWorld () {
-        return this.world;
     }
 
     public void dispose() {

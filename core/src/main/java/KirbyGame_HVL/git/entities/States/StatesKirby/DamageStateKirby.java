@@ -17,6 +17,7 @@ public class DamageStateKirby extends StateKirby {
         acummulatedtimer2 = 0;
         kirby.setDuracion(0);
         kirby.setOpuesto(false);
+        kirby.setPoder(false);
     }
 
     @Override
@@ -34,7 +35,7 @@ public class DamageStateKirby extends StateKirby {
                     }
 
                     else {
-
+                        kirby.getBody().applyLinearImpulse(10, 5, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
                     }
                 }
             }
@@ -51,8 +52,9 @@ public class DamageStateKirby extends StateKirby {
                     }
 
                     else {
-
+                        kirby.getBody().applyLinearImpulse(-10, 5, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
                     }
+
                 }
             }
         }
@@ -66,7 +68,7 @@ public class DamageStateKirby extends StateKirby {
                 kirby.setSensorkirby(null);
             }
 
-            if (acummulatedtimer2 > 2.5f) {
+            if (acummulatedtimer2 > 1.5f) {
                 if (!kirby.getColisionSuelo()) {
                     kirby.setState(EnumStates.FALL);
                     kirby.setDuracion(0);

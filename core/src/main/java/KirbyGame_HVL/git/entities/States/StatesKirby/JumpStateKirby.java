@@ -1,6 +1,8 @@
 package KirbyGame_HVL.git.entities.States.StatesKirby;
 
 import KirbyGame_HVL.git.entities.attacks.Star;
+import KirbyGame_HVL.git.entities.enemis.hotHead.HotHead;
+import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDoo;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -16,6 +18,8 @@ public class JumpStateKirby extends StateKirby {
     public void start() {
 
         acummulatedtimer = 0;
+        kirby.setFireKeyPressed(true);
+        kirby.setBeamKeyPressed(true);
     }
 
     @Override
@@ -43,7 +47,7 @@ public class JumpStateKirby extends StateKirby {
         }
 
         else if (Gdx.input.isKeyPressed(Input.Keys.C)) {
-            if (kirby.getCurrentEnemy() == null) {
+            if (kirby.getCurrentEnemy() == null || kirby.getPoder()) {
                 kirby.setState(EnumStates.FLY);
                 kirby.setDuracion(0);
                 kirby.setAnimation(EnumStates.FLY);
@@ -67,7 +71,12 @@ public class JumpStateKirby extends StateKirby {
                 }
                 kirby.setState(EnumStates.JUMP);
             } else {
-
+                if ((kirby.getCurrentEnemy() instanceof HotHead || kirby.getCurrentEnemy() instanceof WaddleDoo) && kirby.getPoder()) {
+                    kirby.setOpuesto(false);
+                    kirby.setState(EnumStates.ATTACK);
+                    kirby.setDuracion(0);
+                    kirby.setAnimation(EnumStates.ATTACK);
+                }
             }
         }
 

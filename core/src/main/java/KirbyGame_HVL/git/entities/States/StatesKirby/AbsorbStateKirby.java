@@ -23,12 +23,21 @@ public class AbsorbStateKirby extends StateKirby {
     @Override
     public void update(float delta) {
 
-        if (!Gdx.input.isKeyPressed(Input.Keys.Z) && kirby.getColisionSuelo()) {
+        if (!Gdx.input.isKeyPressed(Input.Keys.Z)) {
             acummulatedtimer += delta;
             if (acummulatedtimer > 0.8f) {
-                kirby.setState(EnumStates.STAY);
-                kirby.setDuracion(0);
-                kirby.setAnimation(EnumStates.STAY);
+                if (kirby.getColisionSuelo()) {
+                    kirby.setState(EnumStates.STAY);
+                    kirby.setDuracion(0);
+                    kirby.setAnimation(EnumStates.STAY);
+                }
+
+                else {
+                    kirby.setOpuesto(false);
+                    kirby.setState(EnumStates.FALL);
+                    kirby.setDuracion(0);
+                    kirby.setAnimation(EnumStates.FALL2);
+                }
             }
         }
 

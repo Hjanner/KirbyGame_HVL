@@ -36,7 +36,7 @@ public class Key extends ActorWithBox2d {
     }
 
     private void loadTextures() {
-        keyTexture = main.getManager().get("assets/art/spritesKey/Key.png");
+        keyTexture = main.getManager().get("assets/art/sprites/spritesItems/Key.png");
         keyTextureRegion = new TextureRegion(keyTexture, 480, 32);
         TextureRegion [][] tempKey = keyTextureRegion.split(480/15, 32);
         keyFrames = new TextureRegion[tempKey.length * tempKey[0].length];

@@ -5,13 +5,15 @@ import KirbyGame_HVL.git.entities.items.EnumItemType;
 
 public class ScoreManager {
     private static int currentScore;
-    private final int POINTS_DELETE_WADDLE  = 20;
+    private final int POINTS_DELETE_WADDLEDEE  = 20;
     private final int POINTS_DELETE_BRONTO  = 30;
     private final int POINTS_DELETE_HOTHEAD = 50;
+    private final int POINTS_DELETE_WADDLEDOO = 40;
 
     private final int POINTS_LOST_DAMAGE_ENEMY = 10;
     private final int POINTS_LOST_DAMAGE_SPIKES = 10;
     private final int POINTS_LOST_DAMAGE_HOLE = 20;
+    private final int POINTS_LOST_DAMAGE_ATTACK = 30;
 
     private final int POINTS_TAKE_KEY  = 50;
     private final int POINTS_OPEN_DOOR = 100;
@@ -32,8 +34,8 @@ public class ScoreManager {
 
     public void enemyDelete(Enemy enemy) {
         switch (enemy.getType()) {
-            case WADDLE:
-                addPoints(POINTS_DELETE_WADDLE);
+            case WADDLEDEE:
+                addPoints(POINTS_DELETE_WADDLEDEE);
                 break;
             case BRONTO:
                 addPoints(POINTS_DELETE_BRONTO);
@@ -41,8 +43,12 @@ public class ScoreManager {
             case HOTHEAD:
                 addPoints(POINTS_DELETE_HOTHEAD);
                 break;
+            case WADDLEDOO:
+                addPoints(POINTS_DELETE_WADDLEDOO);
+                break;
             default:
                 System.out.println("error ");
+                break;
         }
     }
 
@@ -57,8 +63,12 @@ public class ScoreManager {
             case HOLE:
                 removePoints(POINTS_LOST_DAMAGE_HOLE);
                 break;
+            case ATTACK:
+                removePoints(POINTS_LOST_DAMAGE_ATTACK);
+                break;
             default:
                 System.out.println("Unknown damage type: " + damageType);
+                break;
         }
     }
 

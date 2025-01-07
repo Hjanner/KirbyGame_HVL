@@ -23,7 +23,7 @@ public class DashStateKirby extends StateKirby {
     public void update(float delta) {
 
         acummulatedtimer += delta;
-        if (acummulatedtimer > 0.5f) {
+        if (acummulatedtimer > 0.35f) {
             kirby.setOpuesto(true);
         }
         if (!Gdx.input.isKeyPressed(Input.Keys.DOWN) && kirby.getColisionSuelo() && !Gdx.input.isKeyPressed(Input.Keys.RIGHT) && !Gdx.input.isKeyPressed(Input.Keys.LEFT)) {

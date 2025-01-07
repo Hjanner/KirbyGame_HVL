@@ -16,10 +16,7 @@ public class Star extends Attack {
     private TextureRegion [] kirbyframesStar;
     private Animation kirbyanimationStar;
     private Sprite kirbyStarsprite;
-    private ActorWithBox2d actor;
-    private float accumulatedtimer;
     private static final float STAR_LIFETIME = 2f;
-    private float duracion;
 
     public Star (World world, ActorWithBox2d actor, boolean sentido) {
         this.world = world;
@@ -34,7 +31,7 @@ public class Star extends Attack {
     }
 
     private void load_animation() {
-        kirbyStarTexture = new Texture("assets/art/sprites/kirbyStar.png");
+        kirbyStarTexture = new Texture("assets/art/sprites/SpritesAttacks/kirbyStar.png");
         kirbyStarRegion = new TextureRegion(kirbyStarTexture, 128,32);
         kirbyStarsprite = new Sprite(kirbyStarRegion);
         kirbyStarsprite.setSize(15,15);

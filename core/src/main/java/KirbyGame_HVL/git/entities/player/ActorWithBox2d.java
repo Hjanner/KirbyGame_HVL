@@ -13,9 +13,18 @@ public abstract class ActorWithBox2d extends Actor {
     protected Body body;
     protected Fixture fixture;
     protected Main main;
+    protected boolean flipX;
 
     public Body getBody() {
         return body;
+    }
+
+    public void setFlipX(boolean flipX) {
+        this.flipX = flipX;
+    }
+
+    public boolean getFlipX() {
+        return flipX;
     }
 
     public abstract void dispose();
