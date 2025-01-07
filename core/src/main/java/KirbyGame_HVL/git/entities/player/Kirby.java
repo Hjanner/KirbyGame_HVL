@@ -270,21 +270,18 @@ public class Kirby extends ActorWithBox2d {
     private boolean fireKeyPressed;                 // Bandera para controlar el disparo
     private boolean beamKeyPressed;
 
-
     private Enemy currentEnemy;
     private SensorKirby sensorKirby;
     private Star star;
 
-
-    private float initialX = 180;
-    private float initialY = 1010;
-
+    private float initialX;
+    private float initialY;
 
     /* Constructor en donde se van a cargar todas las texturas y se incializan las regiones de
        todos los movimientos. Se extraen de las texturas frame por frame con el split para luego
        pasarlo a un array unidimensional mediante un bucle for, para luego inicializar las respectivas animaciones.
     * */
-    public Kirby (World world, Main main)  {
+    public Kirby (World world, Main main, float initialX, float initialY)  {
         this.world = world;
         this.main = main;
         this.stateManager = new StateManager();
@@ -305,7 +302,9 @@ public class Kirby extends ActorWithBox2d {
         this.currentEnemy = null;
         this.fireKeyPressed = true;
         this.damageFire = false;
-        createBody(world);
+        this.initialX = initialX;
+        this.initialY = initialY;
+        createBody(world, initialX, initialY);
         load_animation();
     }
 
@@ -428,9 +427,9 @@ public class Kirby extends ActorWithBox2d {
         kirbysprite.draw(batch);
     }
 
-    public void createBody (World world) {
+    public void createBody (World world, float initialX, float initialY) {
         BodyDef kirbybodydef = new BodyDef();
-        kirbybodydef.position.set(180,1010);
+        kirbybodydef.position.set(initialX,initialY);
         kirbybodydef.type = BodyDef.BodyType.DynamicBody;
         body = this.world.createBody(kirbybodydef);
         CircleShape kirbyshape = new CircleShape();

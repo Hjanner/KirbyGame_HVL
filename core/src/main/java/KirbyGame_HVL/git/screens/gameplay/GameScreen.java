@@ -11,6 +11,7 @@ import KirbyGame_HVL.git.entities.attacks.CloudKirby;
 import KirbyGame_HVL.git.entities.attacks.Fire;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
 import KirbyGame_HVL.git.entities.enemis.EnemyFactory;
+import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurdFactory;
 import KirbyGame_HVL.git.entities.enemis.hotHead.HotHead;
 import KirbyGame_HVL.git.entities.enemis.hotHead.HotHeadFactory;
 import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDeeFactory;
@@ -84,7 +85,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         {{500, 1100}, {600, 1150}, {750, 1050}},                        // z 3 - BrontoBurts
         {{1200, 1040}, {1250, 1040}, {1300, 1040}},                      // z 4 - WaddleDees
         {{500, 1010}, {1400, 1010}, {1500, 1010}},                         //g 5 - HotHeads
-        {{250, 1010}, {550, 1010}, {600, 1010}}                          // z 6 - WaddleDoo
+        {{250, 1010}, {2500, 1300}, {600, 1010}}                          // z 6 - WaddleDoo
     };
 
     //ataques
