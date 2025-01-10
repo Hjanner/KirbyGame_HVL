@@ -4,10 +4,12 @@ import KirbyGame_HVL.git.entities.attacks.CloudKirby;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 
 public class FlyStateKirby extends StateKirby {
 
-    private float accumulatedtimer;
+    private float accumulatedtimer, accumulatedtimer2;
+    private Sound soundFly;
     public FlyStateKirby(Kirby kirby) {
         super(kirby);
     }
@@ -16,6 +18,8 @@ public class FlyStateKirby extends StateKirby {
     public void start() {
         kirby.setOpuesto(false);
         accumulatedtimer = 0;
+        accumulatedtimer2 = 0;
+        soundFly = Gdx.audio.newSound(Gdx.files.internal("assets/audio/music/00fc - SE_AIRSHOT.wav"));
     }
 
     @Override
@@ -25,12 +29,22 @@ public class FlyStateKirby extends StateKirby {
         if (Gdx.input.isKeyPressed(Input.Keys.C) && accumulatedtimer > 0.16f) {
             kirby.getBody().applyForce(0,50f, kirby.getBody().getPosition().x, kirby.getBody().getPosition().y, true);
             kirby.setAnimation(EnumStates.FLY2);
-
+            soundFly.play();
+            accumulatedtimer2 += delta;
+            if (accumulatedtimer2 > 0.04f) {
+                soundFly.stop();
+            }
         }
 
         else if (kirby.getBody().getLinearVelocity().y <= 0) {
             kirby.setAnimation(EnumStates.FLY3);
         }
+
+        else if (!Gdx.input.isKeyPressed(Input.Keys.C)){
+            accumulatedtimer2 = 0;
+        }
+
+
 
         if (Gdx.input.isKeyPressed(Input.Keys.Z) && kirby.getColisionSuelo() && !Gdx.input.isKeyPressed(Input.Keys.C)) {
             kirby.setDuracion(0);
@@ -81,6 +95,6 @@ public class FlyStateKirby extends StateKirby {
     @Override
     public void end() {
 
-
+        soundFly.stop();
     }
 }

@@ -2,40 +2,97 @@ package KirbyGame_HVL.git.screens.mainmenu;
 
 import KirbyGame_HVL.git.Main;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 public class AboutScreen extends Pantalla {
     private static final Color LIGHT_PINK = new Color(1, 0.8f, 0.9f, 1);
-    private static final Color DARK_PINK = new Color(0.8f, 0.4f, 0.6f, 1);
 
     private Stage stage;
     private Skin skin;
     private Table mainTable;
-    private TextButton backButton;
+    private TextButton backButton, informationButton;
+    private Dialog informationDialog;
+    private Texture textureBackGround;
+    private TextureRegion textureRegionBackGround;
+    private Sprite spriteBackGround;
+    private SpriteBatch batch;
+    private Sound soundClick;
 
     public AboutScreen(Main main) {
+
         super(main);
+        batch = main.getBatch();
+        soundClick = Gdx.audio.newSound(Gdx.files.internal("assets/audio/music/clicky-mouse-click-182496.mp3"));
     }
 
     @Override
     public void show() {
         stage = new Stage();
-        skin = new Skin(Gdx.files.internal("assets/ui/skin/uiskin.json"));
+        skin = new Skin(Gdx.files.internal("assets/ui/skin/quantum-horizon-ui.json"));
+        textureBackGround = new Texture("assets/art/backgrounds/Kirby_BackGround2.jpg");
+        textureRegionBackGround = new TextureRegion(textureBackGround, 1460, 821);
+        spriteBackGround = new Sprite(textureRegionBackGround);
         mainTable = new Table();
         mainTable.setFillParent(true);
 
         Label.LabelStyle titleStyle = new Label.LabelStyle(skin.get("default", Label.LabelStyle.class));
-        titleStyle.fontColor = DARK_PINK;
+        titleStyle.fontColor = Color.GREEN;
 
         Label titleLabel = new Label("Acerca del Juego", titleStyle);
-        titleLabel.setFontScale(2.0f);
+        titleLabel.setFontScale(2.5f);
 
-        String aboutText = "Kirby Game HVL\n\n" +
+        informationButton = new TextButton("Ver Informacion",skin);
+        backButton = new TextButton("Volver", skin);
+        backButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                soundClick.play();
+                main.setScreen(main.pantallaini);
+            }
+        });
+
+        informationButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                soundClick.play();
+                informationDialog.show(stage);
+            }
+        });
+
+        mainTable.add(titleLabel).pad(40).row();
+        mainTable.add(informationButton).width(300).height(70).pad(25).row();
+        mainTable.add(backButton).width(200).height(60).pad(25);
+
+        mainTable.addAction(Actions.sequence(Actions.fadeOut(0.01f), Actions.fadeIn(2)));
+        stage.addActor(mainTable);
+        Gdx.input.setInputProcessor(stage);
+
+        createDialog();
+    }
+
+    private void createDialog() {
+
+        informationDialog = new Dialog("    Informacion del Proyecto", skin) {
+            public void result(Object obj) {
+                if (obj.equals(true)) hide();
+            }
+        };
+
+        Label titleLabel = informationDialog.getTitleLabel();
+        titleLabel.setFontScale(1.3f);
+
+        informationDialog.text("KirbyGame HVL\n\n" +
             "Version: 1.0.0\n\n" +
             "Desarrolladores:\n" +
             "- Hanner Hernández\n" +
@@ -45,31 +102,20 @@ public class AboutScreen extends Pantalla {
             "- Framework: LibGDX\n" +
             "- Physics: Box2D\n" +
             "- UI: Scene2D\n\n" +
-            "© 2025 Todos los derechos reservados";
+            "© 2025 Todos los derechos reservados\n\n\n");
 
-        Label contentLabel = new Label(aboutText, skin);
-        contentLabel.setWrap(true);
-
-        backButton = new TextButton("Volver", skin);
-        backButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                main.setScreen(main.pantallaini);
-            }
-        });
-
-        mainTable.add(titleLabel).pad(20).row();
-        mainTable.add(contentLabel).width(600).pad(20).row();
-        mainTable.add(backButton).width(200).height(60).pad(20);
-
-        stage.addActor(mainTable);
-        Gdx.input.setInputProcessor(stage);
+        informationDialog.button("Cerrar", true).pad(40);
+        informationDialog.pad(90);
     }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(LIGHT_PINK.r, LIGHT_PINK.g, LIGHT_PINK.b, LIGHT_PINK.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        batch.begin();
+        spriteBackGround.draw(batch);
+        batch.end();
 
         stage.act(delta);
         stage.draw();

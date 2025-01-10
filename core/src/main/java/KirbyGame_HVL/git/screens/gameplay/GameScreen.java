@@ -26,6 +26,7 @@ import KirbyGame_HVL.git.screens.minigames.laberinto.GamePanelLaberinto;
 import KirbyGame_HVL.git.utils.helpers.TiledMapHelper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -84,7 +85,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         {{700, 1020}, {850, 1020}, {900, 1020}},                        // z 2 - BrontoBurts
         {{500, 1100}, {600, 1150}, {750, 1050}},                        // z 3 - BrontoBurts
         {{1200, 1040}, {1250, 1040}, {1300, 1040}},                      // z 4 - WaddleDees
-        {{500, 1010}, {1400, 1010}, {1500, 1010}},                         //g 5 - HotHeads
+        {{300, 1010}, {2600, 1300}, {1500, 1010}},                         //g 5 - HotHeads
         {{250, 1010}, {2500, 1300}, {600, 1010}}                          // z 6 - WaddleDoo
     };
 
@@ -110,6 +111,7 @@ private ArrayList<Attack> attacks;
     private float initialY;
     private int nivel;
     private int helperScore = 0;
+    private Music soundTrack;
 
     public GameScreen(Main main, float initialX, float initialY, int helperScore, int nivel) {
         super(main);
@@ -118,6 +120,8 @@ private ArrayList<Attack> attacks;
         this.nivel = nivel;
         this.main = main;
         this.helperScore = helperScore;
+        soundTrack = Gdx.audio.newMusic(Gdx.files.internal("assets/audio/music/starforge-saga-281379.mp3"));
+        soundTrack.setVolume(0.3f);
         stage = new Stage ();
 
         enemiesList = new ArrayList<>();
@@ -161,6 +165,8 @@ private ArrayList<Attack> attacks;
     @Override
     public void show() {
         super.show();
+        soundTrack.setLooping(true);
+        soundTrack.play();
         world = new World (new Vector2(0, 0), true);
         world.setContactListener(this);                                 // listener de contactos
 
@@ -170,9 +176,6 @@ private ArrayList<Attack> attacks;
         stage.addActor(kirby);
         cam = (OrthographicCamera) stage.getCamera();
         cam.zoom = 0.34f;
-
-        //UI
-        //loadAssetsKey();
 
         createEnemies();
 
@@ -298,17 +301,6 @@ private ArrayList<Attack> attacks;
 
             stage.addActor(enemy);
             zonaEnemies.add(enemy);
-        }
-    }
-
-    private void loadEnemies() {
-
-        // si se eliminan todos los enemies de una zona o grupo se realiza un respawn
-        for (int zona = 0; zona < enemyZonaCoordenadas.length; zona++) {
-            ArrayList<Enemy> zoneEnemies = enemiesList.get(zona);
-            if (zoneEnemies.isEmpty()) {
-                createEnemiesZona(zona);
-            }
         }
     }
 
@@ -603,6 +595,7 @@ private ArrayList<Attack> attacks;
 
         if (setContact(contact, this.kirby, "spikes")) {
             kirby.setDamageFire(false);
+            kirby.setcurrentEnemy(null);
             kirby.setState(EnumStates.DAMAGE);
             kirby.setAnimation(EnumStates.DAMAGE);
             kirby.subPointsPerItem(EnumItemType.SPIKES);

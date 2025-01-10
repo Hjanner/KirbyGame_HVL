@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="160" height="91" tilewidth="24" tileheight="24" infinite="0" nextlayerid="16" nextobjectid="962">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="160" height="91" tilewidth="24" tileheight="24" infinite="0" nextlayerid="16" nextobjectid="963">
  <tileset firstgid="1" source="Fondo.tsx"/>
  <tileset firstgid="221" source="Background.tsx"/>
  <tileset firstgid="477" source="Forest.tsx"/>
@@ -338,7 +338,8 @@
   <object id="953" x="2112.33" y="575.333" width="23.3333" height="49.3333"/>
  </objectgroup>
  <objectgroup id="6" name="Hole">
-  <object id="367" x="27.0303" y="2160.48" width="3788.36" height="21.2121"/>
+  <object id="367" x="27.0303" y="2160.48" width="3333.81" height="21.2121"/>
+  <object id="962" x="3360" y="2158.67" width="241.333" height="24"/>
  </objectgroup>
  <objectgroup id="7" name="Platform" locked="1"/>
  <objectgroup id="9" name="DoorSensor" locked="1">

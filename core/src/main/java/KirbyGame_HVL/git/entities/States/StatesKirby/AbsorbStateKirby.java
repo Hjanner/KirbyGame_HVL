@@ -4,10 +4,12 @@ import KirbyGame_HVL.git.entities.items.SensorKirby;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 
 public class AbsorbStateKirby extends StateKirby {
 
     private float acummulatedtimer;
+    private Sound soundAbsorb;
     public AbsorbStateKirby(Kirby kirby) {
         super(kirby);
     }
@@ -18,6 +20,9 @@ public class AbsorbStateKirby extends StateKirby {
         kirby.setOpuesto(true);
         System.out.println("Estoy Absorbiendo");
         acummulatedtimer = 0;
+        soundAbsorb = Gdx.audio.newSound(Gdx.files.internal("assets/audio/music/suction.mp3"));
+        soundAbsorb.loop();
+        soundAbsorb.play();
     }
 
     @Override
@@ -59,5 +64,6 @@ public class AbsorbStateKirby extends StateKirby {
     @Override
     public void end() {
 
+        soundAbsorb.stop();
     }
 }

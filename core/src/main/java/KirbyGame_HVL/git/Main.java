@@ -7,6 +7,8 @@ import KirbyGame_HVL.git.screens.mainmenu.PantallaGui;
 import KirbyGame_HVL.git.screens.minigames.culebrita.GamePanelCulebrita;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -112,6 +114,8 @@ public class Main extends Game {
         // Texturas de las puertas de minijuegos
         manager.load("assets/art/sprites/spritesItems/Door1.png", Texture.class);
         manager.load("assets/art/sprites/spritesItems/Door2.png", Texture.class);
+
+        // Musica de fondo
 
         manager.finishLoading();
         setScreen(pantallaini);
