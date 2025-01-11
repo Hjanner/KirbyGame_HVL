@@ -1,6 +1,7 @@
 package KirbyGame_HVL.git.screens.mainmenu;
 import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.screens.gameplay.GameScreen;
+import KirbyGame_HVL.git.systems.NameManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -12,12 +13,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import org.w3c.dom.Text;
 
 public class PantallaGui extends Pantalla {
 
@@ -42,6 +45,7 @@ public class PantallaGui extends Pantalla {
     private boolean stop;
     private Music soundTrack;
     private Sound soundClick;
+    private NameManager nameManager;
 
     /*Constructor en donde preparamos nuestro batch para utilizarlo
      * */
@@ -52,6 +56,7 @@ public class PantallaGui extends Pantalla {
         soundClick = Gdx.audio.newSound(Gdx.files.internal("assets/audio/music/clicky-mouse-click-182496.mp3"));
         soundTrack.setVolume(0.3f);
         batch = main.getBatch();
+        nameManager = new NameManager();
     }
 
     /*Metodo en donde se mostraran los distintos botones con las opciones y si se
@@ -126,9 +131,76 @@ public class PantallaGui extends Pantalla {
         singleplayer.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
+                Dialog dialog = new Dialog("\n  Ingrese su nombre", skin);
+                Label titleLabel = dialog.getTitleLabel();
+                titleLabel.setFontScale(1.3f);
+
+                TextField textField = new TextField("", skin);
+                dialog.getContentTable().add(textField).expandX().fillX();
+
+                TextButton buttonAcept =  new TextButton("Aceptar",skin);
+                buttonAcept.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        soundClick.play();
+                        String nombre = textField.getText();
+                        if (nombre.isEmpty()) {
+                            new Dialog("\n\n    Error", skin) {
+                                {
+                                    Label titleLabel = getTitleLabel();
+                                    titleLabel.setFontScale(2.0f);
+                                    text("El nombre no puede\nestar vacio!!");
+                                    button("Aceptar", true);
+                                }
+                            }.show(stage);
+                        } else {
+                            new Dialog("\n\n   START GAME", skin) {
+                                {
+                                    Label titleLabel = getTitleLabel();
+                                    titleLabel.setFontScale(1.6f);
+                                    text("BIENVENIDO " + nombre + "\n\nQUE COMIENCE EL JUEGO!!");
+                                    TextButton button = new TextButton("Aceptar",skin);
+                                    button.addListener(new ClickListener () {
+
+                                        @Override
+                                        public void clicked(InputEvent event, float x, float y) {
+                                            nameManager.setNombre(nombre);
+                                            soundClick.play();
+                                            soundTrack.stop();
+                                            main.setScreen(main.gameScreen);
+                                        }
+                                    });
+
+                                    button(button);
+                                }
+                            }.show(stage);
+                        }
+                    }
+                });
+                dialog.button(buttonAcept);
+
+                TextButton buttonCancel = new TextButton("Cancelar",skin);
+                buttonCancel.addListener(new ClickListener() {
+
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        soundClick.play();
+                        dialog.hide();
+                    }
+                });
+
+                dialog.button(buttonCancel);
+
+                dialog.pad(90);
+                dialog.show(stage);
+            }
+        });
+
+        ranking.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
                 soundClick.play();
-                soundTrack.stop();
-                main.setScreen(main.gameScreen);
+                main.setScreen(main.rankingScreen);
             }
         });
 
@@ -156,8 +228,6 @@ public class PantallaGui extends Pantalla {
             }
         });
 
-        Gdx.input.setInputProcessor(stage);
-
         backButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -165,6 +235,10 @@ public class PantallaGui extends Pantalla {
                 main.setScreen(main.pantallaini);
             }
         });
+
+        Gdx.input.setInputProcessor(stage);
+
+
     }
 
     /*Actualiza el escenario

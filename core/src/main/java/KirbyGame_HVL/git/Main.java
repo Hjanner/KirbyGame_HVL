@@ -1,9 +1,11 @@
 package KirbyGame_HVL.git;
 
+import KirbyGame_HVL.git.screens.gameover.GameOverScreen;
 import KirbyGame_HVL.git.screens.gameplay.GameScreen;
 import KirbyGame_HVL.git.screens.mainmenu.AboutScreen;
 import KirbyGame_HVL.git.screens.mainmenu.HelpScreen;
 import KirbyGame_HVL.git.screens.mainmenu.PantallaGui;
+import KirbyGame_HVL.git.screens.mainmenu.RankingScreen;
 import KirbyGame_HVL.git.screens.minigames.culebrita.GamePanelCulebrita;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
@@ -21,6 +23,7 @@ public class Main extends Game {
     public GameScreen gameScreen;
     public HelpScreen helpScreen;
     public AboutScreen aboutScreen;
+    public RankingScreen rankingScreen;
 
     @Override
     public void create() {
@@ -30,6 +33,7 @@ public class Main extends Game {
         pantallaini = new PantallaGui(this);
         helpScreen = new HelpScreen(this);
         aboutScreen = new AboutScreen(this);
+        rankingScreen = new RankingScreen(this);
 
         manager.load("assets/art/sprites/SpritesNormalKirby/kirbystay.png", Texture.class);
         manager.load("assets/art/sprites/SpritesNormalKirby/kirbywalking.png", Texture.class);

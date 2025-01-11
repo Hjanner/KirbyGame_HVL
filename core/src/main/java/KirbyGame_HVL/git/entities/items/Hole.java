@@ -27,6 +27,7 @@ public class Hole extends ActorWithBox2d implements Box2dSpace {
             body = world.createBody(bodydef);
             shape.setAsBox((rectangle.width + 0.5f) / 2 ,(rectangle.height+0.5f)  / 2);
             fixture = body.createFixture(shape, 1);
+            fixture.setSensor(true);
             fixture.setUserData("Hole");
         }
 

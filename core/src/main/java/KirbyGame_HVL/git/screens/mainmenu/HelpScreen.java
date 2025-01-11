@@ -17,7 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 public class HelpScreen extends Pantalla {
     private static final Color LIGHT_PINK = new Color(1, 0.8f, 0.9f, 1);
-    private static final Color GREEN_FOREST = new Color(34f, 139f, 34f, 1);
 
     private Stage stage;
     private Skin skin;

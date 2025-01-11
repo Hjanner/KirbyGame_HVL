@@ -19,6 +19,7 @@ import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDoo;
 import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDooFactory;
 import KirbyGame_HVL.git.entities.items.*;
 import KirbyGame_HVL.git.entities.player.Kirby;
+import KirbyGame_HVL.git.screens.gameover.GameOverScreen;
 import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
 import KirbyGame_HVL.git.systems.MinigameManager;
 import KirbyGame_HVL.git.screens.minigames.culebrita.GamePanelCulebrita;
@@ -162,6 +163,12 @@ private ArrayList<Attack> attacks;
         }
     }
 
+    public void endGame() {
+        soundTrack.stop();
+        GameOverScreen gameOver = new GameOverScreen(main, kirby);
+        main.setScreen(gameOver);
+    }
+
     @Override
     public void show() {
         super.show();
@@ -224,6 +231,7 @@ private ArrayList<Attack> attacks;
 
         renderKeyContador();
         renderScore();
+        renderName();
 
         //IU
         uiStage.act(delta);
@@ -265,6 +273,17 @@ private ArrayList<Attack> attacks;
         font.draw(batch, "Score: " + kirby.getCurrentScore(),
             scoreX,
             scoreY);
+
+        batch.end();
+    }
+
+    private void renderName() {
+        Batch batch = stage.getBatch();
+        batch.begin();
+        font.getData().setScale(0.34f);
+        font.draw(batch, kirby.getName(),
+            kirby.getBody().getPosition().x - 10,
+            kirby.getBody().getPosition().y + 14);
 
         batch.end();
     }
@@ -602,12 +621,11 @@ private ArrayList<Attack> attacks;
         }
 
         if ((setContact(contact, this.kirby, "Hole"))) {
-            puedoResetKirby = true;
+            endGame();
+            /*puedoResetKirby = true;
             kirby.setState(EnumStates.STAY);
             kirby.setAnimation(EnumStates.STAY);
-            kirby.subPointsPerItem(EnumItemType.HOLE);
-        } else {
-            puedoResetKirby = false;
+            kirby.subPointsPerItem(EnumItemType.HOLE);*/
         }
     }
 
@@ -622,6 +640,10 @@ private ArrayList<Attack> attacks;
         if (setContact(contact, this.kirby, "suelo")
             || setContact(contact, this.kirby, "Plataforma")) {
             kirby.setColisionSuelo(false);
+        }
+
+        if ((setContact(contact, this.kirby, "Hole"))) {
+            puedoResetKirby = false;
         }
 
         if ((userDataA instanceof SensorKirby && userDataB instanceof Enemy) ||
