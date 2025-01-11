@@ -29,9 +29,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 import com.badlogic.gdx.math.Vector2;
@@ -43,7 +41,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.Texture;
 
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -80,12 +77,16 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private Array<Enemy> enemiesToRemove;
     private Map<Integer, EnemyFactory> zonaFactories;           // Define que factory usar en cada zona
     private int[][][] enemyZonaCoordenadas = {
-        {{700, 1010}, {850, 1010}, {600, 1010}},           // zona 1 - WaddleDees
-        {{700, 1020}, {850, 1020}, {900, 1020}},                        // z 2 - BrontoBurts
-        {{500, 1100}, {600, 1150}, {750, 1050}},                        // z 3 - BrontoBurts
-        {{1200, 1040}, {1250, 1040}, {1300, 1040}},                      // z 4 - WaddleDees
-        {{500, 1010}, {1400, 1010}, {1500, 1010}},                         //g 5 - HotHeads
-        {{250, 1010}, {2500, 1300}, {600, 1010}}                          // z 6 - WaddleDoo
+        {{2050, 816}, {1850, 740}, {1650, 740}, {2010, 696}, {2055, 624}, {1982, 528}, {1982, 528}, {1971, 244}, {2182, 327}},           // zona spanw k - WaddleDees
+        {{1750, 130}, {1400, 140}, {1050, 110}, {700, 130}, {100, 110}, {2250, 130}, {2600, 140}, {2950, 130}, {2550, 916}, {2400, 916}},                        // z 2 - w dee piso
+        {{1750, 1373}, {1400, 1373}, {1050, 1373}, {700, 1276}, {100, 1276}, {2000, 150}, {2400, 140}, {2600, 150}, {2450, 1020}, {2650, 1035}, {2000, 340}, {2000, 680}, {2000, 1070}, {2005, 1150}, {2005, 1250}, {2005, 1050}},                        // z 3 - BrontoBurts spawn piso
+        {{1200, 1350}, {1250, 1040}, {1300, 747}, {1765, 1373}, {1665, 1373}, {2050, 1800}, {2251, 1732}, {2351, 1732}, {2551, 1732}},                      // z 4 - WaddleDees
+        {{1450, 740}, {2750, 916}, {1500, 1222}, {2251, 1732}, {3036, 1732}, {3216, 77}, {109, 1732}, {220, 1829}, {988, 1780}, {1621, 1804}},                         //g 5 - HotHeads
+        {{2600, 1300}, {1820, 461}, {600, 1010}, {2954, 1732}, {3780, 77}, {2780 , 77}, {1433 , 1253}, {1074, 1276}, {394, 1732}, {250, 2092}, {2224, 1732}, {3765, 77}} ,                         // z 6 - WaddleDoo
+        {{2950, 1832}, {2850, 1802}, {600, 1010}, {2954, 1732}, {3350, 1600}, {3330, 1500}, {3340, 1400}, {600, 1460}, {650, 1460}, {650, 1600}, {650, 1860}, {231, 1990}, {220, 1980}},//bronto
+        {{3650, 1360}, {3650, 1160}, {3700, 960}, {3650, 860}, {3850, 860}, {3650, 460}, {3650, 460}, {3650, 1160}, {3750, 900}, {3550, 840}, {3950, 9200}, {3450, 360}, {3650, 460}}, //bronto
+        {{ 898, 1276}, {698, 1276}, {1237, 1804}, {1337, 1804}, {1400, 1804},  {1800, 1804}, {1900, 1804}},  //waddel
+        {{2005, 1850}, {2105, 1870}, {2205, 1840}, {2720, 1350}, {2720, 1450}, {2720, 1250}, {2720, 1750}, {2720, 1650}, {2720, 1550}, {3512, 700}}
     };
 
     //ataques
@@ -111,6 +112,9 @@ private ArrayList<Attack> attacks;
     private int nivel;
     private int helperScore = 0;
 
+    private SpriteBatch batch;
+    private Texture brickTexture;
+
     public GameScreen(Main main, float initialX, float initialY, int helperScore, int nivel) {
         super(main);
         this.initialX = initialX ;
@@ -124,11 +128,18 @@ private ArrayList<Attack> attacks;
         enemiesToRemove = new Array<>();
         zonaFactories = new HashMap<>();
         zonaFactories.put(0, new WaddleDeeFactory());                   //se define el factory a usar por grupo
-        zonaFactories.put(1, new BrontoBurdFactory());
+        zonaFactories.put(1, new WaddleDeeFactory());
         zonaFactories.put(2, new BrontoBurdFactory());
         zonaFactories.put(3, new WaddleDeeFactory());
         zonaFactories.put(4, new HotHeadFactory());
         zonaFactories.put(5, new WaddleDooFactory());
+        zonaFactories.put(6, new BrontoBurdFactory());
+        zonaFactories.put(7, new BrontoBurdFactory());
+        zonaFactories.put(8, new WaddleDooFactory());
+        zonaFactories.put(9, new BrontoBurdFactory());
+
+
+
         for (int i = 0; i < enemyZonaCoordenadas.length; i++) {         //se crean ls grupos
             enemiesList.add(new ArrayList<>());
         }
@@ -190,12 +201,21 @@ private ArrayList<Attack> attacks;
         spikes = new Spikes(world, map, 4);
         hole = new Hole(world, map, 5);
         platformStatic = new Platform(world, map, 6);
+
+        batch = new SpriteBatch();
+        brickTexture = new Texture(Gdx.files.internal("assets/art/minijuegos/logito.png"));
+
     }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        Gdx.gl.glClearColor(0.53f, 0.81f, 0.92f, 1);
+        //Gdx.gl.glClearColor(0, 0, 0, 0);
+
+        batch.begin();
+        batch.draw(brickTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.end();
+
         world.step(1/60f,6,2);
 
         loadAssetsKey();

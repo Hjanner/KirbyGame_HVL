@@ -1112,7 +1112,7 @@ public class Kirby extends ActorWithBox2d {
         kirbysprite.setRegion(frame);
         kirbysprite.flip(flipX,false);
 
-
+        System.out.println(getBody().getPosition().x + " "+ getBody().getPosition().y);
     }
 
     public void shootFire() {
