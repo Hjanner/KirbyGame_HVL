@@ -1,12 +1,16 @@
 package KirbyGame_HVL.git;
 
+import KirbyGame_HVL.git.screens.gameover.GameOverScreen;
 import KirbyGame_HVL.git.screens.gameplay.GameScreen;
 import KirbyGame_HVL.git.screens.mainmenu.AboutScreen;
 import KirbyGame_HVL.git.screens.mainmenu.HelpScreen;
 import KirbyGame_HVL.git.screens.mainmenu.PantallaGui;
+import KirbyGame_HVL.git.screens.mainmenu.RankingScreen;
 import KirbyGame_HVL.git.screens.minigames.culebrita.GamePanelCulebrita;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -19,15 +23,17 @@ public class Main extends Game {
     public GameScreen gameScreen;
     public HelpScreen helpScreen;
     public AboutScreen aboutScreen;
+    public RankingScreen rankingScreen;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         manager = new AssetManager();
-        gameScreen = new GameScreen(this, 2010, 818, 0, 1);
+        gameScreen = new GameScreen(this, 3615, 985, 0, 1);//2010 818
         pantallaini = new PantallaGui(this);
         helpScreen = new HelpScreen(this);
         aboutScreen = new AboutScreen(this);
+        rankingScreen = new RankingScreen(this);
 
         manager.load("assets/art/sprites/SpritesNormalKirby/kirbystay.png", Texture.class);
         manager.load("assets/art/sprites/SpritesNormalKirby/kirbywalking.png", Texture.class);
@@ -112,6 +118,8 @@ public class Main extends Game {
         // Texturas de las puertas de minijuegos
         manager.load("assets/art/sprites/spritesItems/Door1.png", Texture.class);
         manager.load("assets/art/sprites/spritesItems/Door2.png", Texture.class);
+
+        // Musica de fondo
 
         manager.finishLoading();
         setScreen(pantallaini);

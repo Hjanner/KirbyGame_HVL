@@ -12,6 +12,7 @@ import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDoo;
 import KirbyGame_HVL.git.entities.items.SensorKirby;
 import KirbyGame_HVL.git.entities.attacks.Fire;
 import KirbyGame_HVL.git.entities.items.EnumItemType;
+import KirbyGame_HVL.git.systems.NameManager;
 import KirbyGame_HVL.git.systems.ScoreManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -266,6 +267,7 @@ public class Kirby extends ActorWithBox2d {
     private Animation currentAnimation;
     private CloudKirby cloudkirby;
     private ScoreManager scoreManager;
+    private NameManager nameManager;
 
     private boolean fireKeyPressed;                 // Bandera para controlar el disparo
     private boolean beamKeyPressed;
@@ -304,6 +306,7 @@ public class Kirby extends ActorWithBox2d {
         this.damageFire = false;
         this.initialX = initialX;
         this.initialY = initialY;
+        nameManager = new NameManager();
         createBody(world, initialX, initialY);
         load_animation();
     }
@@ -393,6 +396,10 @@ public class Kirby extends ActorWithBox2d {
 
     public void setStar (Star star) {
         this.star = star;
+    }
+
+    public String getName() {
+        return nameManager.getNombre();
     }
 
     public void setPoder (boolean poder) {

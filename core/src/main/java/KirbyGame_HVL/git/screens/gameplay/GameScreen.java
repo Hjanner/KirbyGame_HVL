@@ -12,13 +12,16 @@ import KirbyGame_HVL.git.entities.attacks.Fire;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
 import KirbyGame_HVL.git.entities.enemis.EnemyFactory;
 import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurdFactory;
+import KirbyGame_HVL.git.entities.enemis.brontoBurt.BrontoBurt;
 import KirbyGame_HVL.git.entities.enemis.hotHead.HotHead;
 import KirbyGame_HVL.git.entities.enemis.hotHead.HotHeadFactory;
+import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDee;
 import KirbyGame_HVL.git.entities.enemis.waddleDee.WaddleDeeFactory;
 import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDoo;
 import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDooFactory;
 import KirbyGame_HVL.git.entities.items.*;
 import KirbyGame_HVL.git.entities.player.Kirby;
+import KirbyGame_HVL.git.screens.gameover.GameOverScreen;
 import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
 import KirbyGame_HVL.git.systems.MinigameManager;
 import KirbyGame_HVL.git.screens.minigames.culebrita.GamePanelCulebrita;
@@ -26,6 +29,7 @@ import KirbyGame_HVL.git.screens.minigames.laberinto.GamePanelLaberinto;
 import KirbyGame_HVL.git.utils.helpers.TiledMapHelper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -93,7 +97,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private Array<Fire> firesToRemove;
 
 //nubes
-private ArrayList<Attack> attacks;
+    private ArrayList<Attack> attacks;
     private Array<Attack> attacksToRemove;
     private float lastCloudCreationTime = 0;
 
@@ -111,9 +115,12 @@ private ArrayList<Attack> attacks;
     private float initialY;
     private int nivel;
     private int helperScore = 0;
+    private Music soundTrack;
 
     private SpriteBatch batch;
     private Texture brickTexture;
+    private GameOverScreen gameOverScreen;
+    private int waddleDeeCount, hotHeadCount, waddleDooCount, brontoBurtCount = 0;
 
     public GameScreen(Main main, float initialX, float initialY, int helperScore, int nivel) {
         super(main);
@@ -122,6 +129,8 @@ private ArrayList<Attack> attacks;
         this.nivel = nivel;
         this.main = main;
         this.helperScore = helperScore;
+        soundTrack = Gdx.audio.newMusic(Gdx.files.internal("assets/audio/music/starforge-saga-281379.mp3"));
+        soundTrack.setVolume(0.3f);
         stage = new Stage ();
 
         enemiesList = new ArrayList<>();
@@ -137,8 +146,6 @@ private ArrayList<Attack> attacks;
         zonaFactories.put(7, new BrontoBurdFactory());
         zonaFactories.put(8, new WaddleDooFactory());
         zonaFactories.put(9, new BrontoBurdFactory());
-
-
 
         for (int i = 0; i < enemyZonaCoordenadas.length; i++) {         //se crean ls grupos
             enemiesList.add(new ArrayList<>());
@@ -159,19 +166,28 @@ private ArrayList<Attack> attacks;
     public void miniGame() {
         minigameManager = new MinigameManager(kirby);                                                                   //toma los datos del kirby
 
-        if (nivel == 1){
+        if (nivel == 1 && keysCollected == 5){
             GamePanelCulebrita minigame1 = new GamePanelCulebrita(main, minigameManager);
             main.setScreen(minigame1);
-        }else if (nivel == 2){
-            //GamePanelViejita minigame2 = new GamePanelViejita(main, minigameManager);
+        }else if (nivel == 2 && waddleDeeCount >= 5 && waddleDooCount >= 5 && brontoBurtCount >= 5 && hotHeadCount >= 5){
             GamePanelLaberinto minigame2 = new GamePanelLaberinto(main, minigameManager);
             main.setScreen(minigame2);
+        } else if (nivel == 3) {
+            endGame();
         }
+    }
+
+    public void endGame() {
+        soundTrack.stop();
+        GameOverScreen gameOver = new GameOverScreen(main, kirby);
+        main.setScreen(gameOver);
     }
 
     @Override
     public void show() {
         super.show();
+        soundTrack.setLooping(true);
+        soundTrack.play();
         world = new World (new Vector2(0, 0), true);
         world.setContactListener(this);                                 // listener de contactos
 
@@ -210,12 +226,7 @@ private ArrayList<Attack> attacks;
     @Override
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        //Gdx.gl.glClearColor(0, 0, 0, 0);
-
-        batch.begin();
-        batch.draw(brickTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.end();
-
+        Gdx.gl.glClearColor(0.53f, 0.81f, 0.92f, 1);
         world.step(1/60f,6,2);
 
         loadAssetsKey();
@@ -239,8 +250,12 @@ private ArrayList<Attack> attacks;
         bdr.render(world, cam.combined);
         stage.draw();
 
-        renderKeyContador();
+        if (nivel == 1 ) renderKeyContador();
+        else if (nivel == 2) renderEnemiesContador();
+
+
         renderScore();
+        renderName();
 
         //IU
         uiStage.act(delta);
@@ -272,6 +287,78 @@ private ArrayList<Attack> attacks;
         batch.end();
     }
 
+    private void renderEnemiesContador() {
+        Batch batch = stage.getBatch();
+        batch.begin();
+        batch.setProjectionMatrix(stage.getCamera().combined);
+
+        float baseX = Math.round(cam.position.x - cam.viewportWidth/2 * cam.zoom + 10);
+        float baseY = Math.round(cam.position.y + cam.viewportHeight/2 * cam.zoom - 10);
+        float espacioIconos = 10;
+        float espacioIconosFilas = 10;
+
+        // Renderizar contadores para cada tipo de enemigo
+        renderEnemyTypeRow(batch, "WaddleDee", waddleDeeCount, baseX, baseY, 0);
+        renderEnemyTypeRow(batch, "HotHead", hotHeadCount, baseX, baseY - espacioIconosFilas, 1);
+        renderEnemyTypeRow(batch, "WaddleDoo", waddleDooCount, baseX, baseY - (espacioIconosFilas * 2), 2);
+        renderEnemyTypeRow(batch, "BrontoBurt", brontoBurtCount, baseX, baseY - (espacioIconosFilas * 3), 3);
+
+        batch.end();
+    }
+
+    private void renderEnemyTypeRow(Batch batch, String enemyType, int count, float baseX, float baseY, int row) {
+        float espacio = 15;
+        int maxEnemies = 5;
+
+        font.getData().setScale(0.4f);
+        font.draw(batch, enemyType + ": ", baseX, baseY);
+
+        // pos inicial para los iconos depues del texto
+        float iconsStartX = baseX + 40;
+
+        Texture enemyTexture;
+        TextureRegion enemyRegion;
+        Sprite enemySprite;
+
+        switch (enemyType) {
+            case "WaddleDoo":
+                enemyTexture = main.getManager().get("assets/art/sprites/spritesWaddleDoo/WaddleDooWalk.png");
+                enemyRegion = new TextureRegion(enemyTexture, 0, 0, 32, 32); // Ajusta coordenadas según el spritesheet
+                break;
+            case "HotHead":
+                enemyTexture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadWalk.png");
+                enemyRegion = new TextureRegion(enemyTexture, 0, 0, 32, 32);
+                break;
+            case "WaddleDee":
+                enemyTexture = main.getManager().get("assets/art/sprites/spritesWaddleDee/WaddleDeeWalk.png");
+                enemyRegion = new TextureRegion(enemyTexture, 0, 0, 32, 32);
+                break;
+            case "BrontoBurt":
+                enemyTexture = main.getManager().get("assets/art/sprites/spritesBrontoBurt/BrontoBurtFly.png");
+                enemyRegion = new TextureRegion(enemyTexture, 0, 0, 32, 32);
+                break;
+            default:
+                enemyTexture = keyIconTexture;
+                enemyRegion = keyIconRegion;
+                break;
+        }
+
+        enemySprite = new Sprite(enemyRegion);
+        enemySprite.setSize(10, 10);
+
+        // Dibuja los iconos de enemigos
+        for (int i = 0; i < maxEnemies; i++) {
+            enemySprite.setPosition(iconsStartX + (i * espacio), baseY - 8);
+            enemySprite.setAlpha(i < count ? 1f : 0.5f); // enemigos no eliminados transparentes
+            enemySprite.draw(batch);
+        }
+
+
+        font.draw(batch, ((count >= 5) ? 5 : count) + "/" + maxEnemies,
+            iconsStartX + (maxEnemies * espacio) + 5,
+            baseY);
+    }
+
     private void renderScore() {
         Batch batch = stage.getBatch();
         batch.begin();
@@ -282,6 +369,17 @@ private ArrayList<Attack> attacks;
         font.draw(batch, "Score: " + kirby.getCurrentScore(),
             scoreX,
             scoreY);
+
+        batch.end();
+    }
+
+    private void renderName() {
+        Batch batch = stage.getBatch();
+        batch.begin();
+        font.getData().setScale(0.34f);
+        font.draw(batch, kirby.getName(),
+            kirby.getBody().getPosition().x - 10,
+            kirby.getBody().getPosition().y + 14);
 
         batch.end();
     }
@@ -321,21 +419,19 @@ private ArrayList<Attack> attacks;
         }
     }
 
-    private void loadEnemies() {
+    private void updateCountEnemiesDeleted(Enemy enemy){
+        if (enemy instanceof WaddleDee) waddleDeeCount++;
+        else if (enemy instanceof HotHead) hotHeadCount++;
+        else if (enemy instanceof WaddleDoo) waddleDooCount++;
+        else if (enemy instanceof BrontoBurt) brontoBurtCount++;
 
-        // si se eliminan todos los enemies de una zona o grupo se realiza un respawn
-        for (int zona = 0; zona < enemyZonaCoordenadas.length; zona++) {
-            ArrayList<Enemy> zoneEnemies = enemiesList.get(zona);
-            if (zoneEnemies.isEmpty()) {
-                createEnemiesZona(zona);
-            }
-        }
     }
 
     private void deleteEnemies() {
         for (ArrayList<Enemy> zoneEnemies : enemiesList) {
             for (Enemy enemy : new ArrayList<>(zoneEnemies)) {                          //  una copia para evitar errores
                 if (enemiesToRemove.contains(enemy, true)) {
+                    if (nivel == 2) updateCountEnemiesDeleted(enemy);
                     zoneEnemies.remove(enemy);                          // Eliminar de la lista de la zona
                 }
             }
@@ -366,7 +462,14 @@ private ArrayList<Attack> attacks;
 
 //objetos mapa
     private void createDoor() {
-        door = new Door(world, main, 100, 1050, true);
+        int posx = 2670, posy = 1285;
+
+        if(nivel == 3){
+            posx = 3780;
+            posy = 77;
+        }
+
+        door = new Door(world, main, posx, posy, true);
         stage.addActor(door);
     }
 
@@ -378,18 +481,29 @@ private ArrayList<Attack> attacks;
 
     private void createPlatformMoved() {
         platforms = new ArrayList<>();
-        PlatformMoved verticalPlatform = new PlatformMoved(world, main, 400, 1010, true);
+        PlatformMoved verticalPlatform = new PlatformMoved(world, main, 3475, 1300, true);
         platforms.add(verticalPlatform);
         stage.addActor(verticalPlatform);
 
-        PlatformMoved horizontalPlatform = new PlatformMoved(world, main, 800, 1010, false);
+        PlatformMoved horizontalPlatform = new PlatformMoved(world, main, 3660, 1300, false);
         platforms.add(horizontalPlatform);
         stage.addActor(horizontalPlatform);
 
-        PlatformMoved horizontalPlatform1 = new PlatformMoved(world, main, 1000, 1010, false);
+        PlatformMoved horizontalPlatform1 = new PlatformMoved(world, main, 3475, 1000, false);
         platforms.add(horizontalPlatform1);
         stage.addActor(horizontalPlatform1);
 
+        PlatformMoved horizontalPlatform2 = new PlatformMoved(world, main, 3660, 1000, false);
+        platforms.add(horizontalPlatform2);
+        stage.addActor(horizontalPlatform2);
+
+        PlatformMoved horizontalPlatform3 = new PlatformMoved(world, main, 3475, 515, false);
+        platforms.add(horizontalPlatform3);
+        stage.addActor(horizontalPlatform3);
+
+        PlatformMoved horizontalPlatform4 = new PlatformMoved(world, main, 3660, 515, false);
+        platforms.add(horizontalPlatform4);
+        stage.addActor(horizontalPlatform4);
     }
 
     private void updateMovementPlataforms(float delta){
@@ -560,11 +674,8 @@ private ArrayList<Attack> attacks;
             (userDataB instanceof Kirby && userDataA instanceof Door)) {
 
             Door door = (Door) (userDataA instanceof Door ? userDataA : userDataB);
-            if (keysCollected >= 0 ) {
-                levelCompleted = true;
                 kirby.addPointsPerItems(EnumItemType.DOOR);
                 miniGame();
-            }
         }
 
 //ENEMIES
@@ -623,18 +734,18 @@ private ArrayList<Attack> attacks;
 
         if (setContact(contact, this.kirby, "spikes")) {
             kirby.setDamageFire(false);
+            kirby.setcurrentEnemy(null);
             kirby.setState(EnumStates.DAMAGE);
             kirby.setAnimation(EnumStates.DAMAGE);
             kirby.subPointsPerItem(EnumItemType.SPIKES);
         }
 
         if ((setContact(contact, this.kirby, "Hole"))) {
-            puedoResetKirby = true;
+            endGame();
+            /*puedoResetKirby = true;
             kirby.setState(EnumStates.STAY);
             kirby.setAnimation(EnumStates.STAY);
-            kirby.subPointsPerItem(EnumItemType.HOLE);
-        } else {
-            puedoResetKirby = false;
+            kirby.subPointsPerItem(EnumItemType.HOLE);*/
         }
     }
 
@@ -649,6 +760,10 @@ private ArrayList<Attack> attacks;
         if (setContact(contact, this.kirby, "suelo")
             || setContact(contact, this.kirby, "Plataforma")) {
             kirby.setColisionSuelo(false);
+        }
+
+        if ((setContact(contact, this.kirby, "Hole"))) {
+            puedoResetKirby = false;
         }
 
         if ((userDataA instanceof SensorKirby && userDataB instanceof Enemy) ||

@@ -24,7 +24,7 @@ public abstract class Pantalla implements Screen {
     public Pantalla(Main main) {
         this.main = main;
         this.uiStage = new Stage();
-        this.skin = new Skin(Gdx.files.internal("assets/ui/skin/uiskin.json"));
+        this.skin = new Skin(Gdx.files.internal("assets/ui/skin/quantum-horizon-ui.json"));
         this.inputMultiplexer = new InputMultiplexer(uiStage);
         setupHelpButton();
     }
@@ -38,21 +38,27 @@ public abstract class Pantalla implements Screen {
         helpButton.setPosition(Gdx.graphics.getWidth() - 60, Gdx.graphics.getHeight() - 60);
         helpButton.setSize(30, 30);
 
-        controlsDialog = new Dialog("Controles del Juego", skin) {
+        // controles
+        controlsDialog = new Dialog("\n   Controles del Juego", skin) {
             public void result(Object obj) {
                 if (obj.equals(true)) hide();
             }
         };
-
-        controlsDialog.text("Movimiento Básico:\n" +
+        Label titleLabel = controlsDialog.getTitleLabel();
+        titleLabel.setFontScale(1.6f);
+        controlsDialog.text("\n\nMovimientos Basicos:\n\n" +
+            "- Flechas izquierda/derecha + X: Correr\n" +
             "- Flechas izquierda/derecha: Mover\n" +
-            "- Flecha abajo + dirección: Realizar dash\n\n" +
-            "Habilidades:\n" +
+            "- Flecha abajo: Agacharse\n" +
+            "- Flecha arriba: Saltar\n" +
+            "- Flecha abajo + direccion: Dash\n\n" +
+            "Habilidades:\n\n" +
             "- Z: Absorber/Lanzar ataque\n" +
-            "- Flecha abajo (con enemigo): Adquirir poder\n" +
+            "- Flecha abajo (con enemigo): Poder\n" +
             "- Flecha arriba + C: Volar\n" +
-            "- Z (en el aire): Lanzar nube de ataque");
-        controlsDialog.button("Cerrar", true).pad(20);
+            "- Z (en el aire): Lanzar nube de ataque\n\n\n");
+        controlsDialog.button("Cerrar", true).pad(40);
+        controlsDialog.pad(90);
 
         helpButton.addListener(new ChangeListener() {
             @Override
