@@ -16,9 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
-import java.io.*;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class RankingScreen extends Pantalla {
 
@@ -66,7 +66,7 @@ public class RankingScreen extends Pantalla {
         mainTable.addAction(Actions.sequence(Actions.fadeOut(0.01f), Actions.fadeIn(3)));
         stage.addActor(mainTable);
 
-        rankingDialog = new Dialog("\n\tRanking", skin) {
+        rankingDialog = new Dialog("\n  Ranking", skin) {
             public void result(Object obj) {
                 if (obj.equals(true)) hide();
             }
@@ -76,7 +76,6 @@ public class RankingScreen extends Pantalla {
         titleLabel3.setFontScale(1.6f);
 
         rankingDialog.text(manejadorRanking());
-
         rankingDialog.button("Cerrar", true).pad(20);
         rankingDialog.pad(120);
 
@@ -101,85 +100,6 @@ public class RankingScreen extends Pantalla {
     }
 
     private String manejadorRanking() {
-        ArrayList <String> fecha = new ArrayList<>();
-        ArrayList <String> hora = new ArrayList<>();
-        ArrayList <String> nombre = new ArrayList<>();
-        ArrayList <String> puntaje = new ArrayList<>();
-        ArrayList aux = new ArrayList <>();
-
-        try {
-
-            FileReader fr = new FileReader("Partidas.txt");
-            BufferedReader br = new BufferedReader(fr);
-
-            String linea;
-            String palabra = "";
-            while ((linea = br.readLine()) != null) {
-
-                for (int i = 0; i < linea.length(); i++) {
-                    if (linea.charAt(i) != '|') {
-                        palabra += linea.charAt(i);
-                    }
-
-                    else {
-                        aux.add(palabra);
-                        palabra = "";
-                    }
-                }
-
-                fecha.add((String) aux.get(0));
-                hora.add((String) aux.get(1));
-                nombre.add((String) aux.get(2));
-                puntaje.add((String) aux.get(3));
-                aux.clear();
-            }
-
-            br.close();
-            fr.close();
-
-            String [] fechas = new String[fecha.size()];
-            String [] horas = new String[hora.size()];
-            String [] nombres = new String[nombre.size()];
-            String [] puntajes = new String[puntaje.size()];
-
-            for (int i = 0; i < puntaje.size(); i++) {
-                fechas[i] = fecha.get(i);
-                horas[i] = hora.get(i);
-                nombres[i] = nombre.get(i);
-                puntajes[i] = puntaje.get(i);
-            }
-
-            for (int i = 0; i < puntajes.length - 1; i++) {
-                for (int j = 0; j < puntajes.length - i - 1; j++) {
-                    if (Integer.parseInt(puntajes[j]) < Integer.parseInt(puntajes[j + 1])) {
-                        String temp = puntajes[j];
-                        puntajes[j] = puntajes[j + 1];
-                        puntajes[j + 1] = temp;
-                        String temp2 = fechas[j];
-                        fechas[j] = fechas[j + 1];
-                        fechas[j + 1] = temp2;
-                        String temp3 = horas[j];
-                        horas[j] = horas[j + 1];
-                        horas[j + 1] = temp3;
-                        String temp4 = nombres[j];
-                        nombres[j] = nombres[j + 1];
-                        nombres[j + 1] = temp4;
-                    }
-                }
-            }
-
-            String cadena = "";
-            for (int i = 0; i < puntajes.length; i++) {
-                cadena += fechas[i] + " " + horas[i] + " " + " " + nombres[i] + " " + puntajes[i] + " PUNTOS\n";
-            }
-
-            return cadena;
-
-        } catch (IOException e) {
-
-            System.out.println("Error al leer el archivo " + e.getMessage());
-        }
-
         return "";
     }
 

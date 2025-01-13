@@ -29,7 +29,7 @@ public class Main extends Game {
     public void create() {
         batch = new SpriteBatch();
         manager = new AssetManager();
-        gameScreen = new GameScreen(this, 2010, 818, 0, 1);
+        gameScreen = new GameScreen(this, 3615, 985, 0, 1);//2010 818
         pantallaini = new PantallaGui(this);
         helpScreen = new HelpScreen(this);
         aboutScreen = new AboutScreen(this);
