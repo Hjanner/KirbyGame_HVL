@@ -6,10 +6,12 @@ import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDoo;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 
 public class RunStateKirby extends StateKirby {
 
     private float acummulatedtimer, acummulatedtimer2;
+    private Sound soundStar;
     public RunStateKirby (Kirby kirby) {
         super (kirby);
     }
@@ -21,6 +23,8 @@ public class RunStateKirby extends StateKirby {
         acummulatedtimer2 = 0;
         kirby.setFireKeyPressed(true);
         kirby.setBeamKeyPressed(true);
+        soundStar = Gdx.audio.newSound(Gdx.files.internal("assets/audio/music/00f9 - SE_STARSHOT2.wav"));
+
     }
 
     @Override
@@ -111,11 +115,13 @@ public class RunStateKirby extends StateKirby {
                     kirby.setDuracion(0);
                     kirby.setAnimation(EnumStates.ATTACK);
                     if (kirby.getFlipX()) {
+                        soundStar.play();
                         Star star = new Star(kirby.getWorld(), kirby, false);
                         star.getBody().applyLinearImpulse(-35, 0, star.getBody().getPosition().x, star.getBody().getPosition().y, true);
                         kirby.setStar(star);
                         kirby.setcurrentEnemy(null);
                     } else {
+                        soundStar.play();
                         Star star = new Star(kirby.getWorld(), kirby, true);
                         star.getBody().applyLinearImpulse(35, 0, star.getBody().getPosition().x, star.getBody().getPosition().y, true);
                         kirby.setStar(star);

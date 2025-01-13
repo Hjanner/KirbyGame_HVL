@@ -5,10 +5,12 @@ import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDoo;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 
 public class DownStateKirby extends StateKirby {
 
-    private float acummulatedtimer = 0;
+    private float acummulatedtimer;
+    private Sound soundAbility;
     public DownStateKirby(Kirby kirby) {
         super(kirby);
     }
@@ -18,6 +20,7 @@ public class DownStateKirby extends StateKirby {
         System.out.println("Estado abajo");
         kirby.setOpuesto(true);
         acummulatedtimer = 0;
+        soundAbility = Gdx.audio.newSound(Gdx.files.internal("assets/audio/music/Voicy_Kirbys Ability .mp3"));
     }
 
     @Override
@@ -26,6 +29,7 @@ public class DownStateKirby extends StateKirby {
         acummulatedtimer += delta;
         if (kirby.getCurrentEnemy() != null && acummulatedtimer > 0.2f && !kirby.getPoder()) {
             if (kirby.getCurrentEnemy() instanceof HotHead) {
+                soundAbility.play();
                 kirby.setPoder(true);
                 kirby.setState(EnumStates.STAY);
                 kirby.setDuracion(0);
@@ -33,6 +37,7 @@ public class DownStateKirby extends StateKirby {
             }
 
             else if (kirby.getCurrentEnemy() instanceof WaddleDoo) {
+                soundAbility.play();
                 kirby.setPoder(true);
                 kirby.setState(EnumStates.STAY);
                 kirby.setDuracion(0);

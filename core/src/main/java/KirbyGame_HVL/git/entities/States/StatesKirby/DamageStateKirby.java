@@ -1,11 +1,14 @@
 package KirbyGame_HVL.git.entities.States.StatesKirby;
 
 import KirbyGame_HVL.git.entities.player.Kirby;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 
 public class DamageStateKirby extends StateKirby {
 
     private float acummulatedtimer;
     private float acummulatedtimer2;
+    private Sound soundDamage;
     public DamageStateKirby(Kirby kirby) {
         super(kirby);
     }
@@ -18,6 +21,8 @@ public class DamageStateKirby extends StateKirby {
         kirby.setDuracion(0);
         kirby.setOpuesto(false);
         kirby.setPoder(false);
+        soundDamage = Gdx.audio.newSound(Gdx.files.internal("assets/audio/music/Voicy_Kirby Hurt Sound.mp3"));
+        soundDamage.play();
     }
 
     @Override

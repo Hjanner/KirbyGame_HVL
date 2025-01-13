@@ -19,6 +19,7 @@ import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDoo;
 import KirbyGame_HVL.git.entities.enemis.waddleDoo.WaddleDooFactory;
 import KirbyGame_HVL.git.entities.items.*;
 import KirbyGame_HVL.git.entities.player.Kirby;
+import KirbyGame_HVL.git.screens.gameover.GameOverScreen;
 import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
 import KirbyGame_HVL.git.systems.MinigameManager;
 import KirbyGame_HVL.git.screens.minigames.culebrita.GamePanelCulebrita;
@@ -26,6 +27,7 @@ import KirbyGame_HVL.git.screens.minigames.laberinto.GamePanelLaberinto;
 import KirbyGame_HVL.git.utils.helpers.TiledMapHelper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -111,6 +113,7 @@ private ArrayList<Attack> attacks;
     private float initialY;
     private int nivel;
     private int helperScore = 0;
+    private Music soundTrack;
 
     private SpriteBatch batch;
     private Texture brickTexture;
@@ -122,6 +125,8 @@ private ArrayList<Attack> attacks;
         this.nivel = nivel;
         this.main = main;
         this.helperScore = helperScore;
+        soundTrack = Gdx.audio.newMusic(Gdx.files.internal("assets/audio/music/starforge-saga-281379.mp3"));
+        soundTrack.setVolume(0.3f);
         stage = new Stage ();
 
         enemiesList = new ArrayList<>();
@@ -169,9 +174,17 @@ private ArrayList<Attack> attacks;
         }
     }
 
+    public void endGame() {
+        soundTrack.stop();
+        GameOverScreen gameOver = new GameOverScreen(main, kirby);
+        main.setScreen(gameOver);
+    }
+
     @Override
     public void show() {
         super.show();
+        soundTrack.setLooping(true);
+        soundTrack.play();
         world = new World (new Vector2(0, 0), true);
         world.setContactListener(this);                                 // listener de contactos
 
@@ -241,6 +254,7 @@ private ArrayList<Attack> attacks;
 
         renderKeyContador();
         renderScore();
+        renderName();
 
         //IU
         uiStage.act(delta);
@@ -286,6 +300,17 @@ private ArrayList<Attack> attacks;
         batch.end();
     }
 
+    private void renderName() {
+        Batch batch = stage.getBatch();
+        batch.begin();
+        font.getData().setScale(0.34f);
+        font.draw(batch, kirby.getName(),
+            kirby.getBody().getPosition().x - 10,
+            kirby.getBody().getPosition().y + 14);
+
+        batch.end();
+    }
+
     public void update () {
         cam.position.set(kirby.getBody().getPosition(),0);
         cam.update();
@@ -318,17 +343,6 @@ private ArrayList<Attack> attacks;
 
             stage.addActor(enemy);
             zonaEnemies.add(enemy);
-        }
-    }
-
-    private void loadEnemies() {
-
-        // si se eliminan todos los enemies de una zona o grupo se realiza un respawn
-        for (int zona = 0; zona < enemyZonaCoordenadas.length; zona++) {
-            ArrayList<Enemy> zoneEnemies = enemiesList.get(zona);
-            if (zoneEnemies.isEmpty()) {
-                createEnemiesZona(zona);
-            }
         }
     }
 
@@ -623,18 +637,18 @@ private ArrayList<Attack> attacks;
 
         if (setContact(contact, this.kirby, "spikes")) {
             kirby.setDamageFire(false);
+            kirby.setcurrentEnemy(null);
             kirby.setState(EnumStates.DAMAGE);
             kirby.setAnimation(EnumStates.DAMAGE);
             kirby.subPointsPerItem(EnumItemType.SPIKES);
         }
 
         if ((setContact(contact, this.kirby, "Hole"))) {
-            puedoResetKirby = true;
+            endGame();
+            /*puedoResetKirby = true;
             kirby.setState(EnumStates.STAY);
             kirby.setAnimation(EnumStates.STAY);
-            kirby.subPointsPerItem(EnumItemType.HOLE);
-        } else {
-            puedoResetKirby = false;
+            kirby.subPointsPerItem(EnumItemType.HOLE);*/
         }
     }
 
@@ -649,6 +663,10 @@ private ArrayList<Attack> attacks;
         if (setContact(contact, this.kirby, "suelo")
             || setContact(contact, this.kirby, "Plataforma")) {
             kirby.setColisionSuelo(false);
+        }
+
+        if ((setContact(contact, this.kirby, "Hole"))) {
+            puedoResetKirby = false;
         }
 
         if ((userDataA instanceof SensorKirby && userDataB instanceof Enemy) ||
