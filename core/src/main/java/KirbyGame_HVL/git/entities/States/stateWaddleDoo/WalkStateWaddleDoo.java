@@ -77,8 +77,8 @@ public class WalkStateWaddleDoo extends StateWaddleDoo {
             waddleDoo.setAnimation(EnumStateEnemy.ATTACK);
         }
 
-        waddleDoo.getBody().setLinearVelocity(movementSpeed, 0);
-        waddleDoo.getBody().applyLinearImpulse(0,-40, waddleDoo.getBody().getPosition().x, waddleDoo.getBody().getPosition().y, true);
+        waddleDoo.getBody().setLinearVelocity(movementSpeed, waddleDoo.getBody().getLinearVelocity().y);
+        waddleDoo.getBody().applyLinearImpulse(0,-20f, waddleDoo.getBody().getPosition().x, waddleDoo.getBody().getPosition().y, true);
     }
 
     @Override

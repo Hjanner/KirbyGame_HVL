@@ -165,7 +165,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
     public void miniGame() {
         minigameManager = new MinigameManager(kirby);                                                                   //toma los datos del kirby
-
+        soundTrack.stop();
         if (nivel == 1 && keysCollected == 5){
             GamePanelCulebrita minigame1 = new GamePanelCulebrita(main, minigameManager);
             main.setScreen(minigame1);
@@ -179,7 +179,6 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
 
     public void endGame() {
-        soundTrack.stop();
         GameOverScreen gameOver = new GameOverScreen(main, kirby);
         main.setScreen(gameOver);
     }
@@ -472,7 +471,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
         if(nivel == 3){
             posx = 3780;
-            posy = 77;
+            posy = 85;
         }
 
         door = new Door(world, main, posx, posy, true);
@@ -776,7 +775,11 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             (userDataB instanceof SensorKirby && userDataA instanceof Enemy)) {
 
             Enemy enemy = (Enemy) (userDataA instanceof Enemy ? userDataA : userDataB);
-            enemy.setState(EnumStateEnemy.WALK);
+            if (enemy instanceof BrontoBurt) {
+                enemy.setState(EnumStateEnemy.FLY);
+            } else {
+                enemy.setState(EnumStateEnemy.WALK);
+            }
         }
     }
 

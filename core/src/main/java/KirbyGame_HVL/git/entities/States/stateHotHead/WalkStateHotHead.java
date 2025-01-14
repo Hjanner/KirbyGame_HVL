@@ -79,9 +79,8 @@ public class WalkStateHotHead extends StateHotHead {
             hotHead.setAnimation(EnumStateEnemy.ATTACK);
         }
 
-        hotHead.getBody().setLinearVelocity(movementSpeed, 0);
-        hotHead.getBody().applyLinearImpulse(0,-40, hotHead.getBody().getPosition().x, hotHead.getBody().getPosition().y, true);
-
+        hotHead.getBody().setLinearVelocity(movementSpeed, hotHead.getBody().getLinearVelocity().y);
+        hotHead.getBody().applyLinearImpulse(0,-20f, hotHead.getBody().getPosition().x, hotHead.getBody().getPosition().y, true);
     }
 
     @Override

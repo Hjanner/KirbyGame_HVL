@@ -37,7 +37,7 @@ public class AttackStateWaddleDoo extends StateWaddleDoo {
             }
         }
 
-        waddleDoo.getBody().applyLinearImpulse(0,-40f, waddleDoo.getBody().getPosition().x, waddleDoo.getBody().getPosition().y, true);
+        waddleDoo.getBody().applyLinearImpulse(0,-9.8f, waddleDoo.getBody().getPosition().x, waddleDoo.getBody().getPosition().y, true);
     }
 
     @Override

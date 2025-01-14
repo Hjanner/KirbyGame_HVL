@@ -430,7 +430,7 @@ public class Kirby extends ActorWithBox2d {
      * */
     @Override
     public void draw (Batch batch, float parentAlpha) {
-        kirbysprite.setPosition(body.getPosition().x - 11,body.getPosition().y - 5);
+        kirbysprite.setPosition(body.getPosition().x - 10,body.getPosition().y - 5);
         kirbysprite.draw(batch);
     }
 

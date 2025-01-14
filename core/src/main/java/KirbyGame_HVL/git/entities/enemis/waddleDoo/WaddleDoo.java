@@ -102,9 +102,9 @@ public class WaddleDoo extends Enemy {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 0.5f;
-        fixtureDef.friction = 0.8f;
-        fixtureDef.restitution = 0.0f;
+        fixtureDef.density = 0.1f;
+        fixtureDef.friction = 0.4f;
+        fixtureDef.restitution = 0.1f;
 
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
