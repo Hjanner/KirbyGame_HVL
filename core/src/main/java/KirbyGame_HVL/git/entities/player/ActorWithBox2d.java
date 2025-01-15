@@ -15,6 +15,8 @@ public abstract class ActorWithBox2d extends Actor {
     protected Main main;
     protected boolean flipX;
 
+    //  Setters y Getters
+
     public Body getBody() {
         return body;
     }
@@ -26,6 +28,8 @@ public abstract class ActorWithBox2d extends Actor {
     public boolean getFlipX() {
         return flipX;
     }
+
+    // Dispose
 
     public abstract void dispose();
 }

@@ -7,7 +7,6 @@ import KirbyGame_HVL.git.entities.States.StatesKirby.DashStateKirby;
 import KirbyGame_HVL.git.entities.States.StatesKirby.EnumStates;
 import KirbyGame_HVL.git.entities.attacks.Attack;
 import KirbyGame_HVL.git.entities.attacks.Beam;
-import KirbyGame_HVL.git.entities.attacks.CloudKirby;
 import KirbyGame_HVL.git.entities.attacks.Fire;
 import KirbyGame_HVL.git.entities.enemis.Enemy;
 import KirbyGame_HVL.git.entities.enemis.EnemyFactory;
@@ -26,33 +25,28 @@ import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
 import KirbyGame_HVL.git.systems.MinigameManager;
 import KirbyGame_HVL.git.screens.minigames.culebrita.GamePanelCulebrita;
 import KirbyGame_HVL.git.screens.minigames.laberinto.GamePanelLaberinto;
+import KirbyGame_HVL.git.systems.MusicManager;
 import KirbyGame_HVL.git.utils.helpers.TiledMapHelper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import com.badlogic.gdx.graphics.Texture;
-
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 
 public class GameScreen extends Pantalla implements ContactListener, Screen {
 
+    // Escenario y Mundo
     private Stage stage;
     private World world;
 
@@ -61,10 +55,9 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private OrthographicCamera cam;
     private TiledMapHelper tiledMapHelper;
     private OrthogonalTiledMapRenderer map;
-    private Box2DDebugRenderer bdr;
 
-//items
-    //keys
+// Items
+    // Keys
     private ArrayList<Key> keys;
     private Array<Key> keysToRemove;
     private Texture keyIconTexture;
@@ -73,13 +66,16 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     private int keysCollected = 0;
     private final int TOTAL_KEYS = 5;
     private BitmapFont font;
-    private Door door;
-    private boolean levelCompleted = false;
 
-    //enemies
+    // Puertas
+    private Door door;
+
+    // Enemies
     private ArrayList<ArrayList<Enemy>> enemiesList;
     private Array<Enemy> enemiesToRemove;
-    private Map<Integer, EnemyFactory> zonaFactories;           // Define que factory usar en cada zona
+
+    // Define que factory usar en cada zona
+    private Map<Integer, EnemyFactory> zonaFactories;
     private int[][][] enemyZonaCoordenadas = {
         {{2050, 816}, {1850, 740}, {1650, 740}, {2010, 696}, {2055, 624}, {1982, 528}, {1982, 528}, {1971, 244}, {2182, 327}},           // zona spanw k - WaddleDees
         {{1750, 130}, {1400, 140}, {1050, 110}, {700, 130}, {100, 110}, {2250, 130}, {2600, 140}, {2950, 130}, {2550, 916}, {2400, 916}},                        // z 2 - w dee piso
@@ -93,50 +89,47 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         {{2005, 1850}, {2105, 1870}, {2205, 1840}, {2720, 1350}, {2720, 1450}, {2720, 1250}, {2720, 1750}, {2720, 1650}, {2720, 1550}, {3512, 700}}
     };
 
-    //ataques
-    private Array<Fire> firesToRemove;
-
-//nubes
+    // Ataques
     private ArrayList<Attack> attacks;
     private Array<Attack> attacksToRemove;
     private float lastCloudCreationTime = 0;
 
-//objetos del mapa
+    // Objetos del mapa
     private Floor floor;
     private Spikes spikes;
     private Hole hole;
     private Platform platformStatic;
     private ArrayList<PlatformMoved> platforms;
 
-    //helpers
+    // Helpers
     private boolean puedoResetKirby = false;
     private MinigameManager minigameManager;
     private float initialX;
     private float initialY;
     private int nivel;
     private int helperScore = 0;
-    private Music soundTrack;
-
     private SpriteBatch batch;
     private Texture brickTexture;
-    private GameOverScreen gameOverScreen;
     private int waddleDeeCount, hotHeadCount, waddleDooCount, brontoBurtCount = 0;
 
+    // Constructor
     public GameScreen(Main main, float initialX, float initialY, int helperScore, int nivel) {
         super(main);
-        this.initialX = initialX ;
-        this.initialY = initialY ;
+
+        this.initialX = initialX;
+        this.initialY = initialY;
         this.nivel = nivel;
         this.main = main;
         this.helperScore = helperScore;
-        soundTrack = Gdx.audio.newMusic(Gdx.files.internal("assets/audio/music/starforge-saga-281379.mp3"));
-        soundTrack.setVolume(0.3f);
         stage = new Stage ();
 
+        //
         enemiesList = new ArrayList<>();
         enemiesToRemove = new Array<>();
         zonaFactories = new HashMap<>();
-        zonaFactories.put(0, new WaddleDeeFactory());                   //se define el factory a usar por grupo
+
+        // Se define el factory a usar por grupo
+        zonaFactories.put(0, new WaddleDeeFactory());
         zonaFactories.put(1, new WaddleDeeFactory());
         zonaFactories.put(2, new BrontoBurdFactory());
         zonaFactories.put(3, new WaddleDeeFactory());
@@ -147,11 +140,10 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         zonaFactories.put(8, new WaddleDooFactory());
         zonaFactories.put(9, new BrontoBurdFactory());
 
-        for (int i = 0; i < enemyZonaCoordenadas.length; i++) {         //se crean ls grupos
+        // Se crean ls grupos
+        for (int i = 0; i < enemyZonaCoordenadas.length; i++) {
             enemiesList.add(new ArrayList<>());
         }
-
-        firesToRemove = new Array<>();
 
         attacks = new ArrayList<>();
         attacksToRemove = new Array<>();
@@ -163,55 +155,41 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         font.setColor(Color.WHITE);
     }
 
-    public void miniGame() {
-        minigameManager = new MinigameManager(kirby);                                                                   //toma los datos del kirby
-        soundTrack.stop();
-        if (nivel == 1 && keysCollected == 5){
-            GamePanelCulebrita minigame1 = new GamePanelCulebrita(main, minigameManager);
-            main.setScreen(minigame1);
-        }else if (nivel == 2 && waddleDeeCount >= 5 && waddleDooCount >= 5 && brontoBurtCount >= 5 && hotHeadCount >= 5){
-            GamePanelLaberinto minigame2 = new GamePanelLaberinto(main, minigameManager);
-            main.setScreen(minigame2);
-        } else if (nivel == 3) {
-            endGame();
-        }
-    }
-
-
-    public void endGame() {
-        GameOverScreen gameOver = new GameOverScreen(main, kirby);
-        main.setScreen(gameOver);
-    }
-
     @Override
     public void show() {
         super.show();
-        soundTrack.setLooping(true);
-        soundTrack.play();
-        world = new World (new Vector2(0, 0), true);
-        world.setContactListener(this);                                 // listener de contactos
 
+        // Iniciamos la Musica
+        MusicManager.play();
+
+        // Iniciamos el Mundo
+        world = new World (new Vector2(0, 0), true);
+
+        // Listener de contactos
+        world.setContactListener(this);
+
+        // Creamos el Kirby
         kirby = new Kirby(world, main, initialX, initialY);
         setScoreInGame(helperScore);
 
+        // Añadimos el kirby al escenario
         stage.addActor(kirby);
+
+        // Añadimos la camara
         cam = (OrthographicCamera) stage.getCamera();
         cam.zoom = 0.34f;
 
-        //UI
-        //loadAssetsKey();
-
         createEnemies();
 
-        //items
+        // Items
         createKeys();
         createDoor();
 
+        // Iniciamos el mapa
         tiledMapHelper = new TiledMapHelper();
         map = tiledMapHelper.setupmap();
-        bdr = new Box2DDebugRenderer();
 
-        //map elements
+        // Elementos del Mapa
         createPlatformMoved();
         createFloor();
         spikes = new Spikes(world, map, 4);
@@ -226,8 +204,8 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     @Override
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        //Gdx.gl.glClearColor(0, 0, 0, 0);
 
+        // Iniciamos el batch para el texto del GameScreen
         batch.begin();
         batch.draw(brickTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.end();
@@ -236,6 +214,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
         loadAssetsKey();
 
+        // Reseteamos al kirby al inicio
         if (puedoResetKirby) {
             kirby.resetPosition();
             puedoResetKirby = false;
@@ -252,10 +231,9 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         stage.act();
         update();
         map.render();
-        bdr.render(world, cam.combined);
         stage.draw();
 
-        if (nivel == 1 ) renderKeyContador();
+        if (nivel == 1) renderKeyContador();
         else if (nivel == 2) renderEnemiesContador();
 
 
@@ -267,6 +245,31 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         uiStage.draw();
     }
 
+    // Cargamos los Minijuegos
+    public void miniGame() {
+        minigameManager = new MinigameManager(kirby);                                                                   //toma los datos del kirby
+        if (nivel == 1 && keysCollected == 5) {
+            MusicManager.stop();
+            GamePanelCulebrita minigame1 = new GamePanelCulebrita(main, minigameManager);
+            main.setScreen(minigame1);
+        } else if (nivel == 2 && waddleDeeCount >= 5 && waddleDooCount >= 5 && hotHeadCount >= 5 && brontoBurtCount >= 5){
+            MusicManager.stop();
+            GamePanelLaberinto minigame2 = new GamePanelLaberinto(main, minigameManager);
+            main.setScreen(minigame2);
+        } else if (nivel == 3) {
+            MusicManager.stop();
+            endGame();
+        }
+    }
+
+
+    // Pantalla del final del Juego
+    public void endGame() {
+        GameOverScreen gameOver = new GameOverScreen(main, kirby);
+        main.setScreen(gameOver);
+    }
+
+    // Dibujamos las llaves
     private void renderKeyContador() {
         Batch batch = stage.getBatch();
         batch.begin();
@@ -292,6 +295,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         batch.end();
     }
 
+    // Dibujamos el contador de enemigos
     private void renderEnemiesContador() {
         Batch batch = stage.getBatch();
         batch.begin();
@@ -364,6 +368,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             baseY);
     }
 
+    // Dibujamos la puntuacion
     private void renderScore() {
         Batch batch = stage.getBatch();
         batch.begin();
@@ -378,6 +383,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         batch.end();
     }
 
+    // Dibujamos el nombre del Jugador
     private void renderName() {
         Batch batch = stage.getBatch();
         batch.begin();
@@ -389,13 +395,14 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         batch.end();
     }
 
+    // Actualizamos la posicion de la camara
     public void update () {
         cam.position.set(kirby.getBody().getPosition(),0);
         cam.update();
         map.setView(cam);
     }
 
-//ENEMIES
+    // Creamos a los enemigos
     private void createEnemies() {
         // crea enemies por cada zonas
         for (int zona = 0; zona < enemyZonaCoordenadas.length; zona++) {
@@ -424,6 +431,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
     }
 
+    // Actualizamos el contador de enemigos
     private void updateCountEnemiesDeleted(Enemy enemy){
         if (enemy instanceof WaddleDee) waddleDeeCount++;
         else if (enemy instanceof HotHead) hotHeadCount++;
@@ -432,29 +440,35 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
     }
 
+    // Eliminamos del escenario y del mundo a los enemigos
     private void deleteEnemies() {
         for (ArrayList<Enemy> zoneEnemies : enemiesList) {
-            for (Enemy enemy : new ArrayList<>(zoneEnemies)) {                          //  una copia para evitar errores
+            // Una copia para evitar errores
+            for (Enemy enemy : new ArrayList<>(zoneEnemies)) {
                 if (enemiesToRemove.contains(enemy, true)) {
                     if (nivel == 2) updateCountEnemiesDeleted(enemy);
-                    zoneEnemies.remove(enemy);                          // Eliminar de la lista de la zona
+                    // Eliminar de la lista de la zona
+                    zoneEnemies.remove(enemy);
                 }
             }
         }
         enemiesToRemove.clear();
     }
 
+    // Colision del Kirby con un enemigo
     private void manejadorEnemyColition(Kirby kirby, Enemy enemy) {
         if (kirby.getcurrentState() instanceof DashStateKirby) {
-            //eliminacion de enemy por dash
+            // Eliminacion de enemy por dash
             if (!enemiesToRemove.contains(enemy, true)) {
                 enemy.setFlipX(kirby.getFlipX());
                 enemy.setState(EnumStateEnemy.DIE);
-                kirby.addPointsPerEnemy(enemy);                 //agrega puntos por eliminacion de enemy
+                // Agrega puntos por eliminacion de enemy
+                kirby.addPointsPerEnemy(enemy);
                 enemiesToRemove.add(enemy);
             }
         } else {
-            //kirby recibe daño
+
+            // Kirby recibe daño
             if (kirby.getPoder()) {
                 kirby.setcurrentEnemy(null);
             }
@@ -465,7 +479,9 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
     }
 
-//objetos mapa
+// Objetos mapa
+
+    // Creamos las puertas
     private void createDoor() {
         int posx = 2670, posy = 1285;
 
@@ -478,12 +494,14 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         stage.addActor(door);
     }
 
+    // Creamos el suelo
     public void createFloor(){
         for (int i = 2; i < 4; i++) {
             floor = new Floor(world, map, i);
         }
     }
 
+    // Creamos las plataformas moviles
     private void createPlatformMoved() {
         platforms = new ArrayList<>();
         PlatformMoved verticalPlatform = new PlatformMoved(world, main, 3475, 1300, true);
@@ -511,6 +529,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         stage.addActor(horizontalPlatform4);
     }
 
+    // Actualizamos los movimientos de las plataformas
     private void updateMovementPlataforms(float delta){
         for (PlatformMoved platform : platforms) {
             platform.act(delta);
@@ -518,7 +537,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     }
 
 //ITEMS
-    //keys
+    // Establecemos el tamaño de las llaves
     private void loadAssetsKey(){
         keyIconTexture = main.getManager().get("assets/art/sprites/spritesItems/Key.png");
         keyIconRegion = new TextureRegion(keyIconTexture, 32,32);
@@ -526,6 +545,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         keyIconSprite.setSize(16, 16);
     }
 
+    // Creamos las llaves en el mundo
     private void createKeys(){
         Key key1 = new Key(world, main, 105, 2120);
         Key key2 = new Key(world, main, 110, 1080);
@@ -545,6 +565,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
     }
 
+    // Eliminamos las llaves
     private void deleteKeys(){
         for (Key key : keysToRemove) {
             world.destroyBody(key.getBody());
@@ -553,6 +574,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         keysToRemove.clear();
     }
 
+    // Colision del jugador con las llave
     private void manejadorKeyColition(){
         for (Key key : keys) {
             if (key.isCollected() && !keysToRemove.contains(key, true)) {
@@ -561,10 +583,9 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
         keysCollected++;
         kirby.addPointsPerItems(EnumItemType.KEY);
-        //un  mensaje en pantalla ir en pantalla
     }
 
-//nube
+    // Cargamos las nubes
     public void cloud () {
         lastCloudCreationTime += Gdx.graphics.getDeltaTime();
         if (lastCloudCreationTime >= 1f && kirby.getCloud() != null) {
@@ -572,6 +593,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
     }
 
+    // Cargamos las estrellas
     public void star () {
         lastCloudCreationTime += Gdx.graphics.getDeltaTime();
         if (lastCloudCreationTime >= 1f && kirby.getStar() != null) {
@@ -579,17 +601,23 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
     }
 
+    // Eliminamos los ataques
     public void deleteAttacks(){
         for (Attack attack : attacksToRemove) {
             if (attack.getBody() != null) {
-                world.destroyBody(attack.getBody());     // Destruye el cuerpo en Box2D
-                attack.remove();                         // Elimina del stage
+
+                // Destruye el cuerpo en Box2D
+                world.destroyBody(attack.getBody());
+
+                // Elimina del stage
+                attack.remove();
                 attacks.remove(attack);
             }
         }
         attacksToRemove.clear();
     }
 
+    // Colision del ataque con el enemigo
     private void manejadorAttackEnemyCollision(Attack attack, Enemy enemy) {
         if (!attacksToRemove.contains(attack, true)) {                                       // en lo que haga contacto desaparece menos el Beam
             if (!(attack instanceof Beam)) {
@@ -605,18 +633,19 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
                 enemy.setFlipX(!attack.getSentido());
             }
             enemy.setState(EnumStateEnemy.DIE);
-            kirby.addPointsPerEnemy(enemy);                 //agrega puntos por eliminacion de enemy
+            // Agrega puntos por eliminacion de enemy
+            kirby.addPointsPerEnemy(enemy);
             enemiesToRemove.add(enemy);
         }
     }
 
+    // Colision del kirby con un ataque del enemigo
     private void manejadorAttackKirbyCollision(Attack attack){
 
         if (attack.getAttackOfKirby()){                                                          //si el ataque es el kirby no pasa nada
             return;
         }
 
-        //animaciones de muerte del kirby y debe ir logica de puntos
         if (attack instanceof Fire) {
             kirby.setDamageFire(true);
         }
@@ -630,15 +659,18 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         kirby.setFlipx(!attack.getSentido());
         kirby.setState(EnumStates.DAMAGE);
         kirby.setAnimation(EnumStates.DAMAGE);
-        kirby.subPointsPerItem(EnumItemType.ATTACK);               //resta punto por ser atacado por un enemigo
+        // Resta punto por ser atacado por un enemigo
+        kirby.subPointsPerItem(EnumItemType.ATTACK);
 
-        if (!attacksToRemove.contains(attack, true)) {                                  // en lo que haga contacto desaparece
+        if (!attacksToRemove.contains(attack, true)) {
+            // En lo que haga contacto desaparece menos el Beam
             if (!(attack instanceof Beam)) {
                 attacksToRemove.add(attack);
             }
         }
     }
 
+    // Colision del kirby en estado de absorcion con un enemigo
     private void manejadorEnemyKirbyAbsorbCollition(Kirby kirby, Enemy enemy) {
         kirby.setcurrentEnemy(enemy);
         if (!enemiesToRemove.contains(enemy, true)) {
@@ -650,12 +682,17 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
     }
 
 //listener
+
+    // Detectamos el contacto
     private boolean setContact(Contact contact, Object userA, Object userB) {
         return ((contact.getFixtureA().getUserData().equals(userA) && contact.getFixtureB().getUserData().equals(userB)) || (contact.getFixtureA().getUserData().equals(userB) && contact.getFixtureB().getUserData().equals(userA)));
     }
 
+    // Detecta el contacto
     @Override
     public void beginContact(Contact contact) {
+
+        // Obtenemos los userData los objetos que entraron en contacto
         Fixture fixtureA = contact.getFixtureA();
         Fixture fixtureB = contact.getFixtureB();
 
@@ -663,7 +700,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         Object userDataB = fixtureB.getUserData();
 
 //ITEMS
-        // colision con llave
+        // Colision con llave
         if ((userDataA instanceof Kirby && userDataB instanceof Key) ||
             (userDataB instanceof Kirby && userDataA instanceof Key)) {
 
@@ -675,6 +712,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             }
         }
 
+        // Colision con Puerta
         if ((userDataA instanceof Kirby && userDataB instanceof Door) ||
             (userDataB instanceof Kirby && userDataA instanceof Door)) {
 
@@ -684,7 +722,8 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
 
 //ENEMIES
-        //colision kirby-enemies y dash
+
+        // Colision kirby-enemies
         if ((userDataA instanceof Kirby && userDataB instanceof Enemy) ||
             (userDataB instanceof Kirby && userDataA instanceof Enemy)) {
 
@@ -696,12 +735,11 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
 
             }
             else {
-                // debe llamar tambien a manejadorEnemyColition aqui para la logica de los puntos perdidos
                 manejadorEnemyColition(kirby, enemy);
             }
         }
 
-        // colision attack-enemies
+        // Colision attack-enemies
         if ((userDataA instanceof Attack && userDataB instanceof Enemy) ||
             (userDataB instanceof Attack && userDataA instanceof Enemy)) {
 
@@ -713,7 +751,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             manejadorAttackEnemyCollision(attack, enemy);
         }
 
-        // colision ataque-kirby
+        // Colision attack-kirby
         if ((userDataA instanceof Attack && userDataB instanceof Kirby) ||
             (userDataB instanceof Attack && userDataA instanceof Kirby)) {
 
@@ -721,6 +759,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             manejadorAttackKirbyCollision(attack);
         }
 
+        // Colision Sensor-Enemie
         if ((userDataA instanceof SensorKirby && userDataB instanceof Enemy) ||
             (userDataB instanceof SensorKirby && userDataA instanceof Enemy)) {
 
@@ -730,13 +769,13 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
 
 //WORLD
-        // colision con el suelo
+        // Colision con el suelo y plataformas
         if (setContact(contact, this.kirby, "suelo")
             || setContact(contact, this.kirby, "Plataforma")) {
             kirby.setColisionSuelo(true);
         }
 
-
+        // Colision con los pinchos
         if (setContact(contact, this.kirby, "spikes")) {
             kirby.setDamageFire(false);
             kirby.setcurrentEnemy(null);
@@ -745,32 +784,38 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             kirby.subPointsPerItem(EnumItemType.SPIKES);
         }
 
+        // Colision con el agujero
         if ((setContact(contact, this.kirby, "Hole"))) {
-            endGame();
-            /*puedoResetKirby = true;
+            puedoResetKirby = true;
             kirby.setState(EnumStates.STAY);
             kirby.setAnimation(EnumStates.STAY);
-            kirby.subPointsPerItem(EnumItemType.HOLE);*/
+            kirby.subPointsPerItem(EnumItemType.HOLE);
         }
     }
 
+    // Detecta cundo termina el contacto
     @Override
     public void endContact(Contact contact) {
+
+        // Obtenemos los userData de cada objeto
         Fixture fixtureA = contact.getFixtureA();
         Fixture fixtureB = contact.getFixtureB();
 
         Object userDataA = fixtureA.getUserData();
         Object userDataB = fixtureB.getUserData();
 
+        // Colision con las plataformas
         if (setContact(contact, this.kirby, "suelo")
             || setContact(contact, this.kirby, "Plataforma")) {
             kirby.setColisionSuelo(false);
         }
 
+        // Colision con el agujero
         if ((setContact(contact, this.kirby, "Hole"))) {
             puedoResetKirby = false;
         }
 
+        // Colision Sensor-Enemie
         if ((userDataA instanceof SensorKirby && userDataB instanceof Enemy) ||
             (userDataB instanceof SensorKirby && userDataA instanceof Enemy)) {
 
@@ -807,6 +852,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         stage.getViewport().update(width, height, true);
     }
 
+    // Eliminamos lo que se encuentra en el mapa
     @Override
     public void dispose() {
         // Dispose Stage and Box2D World
@@ -818,9 +864,6 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
         if (map != null) {
             map.dispose();
-        }
-        if (bdr != null) {
-            bdr.dispose();
         }
 
         // Dispose Kirby
@@ -870,14 +913,14 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
         }
         if (door != null) {
             door.dispose();
+
+            // Clear collections
+            if (enemiesToRemove != null) enemiesToRemove.clear();
+            if (keysToRemove != null) keysToRemove.clear();
+            if (attacksToRemove != null) attacksToRemove.clear();
+            if (attacks != null) attacks.clear();
+
+
         }
-
-        // Clear collections
-        if (enemiesToRemove != null) enemiesToRemove.clear();
-        if (keysToRemove != null) keysToRemove.clear();
-        if (attacksToRemove != null) attacksToRemove.clear();
-        if (firesToRemove != null) firesToRemove.clear();
-        if (attacks != null) attacks.clear();
     }
-
 }

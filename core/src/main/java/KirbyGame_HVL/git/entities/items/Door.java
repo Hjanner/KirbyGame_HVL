@@ -10,25 +10,29 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import KirbyGame_HVL.git.Main;
 
 public class Door extends ActorWithBox2d {
+
+// Atributos
+    // Texturas de la puerta
     private Texture doorTexture;
     private TextureRegion doorTextureRegion;
     private Sprite doorSprite;
-    private boolean isActive;
 
+    // Constructor
     public Door(World world, Main main, float x, float y, boolean tipoPuerta) {
         this.world = world;
         this.main = main;
-        this.isActive = false;
         createBody(x, y);
         loadTextures(tipoPuerta);
     }
 
+    // Dibujamos la puerta
     @Override
     public void draw(Batch batch, float parentAlpha) {
         doorSprite.setPosition(body.getPosition().x - 9.5f, body.getPosition().y - 12);
         doorSprite.draw(batch);
     }
 
+    // Creamos el cuerpo de la puerta
     private void createBody(float x, float y) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(x, y);
@@ -37,11 +41,12 @@ public class Door extends ActorWithBox2d {
         Body body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(8.5f, 12);                     // Ajusta el tamaño según necesites
+        shape.setAsBox(8.5f, 12);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.isSensor = true;                         // sensor
+        // Sensor
+        fixtureDef.isSensor = true;
 
         Fixture fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
@@ -51,6 +56,7 @@ public class Door extends ActorWithBox2d {
         this.body = body;
     }
 
+    // Cargamos las texturas
     private void loadTextures(boolean tipoPuerta) {
         if (tipoPuerta) {
             doorTexture = main.getManager().get("assets/art/sprites/spritesItems/Door1.png");
@@ -62,24 +68,13 @@ public class Door extends ActorWithBox2d {
         doorSprite.setSize(19, 26.5f);
     }
 
-    public Body getBody() {
-        return body;
-    }
-
-    public void setActive(boolean active) {
-        this.isActive = active;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
+    // Actualizamos la puerta
     @Override
     public void act(float delta) {
         super.act(delta);
-
     }
 
+    // Eliminamos cualquier tipo de residuo
     public void dispose() {
         if (body != null) {
             world.destroyBody(body);

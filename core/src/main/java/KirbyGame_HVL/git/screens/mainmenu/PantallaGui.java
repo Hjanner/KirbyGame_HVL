@@ -24,13 +24,7 @@ import org.w3c.dom.Text;
 
 public class PantallaGui extends Pantalla {
 
-    /* Atributos:
-       Entre estos atributos estan los distintos botones del menu, las tablas en donde se
-       guardan dichos botones para almacenarlas ordenadamente y un spritebatch para poder
-       cambiar de pantalla. Tambien se encuentra la skin de los botones y su respectivo Stage para
-       operar con el escenario y añadir los distintoa actores.
-    * */
-    public GameScreen gameScreen;
+    // Atributos
     private Main main;
     private Stage stage;
     private Skin skin;
@@ -47,8 +41,7 @@ public class PantallaGui extends Pantalla {
     private Sound soundClick;
     private NameManager nameManager;
 
-    /*Constructor en donde preparamos nuestro batch para utilizarlo
-     * */
+    // Constructor
     public PantallaGui(Main main) {
         super(main);
         this.main = main;
@@ -126,8 +119,6 @@ public class PantallaGui extends Pantalla {
             }
         });
 
-        /*Si se pulsa el boton cambia de pantalla a la del propio kirby.
-         * */
         singleplayer.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {

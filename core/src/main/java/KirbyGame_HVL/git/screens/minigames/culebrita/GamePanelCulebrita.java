@@ -4,6 +4,7 @@ import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.screens.gameplay.GameScreen;
 import KirbyGame_HVL.git.systems.MinigameManager;
 import KirbyGame_HVL.git.systems.MinigameWindow;
+import KirbyGame_HVL.git.systems.MusicManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GamePanelCulebrita extends MinigameWindow implements Screen {
+
+    // Atributos
     private OrthographicCamera camera;
     private Viewport viewport;
     private ShapeRenderer shapeRenderer;
@@ -53,6 +56,7 @@ public class GamePanelCulebrita extends MinigameWindow implements Screen {
     private ArrayList<String> odsImages;
     private final String ODS_IMAGES_PATH = "assets/art/minijuegos/ods/";
 
+    // Constructor
     public GamePanelCulebrita(Main main, MinigameManager manager) {
         super(manager);
         this.main = main;
@@ -112,7 +116,7 @@ public class GamePanelCulebrita extends MinigameWindow implements Screen {
         }
         shapeRenderer.end();
 
-        // obstaculos y ds
+        // obstaculos y ods
         batch.begin();
         for (Rectangle obstacle : obstacles) {
             batch.draw(obstacleTexture, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
@@ -124,6 +128,7 @@ public class GamePanelCulebrita extends MinigameWindow implements Screen {
         batch.end();
     }
 
+    // Dibujamos el puntaje
     private void renderUI() {
         font.getData().setScale(1.5f);
         font.setColor(1, 1, 1, 1);
@@ -138,6 +143,7 @@ public class GamePanelCulebrita extends MinigameWindow implements Screen {
         }
     }
 
+    // Mensaje de ganador
     private void renderWinScreen() {
         font.getData().setScale(3);
         font.setColor(0, 1, 0, 1);
@@ -150,6 +156,7 @@ public class GamePanelCulebrita extends MinigameWindow implements Screen {
         }
     }
 
+    // Mensaje de perdedor
     private void renderGameOverScreen() {
         font.getData().setScale(3);
         font.setColor(1, 0, 0, 1);
@@ -188,6 +195,7 @@ public class GamePanelCulebrita extends MinigameWindow implements Screen {
         main.setScreen(game);
     }
 
+    // Iniciamos el juego
     private void initGame() {
         snakeBody = new ArrayList<>();
         obstacles = new ArrayList<>();
@@ -202,6 +210,7 @@ public class GamePanelCulebrita extends MinigameWindow implements Screen {
         direction = Input.Keys.RIGHT;
     }
 
+    // Cargamos las imagenes de los ODS
     private void loadODSImages() {
         try {
             FileHandle dirHandle = Gdx.files.internal(ODS_IMAGES_PATH);
@@ -233,7 +242,6 @@ public class GamePanelCulebrita extends MinigameWindow implements Screen {
             backgroundTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
             obstacleTexture = new Texture(Gdx.files.internal("assets/art/minijuegos/imagen.png"));
             foodTexture = getRandomFoodTexture(); // Inicializar con una imagen aleatoria
-            //gameOverTexture = new Texture(Gdx.files.internal("assets/art/minijuegos/game_over.png"));
         } catch (Exception e) {
             System.err.println("Error al cargar las textura: " + e.getMessage());
             Gdx.app.exit();
@@ -407,10 +415,6 @@ public class GamePanelCulebrita extends MinigameWindow implements Screen {
         snakeBody.add(newSegment);
     }
 
-    public void gameCompleted(int score) {
-        //main.setScreen(main.gameScreen);
-    }
-
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
@@ -433,6 +437,7 @@ public class GamePanelCulebrita extends MinigameWindow implements Screen {
     @Override
     public void resume() {}
 
+    // Eliminamos las imagenes y lineas
     @Override
     public void dispose() {
         if (shapeRenderer != null) shapeRenderer.dispose();

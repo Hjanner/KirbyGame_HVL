@@ -18,7 +18,6 @@ public class AbsorbStateKirby extends StateKirby {
     public void start() {
 
         kirby.setOpuesto(true);
-        System.out.println("Estoy Absorbiendo");
         acummulatedtimer = 0;
         soundAbsorb = Gdx.audio.newSound(Gdx.files.internal("assets/audio/music/suction.mp3"));
         soundAbsorb.loop();

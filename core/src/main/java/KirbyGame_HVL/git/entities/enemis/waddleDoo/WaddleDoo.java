@@ -17,6 +17,8 @@ import com.badlogic.gdx.physics.box2d.*;
 
 public class WaddleDoo extends Enemy {
 
+// Atributos
+    // Texturas y animaciones del WaddleDoo
     private Texture waddleDooWalkTexture;
     private Texture waddleDooDieTexture;
     private Texture waddleDooAttackTexture;
@@ -26,12 +28,10 @@ public class WaddleDoo extends Enemy {
     private TextureRegion [] waddleDooWalkFrames;
     private TextureRegion [] waddleDooDieFrames;
     private TextureRegion [] waddleDooAttackFrames;
-
     private Animation waddleDooAnimationWalk;
     private Animation waddleDooAnimationDie;
     private Animation waddleDooAnimationAttack;
     private Animation currentAnimation;
-
     private Sprite waddleDooSprite;
 
     private boolean isDead = false;
@@ -39,6 +39,7 @@ public class WaddleDoo extends Enemy {
 
     private boolean canShootBeam;
 
+    // Estados del WaddleDoo
     private StateManager stateManager;
     private WalkStateWaddleDoo stateWalk;
     private DieStateWaddleDoo stateDie;
@@ -46,6 +47,7 @@ public class WaddleDoo extends Enemy {
     private AtractStateWaddleDoo stateAtract;
     private AttackStateWaddleDoo stateAttack;
 
+    // Constructor
     public WaddleDoo (World world, Main main, float x, float y) {
         this.world = world;
         this.main = main;
@@ -64,6 +66,7 @@ public class WaddleDoo extends Enemy {
 
     }
 
+    // Setters y Getters
 
     @Override
     public boolean getFlipX () {
@@ -74,8 +77,6 @@ public class WaddleDoo extends Enemy {
     public void setFlipX (boolean flipX) {
         this.flipX = flipX;
     }
-
-    public Body getBody() {return body;}
 
     public World getWorld () {
         return this.world;
@@ -89,6 +90,50 @@ public class WaddleDoo extends Enemy {
         this.canShootBeam = canShootBeam;
     }
 
+    @Override
+    public void setAnimation(EnumStateEnemy typestate) {
+
+        switch (typestate) {
+            case WALK:
+                currentAnimation = waddleDooAnimationWalk;
+                break;
+            case DIE:
+                currentAnimation = waddleDooAnimationDie;
+                break;
+            case ATTACK:
+                currentAnimation = waddleDooAnimationAttack;
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void setState(EnumStateEnemy typeState) {
+
+        switch (typeState) {
+
+            case WALK:
+                stateManager.setState(stateWalk);
+                break;
+            case DIE:
+                stateManager.setState(stateDie);
+                break;
+            case DIE2:
+                stateManager.setState(stateDie2);
+                break;
+            case ATRACT:
+                stateManager.setState(stateAtract);
+                break;
+            case ATTACK:
+                stateManager.setState(stateAttack);
+                break;
+            default:
+                break;
+        }
+    }
+
+    // Creamos el cuerpo del WaddleDoo
     @Override
     public void createBody(World world, float x, float y) {
 
@@ -113,6 +158,7 @@ public class WaddleDoo extends Enemy {
         shape.dispose();
     }
 
+    // Dibujamos el WaddleDoo
     @Override
     public void draw(Batch batch, float parentAlpha) {
         if (isDisposed || isDead) {
@@ -123,6 +169,7 @@ public class WaddleDoo extends Enemy {
 
     }
 
+    // Actualizamos el WaddleDoo
     @Override
     public void act(float delta) {
         if (isDisposed) {
@@ -133,6 +180,7 @@ public class WaddleDoo extends Enemy {
         updateAnimation(delta);
     }
 
+    // Cargamos las texturas y animaciones del WaddleDoo
     private void loadTextures() {
         waddleDooWalkTexture = main.getManager().get("assets/art/sprites/spritesWaddleDoo/WaddleDooWalk.png");
         waddleDooWalkTextureRegion = new TextureRegion(waddleDooWalkTexture, 256,32);
@@ -172,6 +220,7 @@ public class WaddleDoo extends Enemy {
 
     }
 
+    // Lanzar el Rayo
     public void shootBeam () {
         if (canShootBeam) {
             Beam beam = new Beam(world, this, !flipX);
@@ -179,6 +228,7 @@ public class WaddleDoo extends Enemy {
         }
     }
 
+    // Actualizamos las animaciones del WaddleDoo
     @Override
     public void updateAnimation(float delta) {
         duration += delta;
@@ -187,54 +237,7 @@ public class WaddleDoo extends Enemy {
         waddleDooSprite.setFlip(flipX, false);
     }
 
-    @Override
-    public void setState(EnumStateEnemy typeState) {
-
-        switch (typeState) {
-
-            case WALK:
-                stateManager.setState(stateWalk);
-                break;
-            case DIE:
-                stateManager.setState(stateDie);
-                break;
-            case DIE2:
-                stateManager.setState(stateDie2);
-                break;
-            case ATRACT:
-                stateManager.setState(stateAtract);
-                break;
-            case ATTACK:
-                stateManager.setState(stateAttack);
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public void setAnimation(EnumStateEnemy typestate) {
-
-        switch (typestate) {
-            case WALK:
-                currentAnimation = waddleDooAnimationWalk;
-                break;
-            case DIE:
-                currentAnimation = waddleDooAnimationDie;
-                break;
-            case ATTACK:
-                currentAnimation = waddleDooAnimationAttack;
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public State getcurrentState() {
-        return stateManager.getState();
-    }
-
+    // Eliminamos cualquier tipo de residuo
     public void dispose() {
         if (!isDisposed) {
             isDisposed = true;

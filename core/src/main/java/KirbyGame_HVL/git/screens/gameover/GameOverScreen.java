@@ -3,6 +3,7 @@ package KirbyGame_HVL.git.screens.gameover;
 import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.entities.player.Kirby;
 import KirbyGame_HVL.git.screens.mainmenu.Pantalla;
+import KirbyGame_HVL.git.systems.MusicManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;

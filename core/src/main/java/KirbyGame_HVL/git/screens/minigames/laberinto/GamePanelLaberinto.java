@@ -4,6 +4,7 @@ import KirbyGame_HVL.git.Main;
 import KirbyGame_HVL.git.screens.gameplay.GameScreen;
 import KirbyGame_HVL.git.systems.MinigameManager;
 import KirbyGame_HVL.git.systems.MinigameWindow;
+import KirbyGame_HVL.git.systems.MusicManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GamePanelLaberinto extends MinigameWindow implements Screen {
+
+    // Atributos
     private OrthographicCamera camera;
     private Viewport viewport;
     private ShapeRenderer shapeRenderer;
@@ -48,6 +51,7 @@ public class GamePanelLaberinto extends MinigameWindow implements Screen {
     private Main main;
     private MinigameManager minigameManager;
 
+    // Constructor
     public GamePanelLaberinto(Main main, MinigameManager manager) {
         super(manager);
         this.main = main;
@@ -73,6 +77,7 @@ public class GamePanelLaberinto extends MinigameWindow implements Screen {
         initGame();
     }
 
+    // Texturas de los objetos del laberinto
     private void loadAssets() {
         try {
             backgroundTexture = new Texture(Gdx.files.internal("assets/art/minijuegos/background.png"));
@@ -84,6 +89,7 @@ public class GamePanelLaberinto extends MinigameWindow implements Screen {
             Gdx.app.exit();
         }
     }
+
 
     private void loadODSImages() {
         try {
@@ -301,6 +307,7 @@ public class GamePanelLaberinto extends MinigameWindow implements Screen {
         }
     }
 
+    // Eliminamos las texturas y lineas del juego
     @Override
     public void dispose() {
         if (shapeRenderer != null) shapeRenderer.dispose();

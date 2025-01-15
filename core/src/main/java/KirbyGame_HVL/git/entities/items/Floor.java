@@ -10,10 +10,13 @@ import com.badlogic.gdx.physics.box2d.*;
 
 public class Floor extends ActorWithBox2d implements Box2dSpace {
 
+    // Constructor
     public Floor (World world,OrthogonalTiledMapRenderer map, int layerindex) {
         createBody(world, map, layerindex);
     }
 
+    // Creamos el suelo y las paredes
+    @Override
     public void createBody (World world, OrthogonalTiledMapRenderer map, int layerindex) {
         BodyDef bodydef = new BodyDef();
         PolygonShape shape = new PolygonShape();
@@ -30,6 +33,7 @@ public class Floor extends ActorWithBox2d implements Box2dSpace {
         shape.dispose();
     }
 
+    // Eliminamos cualquier tipo de residuo
     @Override
     public void dispose() {
         if (body != null) {

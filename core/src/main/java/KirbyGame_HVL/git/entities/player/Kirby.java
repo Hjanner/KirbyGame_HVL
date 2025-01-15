@@ -21,15 +21,7 @@ import com.badlogic.gdx.physics.box2d.*;
 
 public class Kirby extends ActorWithBox2d {
 
-    /* Atributos:
-     *  Texturas de los distintos movimientos del personaje de kirby,
-     *  con el tamaño de sus respectivas regiones de cada movimiento, el array
-     *  unidimensional que va a tener cada frame de los diversos movimentos y el objeto de
-     *  la clase animacion que va a tener cada movimiento.
-     *  Un objeto Sprite que se va a encargar de actualizar que animacion se esta haciendo
-     *  en este momento y que movimiento, junto con una variable de velocidad constante y un
-     *  booleano que nos va a indicar si debemos voltear la imagen o no.
-     * */
+    // Atributos
 
     // Kirby Normal
     private Texture kirbywalktexture;
@@ -104,6 +96,32 @@ public class Kirby extends ActorWithBox2d {
     private TextureRegion [] kirbyframesAbsorbSpit;
     private TextureRegion [] kirbyFramesDamageFire;
     private TextureRegion [] kirbyFramesAbsorbDamageFire;
+    private Animation kirbyanimationStay;
+    private Animation kirbyanimationWalk;
+    private Animation kirbyanimationDown;
+    private Animation kirbyanimationDash;
+    private Animation kirbyanimationRun;
+    private Animation kirbyanimationJump;
+    private Animation kirbyanimationfall;
+    private Animation kirbyanimationfall2;
+    private Animation kirbyanimationfly;
+    private Animation kirbyanimationflybegin;
+    private Animation kirbyanimationflyfall;
+    private Animation kirbyanimationflyfallend;
+    private Animation kirbyanimationdamage;
+    private Animation kirbyanimationAbsorb;
+    private Animation kirbyanimationAbsorbStay;
+    private Animation kirbyanimationAbsorbWalk;
+    private Animation kirbyanimationAbsorbRun;
+    private Animation kirbyanimationAbsorbJump;
+    private Animation kirbyanimationAbsorbFall;
+    private Animation kirbyanimationAbsorbFall2;
+    private Animation kirbyanimationAbsorbDown;
+    private Animation kirbyanimationAbsorbDamage;
+    private Animation kirbyanimationAbsorbSpit;
+    private Animation kirbyAnimationDamageFire;
+    private Animation kirbyAnimationAbsorbDamageFire;
+
 
     // Fire Kirby
     private Texture FireKirbyStayTexture;
@@ -145,6 +163,19 @@ public class Kirby extends ActorWithBox2d {
     private Texture FireKirbyAttackTexture;
     private TextureRegion FireKirbyAttackTextureRegion;
     private TextureRegion [] FireKirbyAttackFrames;
+    private Animation FireKirbyAnimationStay;
+    private Animation FireKirbyAnimationDown;
+    private Animation FireKirbyAnimationWalk;
+    private Animation FireKirbyAnimationRun;
+    private Animation FireKirbyAnimationDash;
+    private Animation FireKirbyAnimationJump;
+    private Animation FireKirbyAnimationFall;
+    private Animation FireKirbyAnimationFall2;
+    private Animation FireKirbyAnimationFlyBegin;
+    private Animation FireKirbyAnimationFly;
+    private Animation FireKirbyAnimationFlyFall;
+    private Animation FireKirbyAnimationFlyFallEnd;
+    private Animation FireKirbyAnimationAttack;
 
     // Beam Kirby
     private Texture BeamKirbyStayTexture;
@@ -186,70 +217,6 @@ public class Kirby extends ActorWithBox2d {
     private Texture BeamKirbyAttackTexture;
     private TextureRegion BeamKirbyAttackTextureRegion;
     private TextureRegion [] BeamKirbyAttackFrames;
-
-    private Sprite kirbysprite;
-    private float duracion = 0;
-    private boolean opuesto;
-    private boolean colisionSuelo;
-    private boolean realizar;
-    private boolean poder;
-    private boolean damageFire;
-    private StateManager stateManager;
-    private RunStateKirby stateRun;
-    private WalkStateKirby stateWalk;
-    private StayStateKirby stateStay;
-    private JumpStateKirby stateJump;
-    private DashStateKirby stateDash;
-    private FallStateKirby stateFall;
-    private DownStateKirby stateDown;
-    private FlyStateKirby stateFly;
-    private DamageStateKirby stateDamage;
-    private AbsorbStateKirby stateAbsorb;
-    private AttackStateKirby stateAttack;
-
-    // Animaciones de Kirby Normal
-    private Animation kirbyanimationStay;
-    private Animation kirbyanimationWalk;
-    private Animation kirbyanimationDown;
-    private Animation kirbyanimationDash;
-    private Animation kirbyanimationRun;
-    private Animation kirbyanimationJump;
-    private Animation kirbyanimationfall;
-    private Animation kirbyanimationfall2;
-    private Animation kirbyanimationfly;
-    private Animation kirbyanimationflybegin;
-    private Animation kirbyanimationflyfall;
-    private Animation kirbyanimationflyfallend;
-    private Animation kirbyanimationdamage;
-    private Animation kirbyanimationAbsorb;
-    private Animation kirbyanimationAbsorbStay;
-    private Animation kirbyanimationAbsorbWalk;
-    private Animation kirbyanimationAbsorbRun;
-    private Animation kirbyanimationAbsorbJump;
-    private Animation kirbyanimationAbsorbFall;
-    private Animation kirbyanimationAbsorbFall2;
-    private Animation kirbyanimationAbsorbDown;
-    private Animation kirbyanimationAbsorbDamage;
-    private Animation kirbyanimationAbsorbSpit;
-    private Animation kirbyAnimationDamageFire;
-    private Animation kirbyAnimationAbsorbDamageFire;
-
-    // Animaciones de Fire Kirby
-    private Animation FireKirbyAnimationStay;
-    private Animation FireKirbyAnimationDown;
-    private Animation FireKirbyAnimationWalk;
-    private Animation FireKirbyAnimationRun;
-    private Animation FireKirbyAnimationDash;
-    private Animation FireKirbyAnimationJump;
-    private Animation FireKirbyAnimationFall;
-    private Animation FireKirbyAnimationFall2;
-    private Animation FireKirbyAnimationFlyBegin;
-    private Animation FireKirbyAnimationFly;
-    private Animation FireKirbyAnimationFlyFall;
-    private Animation FireKirbyAnimationFlyFallEnd;
-    private Animation FireKirbyAnimationAttack;
-
-    // Beam Kirby
     private Animation BeamKirbyAnimationStay;
     private Animation BeamKirbyAnimationDown;
     private Animation BeamKirbyAnimationWalk;
@@ -264,25 +231,61 @@ public class Kirby extends ActorWithBox2d {
     private Animation BeamKirbyAnimationFlyFallEnd;
     private Animation BeamKirbyAnimationAttack;
 
+    // Estados del Kirby
+    private StateManager stateManager;
+    private RunStateKirby stateRun;
+    private WalkStateKirby stateWalk;
+    private StayStateKirby stateStay;
+    private JumpStateKirby stateJump;
+    private DashStateKirby stateDash;
+    private FallStateKirby stateFall;
+    private DownStateKirby stateDown;
+    private FlyStateKirby stateFly;
+    private DamageStateKirby stateDamage;
+    private AbsorbStateKirby stateAbsorb;
+    private AttackStateKirby stateAttack;
+
+    // Sprite del Kirby
+    private Sprite kirbysprite;
+
+    // Duracion de cada frame
+    private float duracion = 0;
+
+    // Bandera para controlar distintas situaciones
+    private boolean opuesto;
+    private boolean colisionSuelo;
+    private boolean realizar;
+    private boolean poder;
+    private boolean damageFire;
+
+    // Animacion actual
     private Animation currentAnimation;
+
+    // Nube de Kirby
     private CloudKirby cloudkirby;
+
+    // Manejador del nombre y puntuacion del jugador
     private ScoreManager scoreManager;
     private NameManager nameManager;
 
-    private boolean fireKeyPressed;                 // Bandera para controlar el disparo
+    // Banderas para controlar los ataques de los poderes
+    private boolean fireKeyPressed;
     private boolean beamKeyPressed;
 
+    // Enemigo actual
     private Enemy currentEnemy;
+
+    // Sensor para la absorcion
     private SensorKirby sensorKirby;
+
+    // Estrella de Kirby
     private Star star;
 
+    // Posicion inicial del Kirby
     private float initialX;
     private float initialY;
 
-    /* Constructor en donde se van a cargar todas las texturas y se incializan las regiones de
-       todos los movimientos. Se extraen de las texturas frame por frame con el split para luego
-       pasarlo a un array unidimensional mediante un bucle for, para luego inicializar las respectivas animaciones.
-    * */
+    // Constructor
     public Kirby (World world, Main main, float initialX, float initialY)  {
         this.world = world;
         this.main = main;
@@ -311,10 +314,7 @@ public class Kirby extends ActorWithBox2d {
         load_animation();
     }
 
-    public void resetPosition() {
-        body.setTransform(new Vector2(initialX, initialY), 0);
-        body.setLinearVelocity(0, 0);
-    }
+    // Setters y Getters
 
     public World getWorld () {
         return this.world;
@@ -426,14 +426,332 @@ public class Kirby extends ActorWithBox2d {
         return beamKeyPressed;
     }
 
-    /* Metodo que se utiliza para actualizar la posicion y animacion del Sprite
-     * */
+    public void setDuracion(float duracion) {
+        this.duracion = duracion;
+    }
+
+    public int getCurrentScore() {
+        return scoreManager.getCurrentScore();
+    }
+
+    public void setCurrentScore(int score) {
+        scoreManager.setCurrentScore(score);
+    }
+
+    // Actualizamos la animacion
+    public void setAnimation (EnumStates typestate) {
+
+        switch (typestate) {
+
+            case RUN:
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationRun;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbRun;
+                    }
+                    else {
+                        if (getCurrentEnemy() instanceof HotHead) {
+                            currentAnimation = FireKirbyAnimationRun;
+                        }
+
+                        else if (getCurrentEnemy() instanceof WaddleDoo) {
+                            currentAnimation = BeamKirbyAnimationRun;
+                        }
+
+                    }
+                }
+                break;
+            case WALK:
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationWalk;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbWalk;
+                    }
+                    else {
+                        if (getCurrentEnemy() instanceof HotHead) {
+                            currentAnimation = FireKirbyAnimationWalk;
+                        }
+
+                        else if (getCurrentEnemy() instanceof WaddleDoo) {
+                            currentAnimation = BeamKirbyAnimationWalk;
+                        }
+                    }
+                }
+                break;
+            case DOWN:
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationDown;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbDown;
+                    }
+                    else{
+                        if (getCurrentEnemy() instanceof HotHead) {
+                            currentAnimation = FireKirbyAnimationDown;
+                        }
+
+                        else if (getCurrentEnemy() instanceof WaddleDoo) {
+                            currentAnimation = BeamKirbyAnimationDown;
+                        }
+                    }
+                }
+                break;
+            case DASH:
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationDash;
+                } else {
+                    if (getCurrentEnemy() instanceof HotHead) {
+                        currentAnimation = FireKirbyAnimationDash;
+                    }
+
+                    else if (getCurrentEnemy() instanceof WaddleDoo) {
+                        currentAnimation = BeamKirbyAnimationDash;
+                    }
+                }
+                break;
+            case JUMP:
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationJump;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbJump;
+                    }
+                    else{
+                        if (getCurrentEnemy() instanceof HotHead) {
+                            currentAnimation = FireKirbyAnimationJump;
+                        }
+
+                        else if (getCurrentEnemy() instanceof WaddleDoo) {
+                            currentAnimation = BeamKirbyAnimationJump;
+                        }
+                    }
+                }
+                break;
+            case STAY:
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationStay;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbStay;
+                    }
+                    else{
+                        if (getCurrentEnemy() instanceof HotHead) {
+                            currentAnimation = FireKirbyAnimationStay;
+                        }
+
+                        else if (getCurrentEnemy() instanceof WaddleDoo) {
+                            currentAnimation = BeamKirbyAnimationStay;
+                        }
+                    }
+                }
+                break;
+            case FALL:
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationfall;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbFall;
+                    }
+                    else{
+                        if (getCurrentEnemy() instanceof HotHead) {
+                            currentAnimation = FireKirbyAnimationFall;
+                        }
+
+                        else if (getCurrentEnemy() instanceof WaddleDoo) {
+                            currentAnimation = BeamKirbyAnimationFall;
+                        }
+                    }
+                }
+                break;
+            case FALL2:
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationfall2;
+                }
+                else {
+                    if (!getPoder()) {
+                        currentAnimation = kirbyanimationAbsorbFall2;
+                    }
+                    else{
+                        if (getCurrentEnemy() instanceof HotHead) {
+                            currentAnimation = FireKirbyAnimationFall2;
+                        }
+
+                        else if (getCurrentEnemy() instanceof WaddleDoo) {
+                            currentAnimation = BeamKirbyAnimationFall2;
+                        }
+                    }
+                }
+                break;
+            case FLY:
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationflybegin;
+                } else {
+                    if (getCurrentEnemy() instanceof HotHead) {
+                        currentAnimation = FireKirbyAnimationFlyBegin;
+                    }
+
+                    else if (getCurrentEnemy() instanceof WaddleDoo) {
+                        currentAnimation = BeamKirbyAnimationFlyBegin;
+                    }
+                }
+                break;
+            case FLY2:
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationfly;
+                } else {
+                    if (getCurrentEnemy() instanceof HotHead) {
+                        currentAnimation = FireKirbyAnimationFly;
+                    }
+
+                    else if (getCurrentEnemy() instanceof WaddleDoo) {
+                        currentAnimation = BeamKirbyAnimationFly;
+                    }
+                }
+                break;
+            case FLY3:
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationflyfall;
+                } else {
+                    if (getCurrentEnemy() instanceof HotHead) {
+                        currentAnimation = FireKirbyAnimationFlyFall;
+                    }
+
+                    else if (getCurrentEnemy() instanceof WaddleDoo) {
+                        currentAnimation = BeamKirbyAnimationFlyFall;
+                    }
+                }
+                break;
+            case FLY4:
+                if (getCurrentEnemy() == null) {
+                    currentAnimation = kirbyanimationflyfallend;
+                } else {
+                    if (getCurrentEnemy() instanceof HotHead) {
+                        currentAnimation = FireKirbyAnimationFlyFallEnd;
+                    }
+
+                    else if (getCurrentEnemy() instanceof WaddleDoo) {
+                        currentAnimation = BeamKirbyAnimationFlyFallEnd;
+                    }
+                }
+                break;
+            case DAMAGE:
+                if (getCurrentEnemy() == null) {
+                    if (damageFire) {
+                        currentAnimation = kirbyAnimationDamageFire;
+                    }
+                    else{
+                        currentAnimation = kirbyanimationdamage;
+                    }
+                }
+                else {
+                    if (!getPoder()) {
+                        if (damageFire) {
+                            currentAnimation = kirbyAnimationAbsorbDamageFire;
+                        }
+                        else{
+                            currentAnimation = kirbyanimationAbsorbDamage;
+                        }
+
+                    }
+                    else{
+                        if (damageFire) {
+                            currentAnimation = kirbyAnimationDamageFire;
+                        }
+                        else{
+                            currentAnimation = kirbyanimationdamage;
+                        }
+                    }
+                }
+                break;
+            case ABSORB:
+                currentAnimation = kirbyanimationAbsorb;
+                break;
+            case ATTACK:
+                if (!getPoder()) {
+                    currentAnimation = kirbyanimationAbsorbSpit;
+                }
+
+                else{
+                    if (getCurrentEnemy() instanceof HotHead) {
+                        currentAnimation = FireKirbyAnimationAttack;
+                    }
+
+                    else if (getCurrentEnemy() instanceof WaddleDoo) {
+                        currentAnimation = BeamKirbyAnimationAttack;
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    // Actualizamos los estados del Kirby
+    public void setState(EnumStates typestate) {
+
+        switch (typestate) {
+
+            case RUN:
+                stateManager.setState(stateRun);
+                break;
+            case WALK:
+                stateManager.setState(stateWalk);
+                break;
+            case STAY:
+                stateManager.setState(stateStay);
+                break;
+            case JUMP:
+                stateManager.setState(stateJump);
+                break;
+            case FALL:
+                stateManager.setState(stateFall);
+                break;
+            case DASH:
+                stateManager.setState(stateDash);
+                break;
+            case DOWN:
+                stateManager.setState(stateDown);
+                break;
+            case FLY:
+                stateManager.setState(stateFly);
+                break;
+            case DAMAGE:
+                stateManager.setState(stateDamage);
+                break;
+            case ABSORB:
+                stateManager.setState(stateAbsorb);
+                break;
+            case ATTACK:
+                stateManager.setState(stateAttack);
+                break;
+            default:
+                break;
+
+        }
+    }
+
+    // Respawn al inicio del Kirby
+    public void resetPosition() {
+        body.setTransform(new Vector2(2010, 818), 0);
+        body.setLinearVelocity(0, 0);
+    }
+
+    // Dibujamos al Kirby
     @Override
     public void draw (Batch batch, float parentAlpha) {
         kirbysprite.setPosition(body.getPosition().x - 10,body.getPosition().y - 5);
         kirbysprite.draw(batch);
     }
 
+    // Creamos el Cuerpo del Kirby
     public void createBody (World world, float initialX, float initialY) {
         BodyDef kirbybodydef = new BodyDef();
         kirbybodydef.position.set(initialX,initialY);
@@ -447,6 +765,7 @@ public class Kirby extends ActorWithBox2d {
         kirbyshape.dispose();
     }
 
+    // Cargamos las animaciones y texturas del Kirby
     public void load_animation () {
 
         // Normal Kirby
@@ -672,6 +991,7 @@ public class Kirby extends ActorWithBox2d {
         BeamKirbyAttackFrames = new TextureRegion[tempBeamKirbyAttack.length * tempBeamKirbyAttack[0].length];
 
 
+        // Obtenemos los frames de las animaciones del Kirby
         int id = 0;
         for (int i = 0; i < tempkirbywalk.length; i++) {
             for (int j = 0; j < tempkirbywalk[i].length; j++){
@@ -1081,47 +1401,23 @@ public class Kirby extends ActorWithBox2d {
         currentAnimation = kirbyanimationStay;
     }
 
-    /*Metodo para eliminar las texturas una vez acabe el programa y no quede basura en la
-      memoria.
-    * */
-    public void dispose () {
-        kirbywalktexture.dispose();
-        kirbyStaytexture.dispose();
-        kirbydashtexture.dispose();
-        kirbydowntexture.dispose();
-        kirbyruntexture.dispose();
-        kirbyAbsorbDamagetexture.dispose();
-        kirbyAbsorbDowntexture.dispose();
-        kirbyAbsorbFall2texture.dispose();
-        kirbyAbsorbFalltexture.dispose();
-        kirbyAbsorbJumptexture.dispose();
-        kirbyAbsorbSpittexture.dispose();
-        kirbyAbsorbtexture.dispose();
-        kirbyfall2texture.dispose();
-        kirbyDamagetexture.dispose();
-        kirbyflybegintexture.dispose();
-        kirbyflyfallendtexture.dispose();
-        body.destroyFixture(fixture);
-        world.destroyBody(body);
-    }
-
-
-
-    /*Metodo que permitira realizar todas las acciones del actor kirby en el escenario
-     * */
+    // Acciones del Kirby
     @Override
     public void act (float delta) {
         super.act(delta);
         stateManager.update(delta);
         retroceso();
+
+        // Obtenemos cada frame por separado
         duracion += delta;
         TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duracion, true);
         kirbysprite.setRegion(frame);
-        kirbysprite.flip(flipX,false);
 
-        System.out.println(getBody().getPosition().x + " "+ getBody().getPosition().y);
+        // Volteamos la imagen cuando sea necesario
+        kirbysprite.flip(flipX,false);
     }
 
+    // Lanzamos la Bola de Fuego
     public void shootFire() {
         if (fireKeyPressed) {
             Fire fire = new Fire(world, this, !flipX);
@@ -1129,6 +1425,7 @@ public class Kirby extends ActorWithBox2d {
         }
     }
 
+    // Lanzamos el Rayo Laser
     public void shootBeam () {
         if (beamKeyPressed) {
             Beam beam = new Beam(world, this, !flipX);
@@ -1136,6 +1433,7 @@ public class Kirby extends ActorWithBox2d {
         }
     }
 
+    // Fuerzas de retroceso del Kirby
     private void retroceso () {
         if (stateManager.getState() instanceof FlyStateKirby) {
             body.applyForce(0, -13f, body.getPosition().x, body.getPosition().y, true);
@@ -1166,326 +1464,41 @@ public class Kirby extends ActorWithBox2d {
         }
     }
 
-    public void setDuracion(float duracion) {
-        this.duracion = duracion;
-    }
-
-    public void setAnimation (EnumStates typestate) {
-
-        switch (typestate) {
-
-            case RUN:
-                if (getCurrentEnemy() == null) {
-                    currentAnimation = kirbyanimationRun;
-                }
-                else {
-                    if (!getPoder()) {
-                        currentAnimation = kirbyanimationAbsorbRun;
-                    }
-                    else{
-                        if (getCurrentEnemy() instanceof HotHead) {
-                            currentAnimation = FireKirbyAnimationRun;
-                        }
-
-                        else if (getCurrentEnemy() instanceof WaddleDoo) {
-                            currentAnimation = BeamKirbyAnimationRun;
-                        }
-
-                    }
-                }
-                break;
-            case WALK:
-                if (getCurrentEnemy() == null) {
-                    currentAnimation = kirbyanimationWalk;
-                }
-                else {
-                    if (!getPoder()) {
-                        currentAnimation = kirbyanimationAbsorbWalk;
-                    }
-                    else{
-                        if (getCurrentEnemy() instanceof HotHead) {
-                            currentAnimation = FireKirbyAnimationWalk;
-                        }
-
-                        else if (getCurrentEnemy() instanceof WaddleDoo) {
-                            currentAnimation = BeamKirbyAnimationWalk;
-                        }
-                    }
-                }
-                break;
-            case DOWN:
-                if (getCurrentEnemy() == null) {
-                    currentAnimation = kirbyanimationDown;
-                }
-                else {
-                    if (!getPoder()) {
-                        currentAnimation = kirbyanimationAbsorbDown;
-                    }
-                    else{
-                        if (getCurrentEnemy() instanceof HotHead) {
-                            currentAnimation = FireKirbyAnimationDown;
-                        }
-
-                        else if (getCurrentEnemy() instanceof WaddleDoo) {
-                            currentAnimation = BeamKirbyAnimationDown;
-                        }
-                    }
-                }
-                break;
-            case DASH:
-                if (getCurrentEnemy() == null) {
-                    currentAnimation = kirbyanimationDash;
-                } else {
-                    if (getCurrentEnemy() instanceof HotHead) {
-                        currentAnimation = FireKirbyAnimationDash;
-                    }
-
-                    else if (getCurrentEnemy() instanceof WaddleDoo) {
-                        currentAnimation = BeamKirbyAnimationDash;
-                    }
-                }
-                break;
-            case JUMP:
-                if (getCurrentEnemy() == null) {
-                    currentAnimation = kirbyanimationJump;
-                }
-                else {
-                    if (!getPoder()) {
-                        currentAnimation = kirbyanimationAbsorbJump;
-                    }
-                    else{
-                        if (getCurrentEnemy() instanceof HotHead) {
-                            currentAnimation = FireKirbyAnimationJump;
-                        }
-
-                        else if (getCurrentEnemy() instanceof WaddleDoo) {
-                            currentAnimation = BeamKirbyAnimationJump;
-                        }
-                    }
-                }
-                break;
-            case STAY:
-                if (getCurrentEnemy() == null) {
-                    currentAnimation = kirbyanimationStay;
-                }
-                else {
-                    if (!getPoder()) {
-                        currentAnimation = kirbyanimationAbsorbStay;
-                    }
-                    else{
-                        if (getCurrentEnemy() instanceof HotHead) {
-                            currentAnimation = FireKirbyAnimationStay;
-                        }
-
-                        else if (getCurrentEnemy() instanceof WaddleDoo) {
-                            currentAnimation = BeamKirbyAnimationStay;
-                        }
-                    }
-                }
-                break;
-            case FALL:
-                if (getCurrentEnemy() == null) {
-                    currentAnimation = kirbyanimationfall;
-                }
-                else {
-                    if (!getPoder()) {
-                        currentAnimation = kirbyanimationAbsorbFall;
-                    }
-                    else{
-                        if (getCurrentEnemy() instanceof HotHead) {
-                            currentAnimation = FireKirbyAnimationFall;
-                        }
-
-                        else if (getCurrentEnemy() instanceof WaddleDoo) {
-                            currentAnimation = BeamKirbyAnimationFall;
-                        }
-                    }
-                }
-                break;
-            case FALL2:
-                if (getCurrentEnemy() == null) {
-                    currentAnimation = kirbyanimationfall2;
-                }
-                else {
-                    if (!getPoder()) {
-                        currentAnimation = kirbyanimationAbsorbFall2;
-                    }
-                    else{
-                        if (getCurrentEnemy() instanceof HotHead) {
-                            currentAnimation = FireKirbyAnimationFall2;
-                        }
-
-                        else if (getCurrentEnemy() instanceof WaddleDoo) {
-                            currentAnimation = BeamKirbyAnimationFall2;
-                        }
-                    }
-                }
-                break;
-            case FLY:
-                if (getCurrentEnemy() == null) {
-                    currentAnimation = kirbyanimationflybegin;
-                } else {
-                    if (getCurrentEnemy() instanceof HotHead) {
-                        currentAnimation = FireKirbyAnimationFlyBegin;
-                    }
-
-                    else if (getCurrentEnemy() instanceof WaddleDoo) {
-                        currentAnimation = BeamKirbyAnimationFlyBegin;
-                    }
-                }
-                break;
-            case FLY2:
-                if (getCurrentEnemy() == null) {
-                    currentAnimation = kirbyanimationfly;
-                } else {
-                    if (getCurrentEnemy() instanceof HotHead) {
-                        currentAnimation = FireKirbyAnimationFly;
-                    }
-
-                    else if (getCurrentEnemy() instanceof WaddleDoo) {
-                        currentAnimation = BeamKirbyAnimationFly;
-                    }
-                }
-                break;
-            case FLY3:
-                if (getCurrentEnemy() == null) {
-                    currentAnimation = kirbyanimationflyfall;
-                } else {
-                    if (getCurrentEnemy() instanceof HotHead) {
-                        currentAnimation = FireKirbyAnimationFlyFall;
-                    }
-
-                    else if (getCurrentEnemy() instanceof WaddleDoo) {
-                        currentAnimation = BeamKirbyAnimationFlyFall;
-                    }
-                }
-                break;
-            case FLY4:
-                if (getCurrentEnemy() == null) {
-                    currentAnimation = kirbyanimationflyfallend;
-                } else {
-                    if (getCurrentEnemy() instanceof HotHead) {
-                        currentAnimation = FireKirbyAnimationFlyFallEnd;
-                    }
-
-                    else if (getCurrentEnemy() instanceof WaddleDoo) {
-                        currentAnimation = BeamKirbyAnimationFlyFallEnd;
-                    }
-                }
-                break;
-            case DAMAGE:
-                if (getCurrentEnemy() == null) {
-                    if (damageFire) {
-                        currentAnimation = kirbyAnimationDamageFire;
-                    }
-                    else{
-                        currentAnimation = kirbyanimationdamage;
-                    }
-                }
-                else {
-                    if (!getPoder()) {
-                        if (damageFire) {
-                            currentAnimation = kirbyAnimationAbsorbDamageFire;
-                        }
-                        else{
-                            currentAnimation = kirbyanimationAbsorbDamage;
-                        }
-
-                    }
-                    else{
-                        if (damageFire) {
-                            currentAnimation = kirbyAnimationDamageFire;
-                        }
-                        else{
-                            currentAnimation = kirbyanimationdamage;
-                        }
-                    }
-                }
-                break;
-            case ABSORB:
-                currentAnimation = kirbyanimationAbsorb;
-                break;
-            case ATTACK:
-                if (!getPoder()) {
-                    currentAnimation = kirbyanimationAbsorbSpit;
-                }
-
-                else{
-                    if (getCurrentEnemy() instanceof HotHead) {
-                        currentAnimation = FireKirbyAnimationAttack;
-                    }
-
-                    else if (getCurrentEnemy() instanceof WaddleDoo) {
-                        currentAnimation = BeamKirbyAnimationAttack;
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    public void setState(EnumStates typestate) {
-
-        switch (typestate) {
-
-            case RUN:
-                stateManager.setState(stateRun);
-                break;
-            case WALK:
-                stateManager.setState(stateWalk);
-                break;
-            case STAY:
-                stateManager.setState(stateStay);
-                break;
-            case JUMP:
-                stateManager.setState(stateJump);
-                break;
-            case FALL:
-                stateManager.setState(stateFall);
-                break;
-            case DASH:
-                stateManager.setState(stateDash);
-                break;
-            case DOWN:
-                stateManager.setState(stateDown);
-                break;
-            case FLY:
-                stateManager.setState(stateFly);
-                break;
-            case DAMAGE:
-                stateManager.setState(stateDamage);
-                break;
-            case ABSORB:
-                stateManager.setState(stateAbsorb);
-                break;
-            case ATTACK:
-                stateManager.setState(stateAttack);
-                break;
-            default:
-                break;
-
-        }
-    }
-
+    // Resta puntos segun el tipo de item
     public void subPointsPerItem(EnumItemType damageType){
-        scoreManager.recibirDamage(damageType);         //resta puntos segun el tipo de item
+        scoreManager.recibirDamage(damageType);
     }
 
+    // Agrega puntos por items tomados
     public void addPointsPerItems(EnumItemType type){
-        scoreManager.takeItems(type);                   //recibe punto por items tomados, llave puerta
+        scoreManager.takeItems(type);
     }
 
+    // Agrega puntos segun el enemigo eliminado
     public void addPointsPerEnemy(Enemy enemy){
-        scoreManager.enemyDelete(enemy);                //agrega puntos segun el enemigo eliminado
+        scoreManager.enemyDelete(enemy);
     }
 
-    public int getCurrentScore() {
-        return scoreManager.getCurrentScore();
-    }
-
-    public void setCurrentScore(int score) {
-        scoreManager.setCurrentScore(score);
+    // Eliminamos todas las cosas para que no queden en memoria
+    public void dispose () {
+        kirbywalktexture.dispose();
+        kirbyStaytexture.dispose();
+        kirbydashtexture.dispose();
+        kirbydowntexture.dispose();
+        kirbyruntexture.dispose();
+        kirbyAbsorbDamagetexture.dispose();
+        kirbyAbsorbDowntexture.dispose();
+        kirbyAbsorbFall2texture.dispose();
+        kirbyAbsorbFalltexture.dispose();
+        kirbyAbsorbJumptexture.dispose();
+        kirbyAbsorbSpittexture.dispose();
+        kirbyAbsorbtexture.dispose();
+        kirbyfall2texture.dispose();
+        kirbyDamagetexture.dispose();
+        kirbyflybegintexture.dispose();
+        kirbyflyfallendtexture.dispose();
+        body.destroyFixture(fixture);
+        world.destroyBody(body);
     }
 
 }

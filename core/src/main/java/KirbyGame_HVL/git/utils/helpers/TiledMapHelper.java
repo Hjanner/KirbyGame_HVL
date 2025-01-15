@@ -9,11 +9,12 @@ public class TiledMapHelper {
     // Atributos
     private TiledMap tiledmap;
 
-    // Constructores
+    // Constructor
     public TiledMapHelper () {
 
     }
 
+    // Retornamos el mapa
     public OrthogonalTiledMapRenderer setupmap () {
         tiledmap = new TmxMapLoader().load("assets/art/tilesets/kirbymapfirstlevel.tmx");
         return new OrthogonalTiledMapRenderer(tiledmap);

@@ -7,6 +7,8 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 
 public abstract class Attack extends ActorWithBox2d {
+
+    // Atributos
     protected World world;
     protected Body body;
     protected Fixture fixture;
@@ -17,11 +19,10 @@ public abstract class Attack extends ActorWithBox2d {
     protected float duracion;
     protected float accumulatedtimer;
 
+    // Funcion para crear el body del ataque
     public abstract void createBody(World world, ActorWithBox2d actor, boolean sentido);
 
-    public void setSentido(boolean sentido){
-        this.sentido = sentido;
-    }
+    // Setters y Getters
 
     public boolean getSentido() {
         return sentido;
@@ -34,6 +35,7 @@ public abstract class Attack extends ActorWithBox2d {
     public Body getBody(){
         return this.body;
     }
+
 
     @Override
     public void dispose() {

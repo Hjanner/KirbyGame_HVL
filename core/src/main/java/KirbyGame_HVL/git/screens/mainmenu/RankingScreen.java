@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 public class RankingScreen extends Pantalla {
 
+    // Atributos
     private Stage stage;
     private Skin skin;
     private Table mainTable;
@@ -32,6 +33,7 @@ public class RankingScreen extends Pantalla {
     private Sound soundClick;
     private static final Color LIGHT_PINK = new Color(1, 0.8f, 0.9f, 1);
 
+    // Constructor
     public RankingScreen(Main main) {
         super(main);
         batch = main.getBatch();
@@ -97,6 +99,7 @@ public class RankingScreen extends Pantalla {
 
     }
 
+    // Funcion que lee el archivo y retorna un ranking de mayor a menor
     private String manejadorRanking() {
         ArrayList<String> fecha = new ArrayList<>();
         ArrayList <String> hora = new ArrayList<>();

@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
 
+    // Atributos
     private AssetManager manager;
     public SpriteBatch batch;
     public PantallaGui pantallaini;
@@ -25,16 +26,26 @@ public class Main extends Game {
     public AboutScreen aboutScreen;
     public RankingScreen rankingScreen;
 
+    public SpriteBatch getBatch() {
+        return batch;
+    }
+
+    public AssetManager getManager() {
+        return manager;
+    }
+
+    // Creamos lo necesario para el juego
     @Override
     public void create() {
         batch = new SpriteBatch();
         manager = new AssetManager();
-        gameScreen = new GameScreen(this, 3615, 985, 0, 1);//2010 818
+        gameScreen = new GameScreen(this, 2010, 818, 0, 1);//2010 818
         pantallaini = new PantallaGui(this);
         helpScreen = new HelpScreen(this);
         aboutScreen = new AboutScreen(this);
         rankingScreen = new RankingScreen(this);
 
+        // Texturas del Normal Kirby
         manager.load("assets/art/sprites/SpritesNormalKirby/kirbystay.png", Texture.class);
         manager.load("assets/art/sprites/SpritesNormalKirby/kirbywalking.png", Texture.class);
         manager.load("assets/art/sprites/SpritesNormalKirby/kirbydown.png", Texture.class);
@@ -123,13 +134,5 @@ public class Main extends Game {
 
         manager.finishLoading();
         setScreen(pantallaini);
-    }
-
-    public SpriteBatch getBatch() {
-        return batch;
-    }
-
-    public AssetManager getManager() {
-        return manager;
     }
 }

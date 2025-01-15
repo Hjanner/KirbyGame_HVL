@@ -12,6 +12,8 @@ import com.badlogic.gdx.math.Vector2;
 import org.w3c.dom.Text;
 
 public class Fire extends Attack {
+
+    // Atributos
     private Texture fireTexture;
     private TextureRegion fireRegion;
     private TextureRegion[] fireFrames;
@@ -20,6 +22,7 @@ public class Fire extends Attack {
     private float fireSpeed = 60f;
     private Animation fireanimation;
 
+    // Constructor
     public Fire(World world, ActorWithBox2d actor, boolean sentido) {
         this.world = world;
         this.actor = actor;
@@ -31,12 +34,14 @@ public class Fire extends Attack {
         createBody(this.world, this.actor, sentido);
     }
 
+    // Dibujamos la bola de fuego
     @Override
     public void draw(Batch batch, float parentAlpha) {
         fireSprite.setPosition(body.getPosition().x - 8, body.getPosition().y - 9);
         fireSprite.draw(batch);
     }
 
+    // Creamos el cuerpo de la bola de fuego
     @Override
     public void createBody(World world, ActorWithBox2d actor, boolean direction) {
         BodyDef bodyDef = new BodyDef();
@@ -81,6 +86,7 @@ public class Fire extends Attack {
         shape.dispose();
     }
 
+    // Cargamos las texturas y animacion de la bola de fuego
     private void load_textures () {
         fireTexture = new Texture("assets/art/sprites/SpritesAttacks/fireball.png");
         fireRegion = new TextureRegion(fireTexture, 128, 32);
@@ -101,6 +107,7 @@ public class Fire extends Attack {
 
     }
 
+    // Actualizamos la bola de fuego
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -114,7 +121,7 @@ public class Fire extends Attack {
         float impulse = body.getMass() * velChange;
         body.applyLinearImpulse(new Vector2(impulse, 0), body.getWorldCenter(), true);
 
-        // autodestruccion automatica del fuego  de cierto tiempo
+        // Eliminamos la bola de fuego despues de cierto tiempo
         if (accumulatedtimer > FIRE_LIFETIME) {
             if (world != null && body != null) {
                 world.destroyBody(body);
@@ -125,6 +132,7 @@ public class Fire extends Attack {
         }
     }
 
+    // Actualizamos las animaciones de la bola de fuego
     private void updateAnimation(float delta) {
         duracion += delta;
         TextureRegion frame = (TextureRegion) fireanimation.getKeyFrame(duracion, true);
@@ -137,10 +145,6 @@ public class Fire extends Attack {
             fireTexture.dispose();
             fireTexture = null;
         }
-    }
-
-    public ActorWithBox2d getActor() {
-        return actor;
     }
 
 }

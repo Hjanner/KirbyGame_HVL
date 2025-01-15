@@ -18,18 +18,22 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class PlatformMoved extends ActorWithBox2d {
 
+// Atributos
+    // Texturas la plataforma
     private Texture platformTexture;
     private TextureRegion platformTextureRegion;
     private Sprite platformSprite;
 
+    // Variables para el movimiento de la plataforma
     private static final float MOVEMENT_SPEED = 30f;
     private static final float CAMBIO_DIRECCION = 5f;
 
-    private boolean isVerticalM;  // true para vertical, false para horizontal
+    // true para vertical, false para horizontal
+    private boolean isVerticalM;
     private float duracion = 0;
     private boolean movimeintoPositivo;
 
-
+    // Constructor
     public PlatformMoved(World world, Main main, float x, float y, boolean isVerticalMovement) {
         this.world = world;
         this.main = main;
@@ -40,6 +44,7 @@ public class PlatformMoved extends ActorWithBox2d {
         loadTextures();
     }
 
+    // Creamos el cuerpo de la plataforma movil
     public void createBody(World world,float x, float y) {
 
         BodyDef bodydef = new BodyDef();
@@ -53,6 +58,7 @@ public class PlatformMoved extends ActorWithBox2d {
         shape.dispose();
     }
 
+    // Cargamos las texturas de la plataforma
     private void loadTextures () {
 
         platformTexture = main.getManager().get("assets/art/tilesets/Platform.png");
@@ -61,12 +67,14 @@ public class PlatformMoved extends ActorWithBox2d {
         platformSprite.setSize(122.5f,12.5f);
     }
 
+    // Actualizamos la plataforma movil
     @Override
     public void act(float delta) {
         super.act(delta);
         updateMovement(delta);
     }
 
+    // Actualizamos el movimiento de la plataforma
     public void updateMovement(float delta) {
         duracion += delta;
 
@@ -93,10 +101,7 @@ public class PlatformMoved extends ActorWithBox2d {
         }
     }
 
-    public boolean isMovimientoVertical() {
-        return isVerticalM;
-    }
-
+    // Dibujamos la plataforma
     @Override
     public void draw(Batch batch, float parentAlpha) {
 
@@ -104,12 +109,11 @@ public class PlatformMoved extends ActorWithBox2d {
         platformSprite.draw(batch);
     }
 
-    public Body getBody(){
-        return this.body;
-    }
-
     @Override
     public void dispose() {
-
+        if (body != null) {
+            body.getWorld().destroyBody(body);
+            body = null;
+        }
     }
 }

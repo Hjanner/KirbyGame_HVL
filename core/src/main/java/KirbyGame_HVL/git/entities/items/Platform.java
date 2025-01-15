@@ -13,10 +13,13 @@ import com.badlogic.gdx.physics.box2d.*;
 
 public class Platform extends ActorWithBox2d implements Box2dSpace {
 
+    // Constructor
     public Platform (World world, OrthogonalTiledMapRenderer map, int layerindex) {
         createBody(world, map, layerindex);
 
     }
+
+    // Creamos el cuerpo de la plataforma
     @Override
         public void createBody(World world, OrthogonalTiledMapRenderer map, int layerindex) {
         BodyDef bodydef = new BodyDef();
@@ -34,14 +37,7 @@ public class Platform extends ActorWithBox2d implements Box2dSpace {
         shape.dispose();
     }
 
-    public void attachBody(){
-
-    }
-
-    public Body getBody(){
-        return body;
-    }
-
+    // Actualizamos la plataforma
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -50,6 +46,9 @@ public class Platform extends ActorWithBox2d implements Box2dSpace {
 
     @Override
     public void dispose() {
-
+        if (body != null) {
+            body.getWorld().destroyBody(body);
+            body = null;
+        }
     }
 }

@@ -20,6 +20,9 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.math.MathUtils;
 
 public class BrontoBurt extends Enemy {
+
+// Atributos
+    // Texturas y animaciones del BrontoBurt
     private Texture brontoBurtFlyTexture;
     private TextureRegion brontoBurtFlyRegion;
     private TextureRegion[] brontoBurtFlyFrames;
@@ -33,17 +36,18 @@ public class BrontoBurt extends Enemy {
 
     private float duration = 0;
     private float startY;
-    private float amplitude = 30f;                          // amplitud del movimiento ondulado
-    private float frequency = 2f;                           // frecuencia cambio de  movimiento
-    private float time = 0;                                 // tiempo para el movimiento ondulado
 
+    // Estados del BrontoBurt
     private StateManager stateManager;
     private FlyStateBrontoBurt flyBrontoBurt;
     private DieStateBrontoBurt dieBrontoBurt;
     private AtractStateBrontoBurt atractBrontoBurt;
     private Die2StateBrontoBurt die2BrontoBurt;
+
+    // Bandera para el dispose
     private boolean isDisposed = false;
 
+    // Constructor
     public BrontoBurt(World world, Main main, float x, float y) {
         this.world = world;
         this.main = main;
@@ -60,11 +64,65 @@ public class BrontoBurt extends Enemy {
         loadTextures();
     }
 
+    // Setters y Getters
+
+    public World getWorld() {
+        return this.world;
+    }
+
+    public float getStartY() {
+        return startY;
+    }
+
+    @Override
+    public void setFlipX(boolean flipX) {
+        this.flipX = flipX;
+    }
+
+    @Override
+    public boolean getFlipX() {
+        return flipX;
+    }
+
+    public void setAnimation(EnumStateEnemy typeState) {
+        switch (typeState) {
+            case FLY:
+                currentAnimation = flyAnimation;
+                break;
+            case DIE:
+                currentAnimation = dieAnimation;
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void setState(EnumStateEnemy typeState) {
+        switch (typeState) {
+            case FLY:
+                stateManager.setState(flyBrontoBurt);
+                break;
+            case DIE:
+                stateManager.setState(dieBrontoBurt);
+                break;
+            case ATRACT:
+                stateManager.setState(atractBrontoBurt);
+                break;
+            case DIE2:
+                stateManager.setState(die2BrontoBurt);
+                break;
+            default:
+                break;
+        }
+    }
+
+    // Creamos el cuerpo del BrontoBurt
     @Override
     public void createBody(World world, float x, float y) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(x, y);
-        bodyDef.type = BodyDef.BodyType.DynamicBody;      // KinematicBody no lo afecta la gravedad
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
 
         CircleShape shape = new CircleShape();
@@ -83,6 +141,7 @@ public class BrontoBurt extends Enemy {
         shape.dispose();
     }
 
+    // Cargamos las texturas y animaciones
     private void loadTextures() {
         brontoBurtFlyTexture = main.getManager().get("assets/art/sprites/spritesBrontoBurt/BrontoBurtFly.png");
         brontoBurtFlyRegion = new TextureRegion(brontoBurtFlyTexture, 96, 32);
@@ -108,12 +167,14 @@ public class BrontoBurt extends Enemy {
         currentAnimation = flyAnimation;
     }
 
+    // Dibujamos el BrontoBurt
     @Override
     public void draw(Batch batch, float parentAlpha) {
         brontoBurtSprite.setPosition(body.getPosition().x - 12, body.getPosition().y - 6);
         brontoBurtSprite.draw(batch);
     }
 
+    // Actualizamos el BrontoBurt
     @Override
     public void act(float delta) {
         if (isDisposed) {
@@ -124,21 +185,7 @@ public class BrontoBurt extends Enemy {
         updateAnimation(delta);
     }
 
-
-
-    public void setAnimation(EnumStateEnemy typeState) {
-        switch (typeState) {
-            case FLY:
-                currentAnimation = flyAnimation;
-                break;
-            case DIE:
-                currentAnimation = dieAnimation;
-                break;
-            default:
-                break;
-        }
-    }
-
+    // Actualizamos la animacion del BrontoBurt
     @Override
     public void updateAnimation(float delta) {
         duration += delta;
@@ -147,57 +194,11 @@ public class BrontoBurt extends Enemy {
         brontoBurtSprite.setFlip(flipX, false);
     }
 
-    @Override
-    public void setState(EnumStateEnemy typeState) {
-        switch (typeState) {
-            case FLY:
-                stateManager.setState(flyBrontoBurt);
-                break;
-            case DIE:
-                stateManager.setState(dieBrontoBurt);
-                break;
-            case ATRACT:
-                stateManager.setState(atractBrontoBurt);
-                break;
-            case DIE2:
-                stateManager.setState(die2BrontoBurt);
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public void setFlipX(boolean flipX) {
-        this.flipX = flipX;
-    }
-
-    @Override
-    public boolean getFlipX() {
-        return flipX;
-    }
-
-    @Override
-    public State getcurrentState() {
-        return this.stateManager.getState();
-    }
-
+    // Eliminamos cualquier tipo de residuo
     public void dispose() {
         if (!isDisposed) {
             isDisposed = true;
             this.remove();
         }
-    }
-
-    public Body getBody() {
-        return body;
-    }
-
-    public World getWorld() {
-        return this.world;
-    }
-
-    public float getStartY() {
-        return startY;
     }
 }

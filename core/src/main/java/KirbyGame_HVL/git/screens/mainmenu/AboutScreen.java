@@ -16,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 public class AboutScreen extends Pantalla {
+
+    // Atributos
     private static final Color LIGHT_PINK = new Color(1, 0.8f, 0.9f, 1);
 
     private Stage stage;
@@ -29,6 +31,7 @@ public class AboutScreen extends Pantalla {
     private SpriteBatch batch;
     private Sound soundClick;
 
+    // Constructor
     public AboutScreen(Main main) {
 
         super(main);
@@ -81,6 +84,7 @@ public class AboutScreen extends Pantalla {
         createDialog();
     }
 
+    // Creamos los dialogos
     private void createDialog() {
 
         informationDialog = new Dialog("    Informacion del Proyecto", skin) {

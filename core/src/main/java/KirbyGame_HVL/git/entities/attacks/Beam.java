@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.*;
 
 public class Beam extends Attack {
 
+    // Atributos
     private Texture beamTexture;
     private TextureRegion beamRegion;
     private TextureRegion[] beamFrames;
@@ -19,6 +20,7 @@ public class Beam extends Attack {
     private Animation beamAnimation;
     private Animation currentAnimation;
 
+    // Constructor
     public Beam (World world, ActorWithBox2d actor, boolean sentido) {
         this.world = world;
         this.actor = actor;
@@ -30,6 +32,7 @@ public class Beam extends Attack {
         createBody(this.world, this.actor, sentido);
     }
 
+    // Cargamos las texturas y animaciones del Rayo
     private void load_textures() {
         if (actor instanceof Kirby) {
             beamTexture = new Texture("assets/art/sprites/SpritesAttacks/BeamKirby.png");
@@ -72,6 +75,7 @@ public class Beam extends Attack {
         currentAnimation = beamAnimation;
     }
 
+    // Creamos el cuerpo del Rayo
     @Override
     public void createBody(World world, ActorWithBox2d actor, boolean direction) {
 
@@ -114,6 +118,7 @@ public class Beam extends Attack {
         shape.dispose();
     }
 
+    // Dibujamos el Rayo
     @Override
     public void draw(Batch batch, float parentAlpha) {
 
@@ -131,12 +136,13 @@ public class Beam extends Attack {
 
     }
 
+    // Actualizamos el Rayo
     @Override
     public void act(float delta) {
         super.act(delta);
         updateAnimation(delta);
         accumulatedtimer += delta;
-        // autodestruccion automatica del fuego  de cierto tiempo
+        // Eliminamos el Rayo despues de cierto tiempo
         if (actor instanceof Kirby) {
             if (accumulatedtimer > 0.7f) {
                 if (world != null && body != null) {
@@ -161,10 +167,18 @@ public class Beam extends Attack {
 
     }
 
+    // Actualizamos las animaciones del Rayo
     private void updateAnimation(float delta) {
         duracion += delta;
         TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duracion, true);
         beamSprite.setRegion(frame);
         beamSprite.setFlip(sentido, false);
+    }
+
+    public void dispose() {
+        if (beamTexture != null) {
+            beamTexture.dispose();
+            beamTexture = null;
+        }
     }
 }

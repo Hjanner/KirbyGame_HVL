@@ -73,7 +73,7 @@ public class DamageStateKirby extends StateKirby {
                 kirby.setSensorkirby(null);
             }
 
-            if (acummulatedtimer2 > 1.5f) {
+            if (acummulatedtimer2 > 1f) {
                 if (!kirby.getColisionSuelo()) {
                     kirby.setState(EnumStates.FALL);
                     kirby.setDuracion(0);

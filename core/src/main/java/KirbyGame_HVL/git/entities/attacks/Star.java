@@ -11,13 +11,15 @@ import com.badlogic.gdx.physics.box2d.*;
 
 public class Star extends Attack {
 
+    // Atributos
     private Texture kirbyStarTexture;
     private TextureRegion kirbyStarRegion;
     private TextureRegion [] kirbyframesStar;
     private Animation kirbyanimationStar;
     private Sprite kirbyStarsprite;
-    private static final float STAR_LIFETIME = 2f;
+    private static final float STAR_LIFETIME = 1.5f;
 
+    // Constructor
     public Star (World world, ActorWithBox2d actor, boolean sentido) {
         this.world = world;
         this.actor = actor;
@@ -30,6 +32,7 @@ public class Star extends Attack {
 
     }
 
+    // Cargamos las texturas y animaciones de la estrella
     private void load_animation() {
         kirbyStarTexture = new Texture("assets/art/sprites/SpritesAttacks/kirbyStar.png");
         kirbyStarRegion = new TextureRegion(kirbyStarTexture, 128,32);
@@ -50,13 +53,14 @@ public class Star extends Attack {
 
     }
 
-
+    // Dibujamos la estrella
     @Override
     public void draw(Batch batch, float parentAlpha) {
         this.kirbyStarsprite.setPosition(body.getPosition().x - 6,body.getPosition().y - 4);
         this.kirbyStarsprite.draw(batch);
     }
 
+    // Creamos el cuerpo de la estrella
     @Override
     public void createBody (World world, ActorWithBox2d actor, boolean sentido) {
         BodyDef bodyDef = new BodyDef();
@@ -76,10 +80,7 @@ public class Star extends Attack {
         shape.dispose();
     }
 
-    public Body getBody () {
-        return fixture.getBody();
-    }
-
+    // Actualizamos la estrella
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -89,21 +90,19 @@ public class Star extends Attack {
         kirbyStarsprite.flip(sentido,false);
         this.accumulatedtimer += delta;
 
-        //este metodo esta al peloooo pelucha
+        // Eliminamos la estrella despues de un cierto tiempo
         if (accumulatedtimer > STAR_LIFETIME) {
             if (world != null && body != null) {
-                world.destroyBody(body);            //Eliminacion directa del cuerpo fisico ojito! se ejecuta antes de eliminar el actor para evitar referencias fisicas residuales
+                // Eliminacion directa del cuerpo fisico ojito! se ejecuta antes de eliminar el actor para evitar referencias fisicas residuales
+                world.destroyBody(body);
                 body = null;
             }
-            remove();                                //se elimina al actor del stage
-            dispose();                              //elimina cualquier textura o recurso asociado con la nube
+            // Se elimina al actor del stage
+            remove();
+            // Elimina cualquier textura o recurso asociado con la nube
+            dispose();
         }
     }
-
-    public ActorWithBox2d getActor() {
-        return actor;
-    }
-
 
     public void dispose() {
         if (kirbyStarTexture != null) {

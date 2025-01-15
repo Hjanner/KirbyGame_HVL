@@ -12,11 +12,12 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class Spikes extends ActorWithBox2d implements Box2dSpace {
 
+    // Constructor
     public Spikes (World world, OrthogonalTiledMapRenderer map, int layerindex) {
         createBody (world, map, layerindex);
     }
 
-
+    // Creamos el cuerpo de los pinchos
     @Override
     public void createBody(World world, OrthogonalTiledMapRenderer map, int layerindex) {
         BodyDef bodydef = new BodyDef();

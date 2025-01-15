@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public abstract class Enemy extends ActorWithBox2d {
 
+    // Atributos
     protected World world;
     protected Body body;
     protected Fixture fixture;
@@ -31,7 +32,6 @@ public abstract class Enemy extends ActorWithBox2d {
 
     public abstract void setState(EnumStateEnemy typeState);
     public abstract void setAnimation (EnumStateEnemy typestate);
-    public abstract State getcurrentState();
 
     public Body getBody() {
         return body;

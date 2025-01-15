@@ -13,11 +13,13 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class CloudKirby extends Attack {
 
+    // Atributos
     private Texture kirbyCloudTexture;
     private TextureRegion kirbyCloudRegion;
     private Sprite kirbycloudsprite;
     private static final float CLOUD_LIFETIME = 0.8f;
 
+    // Constructor
     public CloudKirby (World world, ActorWithBox2d actor, boolean sentido) {
         this.world = world;
         this.actor = actor;
@@ -32,12 +34,14 @@ public class CloudKirby extends Attack {
 
     }
 
+    // Dibujamos la nube
     @Override
     public void draw(Batch batch, float parentAlpha) {
         this.kirbycloudsprite.setPosition(body.getPosition().x - 12,body.getPosition().y - 4);
         this.kirbycloudsprite.draw(batch);
     }
 
+    // Creamos el cuerpo de la nube
     @Override
     public void createBody (World world, ActorWithBox2d actor, boolean sentido) {
         BodyDef bodyDef = new BodyDef();
@@ -57,24 +61,24 @@ public class CloudKirby extends Attack {
         shape.dispose();
     }
 
-    public Body getBody () {
-        return fixture.getBody();
-    }
-
+    // Actualizamos la nube
     @Override
     public void act(float delta) {
         super.act(delta);
         this.accumulatedtimer += delta;
 
-        //este metodo esta al peloooo pelucha
+        // Eliminamos la nube despues de un cierto tiempo
         if (accumulatedtimer > CLOUD_LIFETIME) {
             if (world != null && body != null) {
-                world.destroyBody(body);            //Eliminacion directa del cuerpo fisico ojito! se ejecuta antes de eliminar el actor para evitar referencias fisicas residuales
+                // Eliminacion directa del cuerpo fisico ojito! se ejecuta antes de eliminar el actor para evitar referencias fisicas residuales
+                world.destroyBody(body);
                 body = null;
 
             }
-            remove();                                //se elimina al actor del stage
-            dispose();                              //elimina cualquier textura o recurso asociado con la nube
+            // Se elimina al actor del stage
+            remove();
+            // Elimina cualquier textura o recurso asociado con la nube
+            dispose();
         }
 
     }

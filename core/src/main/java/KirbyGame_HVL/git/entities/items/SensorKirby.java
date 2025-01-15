@@ -9,8 +9,10 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class SensorKirby extends ActorWithBox2d {
 
+    // Atributos
     private Kirby kirby;
 
+    // Constructor
     public SensorKirby (World world, Kirby kirby, boolean sentido) {
         this.world = world;
         this.kirby = kirby;
@@ -18,6 +20,13 @@ public class SensorKirby extends ActorWithBox2d {
 
     }
 
+    // Setters y Getters
+
+    public World getWorld () {
+        return this.world;
+    }
+
+    // Creamos el cuerpo del sensor
     private void createBody(World world, Kirby kirby, boolean sentido) {
         BodyDef bodyDef = new BodyDef();
         if (sentido) {
@@ -36,18 +45,13 @@ public class SensorKirby extends ActorWithBox2d {
         shape.dispose();
     }
 
-    public Body getBody () {
-        return body;
-    }
-
-    public World getWorld () {
-        return this.world;
-    }
-
 
 
     @Override
     public void dispose() {
-
+        if (body != null) {
+            body.getWorld().destroyBody(body);
+            body = null;
+        }
     }
 }

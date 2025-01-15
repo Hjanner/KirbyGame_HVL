@@ -11,19 +11,27 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.*;
 
 public class Key extends ActorWithBox2d {
+
+// Atributos
+    // Texturas y animacion
     private Texture keyTexture;
     private TextureRegion keyTextureRegion;
     private TextureRegion[] keyFrames;
     private Animation keyAnimation;
     private Sprite keySprite;
-    private Main main;
+
     private boolean isCollected;
     private float originalY;
     private float time;
-    private final float FLOAT_AMPLITUDE = 5f;        // que tanto flota arriba y abajo
-    private final float FLOAT_SPEED = 3f;           // velocidad  animation
+
+    // que tanto flota arriba y abajo
+    private final float FLOAT_AMPLITUDE = 5f;
+
+    // velocidad  animation
+    private final float FLOAT_SPEED = 3f;
     private float duracion;
 
+    // Constructor
     public Key(World world, Main main, float x, float y) {
         this.world = world;
         this.main = main;
@@ -35,6 +43,7 @@ public class Key extends ActorWithBox2d {
         loadTextures();
     }
 
+    // Cargamos las texturas y animaciones
     private void loadTextures() {
         keyTexture = main.getManager().get("assets/art/sprites/spritesItems/Key.png");
         keyTextureRegion = new TextureRegion(keyTexture, 480, 32);
@@ -54,7 +63,7 @@ public class Key extends ActorWithBox2d {
         keySprite.setSize(25, 25);
     }
 
-
+    // Creamos el cuerpo de la llave
     private void createBody(World world, float x, float y) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(x, y);
@@ -67,7 +76,8 @@ public class Key extends ActorWithBox2d {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.isSensor = true;                         // sensor
+        // Sensor
+        fixtureDef.isSensor = true;
 
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
@@ -75,6 +85,7 @@ public class Key extends ActorWithBox2d {
         shape.dispose();
     }
 
+    // Dibujamos la llave
     @Override
     public void draw(Batch batch, float parentAlpha) {
         if (!isCollected) {
@@ -83,6 +94,7 @@ public class Key extends ActorWithBox2d {
         }
     }
 
+    // Actualizamos la llave
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -104,10 +116,7 @@ public class Key extends ActorWithBox2d {
         return isCollected;
     }
 
-    public Body getBody () {
-        return fixture.getBody();
-    }
-
+    // Eliminamos cualquier tipo de residuo
     public void dispose() {
         if (keyTexture != null) {
             keyTexture.dispose();

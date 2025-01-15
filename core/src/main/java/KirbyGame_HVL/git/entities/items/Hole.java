@@ -12,9 +12,12 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class Hole extends ActorWithBox2d implements Box2dSpace {
 
+    // Constructor
     public Hole (World world, OrthogonalTiledMapRenderer map, int layerindex) {
         createBody(world, map, layerindex);
     }
+
+    // Creamos los agujeros
     @Override
     public void createBody(World world, OrthogonalTiledMapRenderer map, int layerindex) {
 
@@ -36,6 +39,9 @@ public class Hole extends ActorWithBox2d implements Box2dSpace {
 
     @Override
     public void dispose() {
-
+        if (body != null) {
+            body.getWorld().destroyBody(body);
+            body = null;
+        }
     }
 }

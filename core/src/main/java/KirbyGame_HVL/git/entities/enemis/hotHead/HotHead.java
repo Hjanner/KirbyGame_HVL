@@ -19,7 +19,8 @@ import com.badlogic.gdx.physics.box2d.*;
 
 public class HotHead extends Enemy {
 
-
+// Atributos
+    // Texturas y animaciones del HotHead
     private Texture hotHeadWalkTexture;
     private Texture hotHeadDieTexture;
     private Texture hotHeadDie2Texture;
@@ -42,8 +43,10 @@ public class HotHead extends Enemy {
     private boolean isDead = false;
     private boolean isDisposed = false;
 
+    // Bandera para verificar si puede lanzar la bola de fuego
     private boolean canShootFire;
 
+    // Estados del HotHead
     private StateManager stateManager;
     private WalkStateHotHead stateWalk;
     private DieStateHotHead stateDie;
@@ -51,6 +54,7 @@ public class HotHead extends Enemy {
     private AtractStateHotHead stateAtract;
     private AttackStateHotHead stateAttack;
 
+    // Constructor
     public HotHead(World world, Main main, float x, float y) {
         this.world = world;
         this.main = main;
@@ -67,6 +71,8 @@ public class HotHead extends Enemy {
         createBody(world, x, y);
         loadTextures();
     }
+
+    // Setters y Getters
 
     @Override
     public boolean getFlipX () {
@@ -86,106 +92,8 @@ public class HotHead extends Enemy {
         return canShootFire;
     }
 
-    public Body getBody() {return body;}
-
     public World getWorld () {
         return this.world;
-    }
-
-    @Override
-    public State getcurrentState() {
-        return stateManager.getState();
-    }
-
-
-    public void createBody(World world, float x, float y) {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(x, y);
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        body = world.createBody(bodyDef);
-
-        CircleShape shape = new CircleShape();
-        shape.setRadius(4.5f);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 0.1f;
-        fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.1f;
-
-        fixture = body.createFixture(fixtureDef);
-        fixture.setUserData(this);
-
-        body.setFixedRotation(true);
-        shape.dispose();
-    }
-
-
-    private void loadTextures() {
-        hotHeadWalkTexture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadWalk.png");
-        hotHeadWalkRegion = new TextureRegion(hotHeadWalkTexture, 256, 32);
-        hotHeadDieTexture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadDie.png");
-        hotHeadDieRegion = new TextureRegion(hotHeadDieTexture, 32,32);
-        hotHeadDie2Texture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadDie2.png");
-        hotHeadDie2Region = new TextureRegion(hotHeadDie2Texture, 32,32);
-        hotHeadAttackTexture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadAttack.png");
-        hotHeadAttackRegion = new TextureRegion(hotHeadAttackTexture, 384,32);
-        hotHeadSprite = new Sprite(hotHeadWalkRegion);
-        hotHeadSprite.setSize(18, 18);
-
-        TextureRegion[][] tempFramesWalk = hotHeadWalkRegion.split(256/8, 32);
-        TextureRegion[][] tempFramesAttack = hotHeadAttackRegion.split(384/12,32);
-        hotHeadWalkFrames = new TextureRegion[tempFramesWalk.length * tempFramesWalk[0].length];
-        hotHeadDieFrames = new TextureRegion[1];
-        hotHeadDie2Frames = new TextureRegion[1];
-        hotHeadAttackFrames = new TextureRegion[tempFramesAttack.length * tempFramesAttack[0].length];
-        hotHeadDieFrames[0] = hotHeadDieRegion;
-        hotHeadDie2Frames[0] = hotHeadDie2Region;
-
-
-        int index = 0;
-        for (int i = 0; i < tempFramesWalk.length; i++) {
-            for (int j = 0; j < tempFramesWalk[i].length; j++) {
-                hotHeadWalkFrames[index] = tempFramesWalk[i][j];
-                index++;
-            }
-        }
-
-        index = 0;
-        for (int i = 0; i < tempFramesAttack.length; i++) {
-            for (int j = 0; j < tempFramesAttack[i].length; j++) {
-                hotHeadAttackFrames[index] = tempFramesAttack[i][j];
-                index++;
-            }
-        }
-
-        HotHeadWalkAnimation = new Animation(0.15f, hotHeadWalkFrames);
-        HotHeadDieAnimation = new Animation(1f, hotHeadDieFrames);
-        HotHeadDie2Animation = new Animation(1f, hotHeadDie2Frames);
-        HotHeadAttackAnimation = new Animation(0.1f, hotHeadAttackFrames);
-        currentAnimation = HotHeadWalkAnimation;
-    }
-
-    @Override
-    public void act(float delta) {
-        if (isDisposed) {
-            return;
-        }
-        super.act(delta);
-        stateManager.update(delta);
-        updateAnimation(delta);
-    }
-
-    public void shootFire() {
-        Fire fire = new Fire(world, this, !flipX);
-        getStage().addActor(fire);
-    }
-
-    public void updateAnimation(float delta) {
-        duration += delta;
-        TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duration, true);
-        hotHeadSprite.setRegion(frame);
-        hotHeadSprite.setFlip(flipX, false);
     }
 
     @Override
@@ -235,6 +143,101 @@ public class HotHead extends Enemy {
         }
     }
 
+    // Creamos el cuerpo del HotHead
+    public void createBody(World world, float x, float y) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(x, y);
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        body = world.createBody(bodyDef);
+
+        CircleShape shape = new CircleShape();
+        shape.setRadius(4.5f);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 0.1f;
+        fixtureDef.friction = 0.4f;
+        fixtureDef.restitution = 0.1f;
+
+        fixture = body.createFixture(fixtureDef);
+        fixture.setUserData(this);
+
+        body.setFixedRotation(true);
+        shape.dispose();
+    }
+
+    // Cargamos las texturas y animaciones
+    private void loadTextures() {
+        hotHeadWalkTexture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadWalk.png");
+        hotHeadWalkRegion = new TextureRegion(hotHeadWalkTexture, 256, 32);
+        hotHeadDieTexture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadDie.png");
+        hotHeadDieRegion = new TextureRegion(hotHeadDieTexture, 32,32);
+        hotHeadDie2Texture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadDie2.png");
+        hotHeadDie2Region = new TextureRegion(hotHeadDie2Texture, 32,32);
+        hotHeadAttackTexture = main.getManager().get("assets/art/sprites/spritesHotHead/HotHeadAttack.png");
+        hotHeadAttackRegion = new TextureRegion(hotHeadAttackTexture, 384,32);
+        hotHeadSprite = new Sprite(hotHeadWalkRegion);
+        hotHeadSprite.setSize(18, 18);
+
+        TextureRegion[][] tempFramesWalk = hotHeadWalkRegion.split(256/8, 32);
+        TextureRegion[][] tempFramesAttack = hotHeadAttackRegion.split(384/12,32);
+        hotHeadWalkFrames = new TextureRegion[tempFramesWalk.length * tempFramesWalk[0].length];
+        hotHeadDieFrames = new TextureRegion[1];
+        hotHeadDie2Frames = new TextureRegion[1];
+        hotHeadAttackFrames = new TextureRegion[tempFramesAttack.length * tempFramesAttack[0].length];
+        hotHeadDieFrames[0] = hotHeadDieRegion;
+        hotHeadDie2Frames[0] = hotHeadDie2Region;
+
+
+        int index = 0;
+        for (int i = 0; i < tempFramesWalk.length; i++) {
+            for (int j = 0; j < tempFramesWalk[i].length; j++) {
+                hotHeadWalkFrames[index] = tempFramesWalk[i][j];
+                index++;
+            }
+        }
+
+        index = 0;
+        for (int i = 0; i < tempFramesAttack.length; i++) {
+            for (int j = 0; j < tempFramesAttack[i].length; j++) {
+                hotHeadAttackFrames[index] = tempFramesAttack[i][j];
+                index++;
+            }
+        }
+
+        HotHeadWalkAnimation = new Animation(0.15f, hotHeadWalkFrames);
+        HotHeadDieAnimation = new Animation(1f, hotHeadDieFrames);
+        HotHeadDie2Animation = new Animation(1f, hotHeadDie2Frames);
+        HotHeadAttackAnimation = new Animation(0.1f, hotHeadAttackFrames);
+        currentAnimation = HotHeadWalkAnimation;
+    }
+
+    // Actualizamos el HotHead
+    @Override
+    public void act(float delta) {
+        if (isDisposed) {
+            return;
+        }
+        super.act(delta);
+        stateManager.update(delta);
+        updateAnimation(delta);
+    }
+
+    // Lanzar la Bola de Fuego
+    public void shootFire() {
+        Fire fire = new Fire(world, this, !flipX);
+        getStage().addActor(fire);
+    }
+
+    // Actualizamos las animaciones del HotHead
+    public void updateAnimation(float delta) {
+        duration += delta;
+        TextureRegion frame = (TextureRegion) currentAnimation.getKeyFrame(duration, true);
+        hotHeadSprite.setRegion(frame);
+        hotHeadSprite.setFlip(flipX, false);
+    }
+
+    // Dibujamos el HotHead
     @Override
     public void draw(Batch batch, float parentAlpha) {
         if (isDisposed || isDead) {

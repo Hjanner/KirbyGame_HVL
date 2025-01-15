@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public abstract class Pantalla implements Screen {
+
+    // Atributos
     protected Main main;
     protected Stage uiStage;
     protected Dialog controlsDialog;
@@ -21,6 +23,7 @@ public abstract class Pantalla implements Screen {
     protected Skin skin;
     protected InputMultiplexer inputMultiplexer;
 
+    // Constructor
     public Pantalla(Main main) {
         this.main = main;
         this.uiStage = new Stage();
@@ -100,8 +103,4 @@ public abstract class Pantalla implements Screen {
 
     @Override
     public void resume() {}
-
-    protected void addInputProcessor(InputProcessor processor) {
-        inputMultiplexer.addProcessor(processor);
-    }
 }

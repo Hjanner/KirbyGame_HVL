@@ -16,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 public class HelpScreen extends Pantalla {
+
+    // Atributos
     private static final Color LIGHT_PINK = new Color(1, 0.8f, 0.9f, 1);
 
     private Stage stage;
@@ -29,6 +31,7 @@ public class HelpScreen extends Pantalla {
     private SpriteBatch batch;
     private Sound soundClick;
 
+    // Constructor
     public HelpScreen(Main main) {
 
         super(main);
@@ -48,6 +51,7 @@ public class HelpScreen extends Pantalla {
         Gdx.input.setInputProcessor(stage);
     }
 
+    // Creamos las tablas y titulo de la pantalla
     private void setupMainMenu() {
         mainTable = new Table();
         mainTable.setFillParent(true);
@@ -74,6 +78,7 @@ public class HelpScreen extends Pantalla {
         stage.addActor(mainTable);
     }
 
+    // Creamos los dialogos
     private void createDialogs() {
         // controles
         controlsDialog = new Dialog("\n   Controles del Juego", skin) {
@@ -145,6 +150,7 @@ public class HelpScreen extends Pantalla {
         scoreDialog.pad(90);
     }
 
+    // Registra los eventos del mouse si se presiono un boton
     private void setupButtonListeners() {
         controlsButton.addListener(new ChangeListener() {
             @Override
