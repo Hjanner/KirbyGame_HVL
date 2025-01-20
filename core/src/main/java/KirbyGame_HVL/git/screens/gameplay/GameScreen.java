@@ -44,7 +44,7 @@ import java.util.Map;
 import com.badlogic.gdx.graphics.Texture;
 
 
-public class GameScreen extends Pantalla implements ContactListener, Screen {
+public class GameScreen extends Pantalla implements ContactListener {
 
     // Escenario y Mundo
     private Stage stage;
@@ -256,7 +256,7 @@ public class GameScreen extends Pantalla implements ContactListener, Screen {
             MusicManager.stop();
             GamePanelLaberinto minigame2 = new GamePanelLaberinto(main, minigameManager);
             main.setScreen(minigame2);
-        } else if (nivel == 3) {
+        } else if (nivel == 3){
             MusicManager.stop();
             endGame();
         }

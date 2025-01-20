@@ -383,6 +383,7 @@ public class Kirby extends ActorWithBox2d {
     }
 
     public void setcurrentEnemy (Enemy currentEnemy) {
+
         this.currentEnemy = currentEnemy;
     }
 
@@ -403,6 +404,7 @@ public class Kirby extends ActorWithBox2d {
     }
 
     public void setPoder (boolean poder) {
+
         this.poder = poder;
     }
 

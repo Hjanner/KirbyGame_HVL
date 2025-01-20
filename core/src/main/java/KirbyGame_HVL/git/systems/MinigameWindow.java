@@ -1,8 +1,9 @@
 package KirbyGame_HVL.git.systems;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 
-public abstract class MinigameWindow extends Game {
+public abstract class MinigameWindow extends Game implements Screen {
 
     // Atributos
     protected MinigameManager manager;
