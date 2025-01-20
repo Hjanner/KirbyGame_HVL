@@ -1,13 +1,10 @@
 package KirbyGame_HVL.git.entities.items;
 
-import KirbyGame_HVL.git.entities.States.StateManager;
-
 import KirbyGame_HVL.git.entities.player.ActorWithBox2d;
 import KirbyGame_HVL.git.entities.player.Box2dSpace;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.*;
 

@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class GamePanelCulebrita extends MinigameWindow implements Screen {
+public class GamePanelCulebrita extends MinigameWindow {
 
     // Atributos
     private OrthographicCamera camera;

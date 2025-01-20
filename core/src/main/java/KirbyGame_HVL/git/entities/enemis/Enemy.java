@@ -14,10 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 public abstract class Enemy extends ActorWithBox2d {
 
     // Atributos
-    protected World world;
-    protected Body body;
-    protected Fixture fixture;
-    protected Main main;
     protected boolean flipX;
     protected EnumEnemyType type;
     protected float duration = 0;

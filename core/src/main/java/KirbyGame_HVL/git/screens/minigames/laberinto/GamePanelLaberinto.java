@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class GamePanelLaberinto extends MinigameWindow implements Screen {
+public class GamePanelLaberinto extends MinigameWindow {
 
     // Atributos
     private OrthographicCamera camera;
